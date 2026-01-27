@@ -4,7 +4,7 @@
 
 Build, edit, debug, backup, maintain n8n workflows and the n8n installation with Claude Code.
 
-Built using Private infrastructure documentation for a production Coolify + n8n stack.
+How?  By using Private infrastructure documentation for a production Coolify + n8n stack + n8n MCP server + n8n Skill (details below).
 
 Our Open-Source n8n "Launchpad" production repo: https://github.com/moshehbenavraham/n8n-aiwithapex
 
