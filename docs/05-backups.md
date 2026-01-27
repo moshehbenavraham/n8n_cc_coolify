@@ -1,6 +1,6 @@
 # Backup Commands
 
-Server: See .env for server details | OS: Ubuntu 24.04 LTS
+WSL2 Ubuntu | Docker Compose | ngrok
 
 ---
 
@@ -9,32 +9,37 @@ Server: See .env for server details | OS: Ubuntu 24.04 LTS
 ```bash
 # Source environment variables first
 source .env
+cd $N8N_DEPLOYMENT_PATH
 
 # Full backup
-sudo docker exec $(sudo docker ps -qf name=postgres-$N8N_NETWORK_ID) pg_dump -U $N8N_DB_USERNAME -d n8n > n8n_backup_$(date +%Y%m%d).sql
+docker compose exec postgres pg_dump -U $N8N_DB_USERNAME -d n8n > n8n_backup_$(date +%Y%m%d).sql
 
 # Workflows only
-sudo docker exec $(sudo docker ps -qf name=postgres-$N8N_NETWORK_ID) pg_dump -U $N8N_DB_USERNAME -d n8n -t workflow_entity > n8n_workflows_$(date +%Y%m%d).sql
+docker compose exec postgres pg_dump -U $N8N_DB_USERNAME -d n8n -t workflow_entity > n8n_workflows_$(date +%Y%m%d).sql
 ```
 
-## Agent Memory Backup
+## n8n Data Volume Backup
 
 ```bash
 # Source environment variables first
 source .env
+cd $N8N_DEPLOYMENT_PATH
 
-sudo docker exec $AGENT_MEMORY_CONTAINER_ID pg_dump -U $AGENT_MEMORY_DB_USERNAME -d $AGENT_MEMORY_DB_NAME > agent_memory_backup_$(date +%Y%m%d).sql
+# Backup n8n data volume
+docker run --rm -v n8n_n8n-data:/data -v $(pwd):/backup alpine tar czf /backup/n8n_data_$(date +%Y%m%d).tar.gz -C /data .
 ```
 
-## Coolify Backup
+## Restore Database
 
 ```bash
 # Source environment variables first
 source .env
+cd $N8N_DEPLOYMENT_PATH
 
-sudo docker exec coolify-db pg_dump -U $COOLIFY_DB_USERNAME > coolify_backup_$(date +%Y%m%d).sql
+# Restore from backup
+cat n8n_backup_YYYYMMDD.sql | docker compose exec -T postgres psql -U $N8N_DB_USERNAME -d n8n
 ```
 
 ---
 
-*Documentation generated: 2026-01-18*
+*Documentation generated: 2026-01-27*

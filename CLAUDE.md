@@ -14,7 +14,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is an infrastructure documentation project for a production Coolify + n8n + PostgreSQL stack. Server details are in the .env file.
+This is a resource project to enable you to build, edit, and debug n8n workflows.  It includes a specialized n8n MCP server, specialized n8n Skills, and infrastructure documentation for a local WSL2 Ubuntu Docker + ngrok n8n stack.
+
+**Actual Deployment**: The n8n Docker stack runs at `$N8N_DEPLOYMENT_PATH` (see .env) - you can directly access this as needed for reference/information but should not edit.
 
 **Documentation**: See `docs/` folder (index: `docs/README_docs.md`)
 
@@ -68,13 +70,14 @@ Packages load at runtime. Full list: https://pyodide.org/en/stable/usage/package
 
 ## Deployment
 
-**GitHub Repo**: `moshehbenavraham/n8n-aiwithapex` (branch: `main`)
+**Deployment Path**: `$N8N_DEPLOYMENT_PATH` (see .env)
 
-Commits to `main` automatically trigger Coolify to rebuild and deploy the n8n stack. The repo contains `docker-compose.coolify.yml` and related configuration.
+The n8n stack runs locally via Docker Compose in WSL2 Ubuntu. Public access is provided via ngrok tunnel.
+
+**GitHub Repo**: `moshehbenavraham/n8n-aiwithapex` (branch: `main`)
 
 ## Project-Specific Rules
 
-- Use Coolify dashboard or API for deployments when possible
-- Avoid manual Docker changes that bypass Coolify
-- Container IDs change on redeployment; verify with `docker ps`
+- Container management uses standard `docker compose` commands
+- Run commands from the deployment directory: `cd $N8N_DEPLOYMENT_PATH`
 - Source `.env` before running database commands

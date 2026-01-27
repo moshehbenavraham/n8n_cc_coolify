@@ -1,35 +1,33 @@
 # Network Topology
 
-Server: See .env for server details | OS: Ubuntu 24.04 LTS
+WSL2 Ubuntu | Docker Compose | ngrok
 
 ---
 
 ```
 Internet
     |
-[Cloudflare] ──── aiwithapex.com
+[ngrok] ──── $N8N_URL (public HTTPS)
     |
-[UFW Firewall] ──── $SERVER_IP
+    | (tunnel to localhost:5678)
     |
-[coolify-proxy/Traefik] :80/:443
+[WSL2 Ubuntu]
     |
-    ├── coolify.aiwithapex.com ──► [coolify:8080]
-    │                                    |
-    │                              [coolify-db:5432]
+[Docker Network: n8n-network]
+    |
+    ├── [n8n:5678] ──► Main n8n instance
+    │        |
+    │   ┌────┼────────────────┐
+    │   |    |                |
+    │ [worker-1] [worker-2] [worker-3]
+    │   |         |           |
+    │ [runner-1] [runner-2] [runner-3]
     │
-    └── n8n.aiwithapex.com ──► [n8n:5678]
-                                    |
-                    ┌───────────────┼───────────────┐
-                    |               |               |
-              [n8n-worker-1]  [n8n-worker-2]  [n8n-worker-3]
-                    |               |               |
-              [runner-1]      [runner-2]      [runner-3]
-                    |
-                    ├── [postgres (n8n DB):5432]
-                    ├── [redis:6379]
-                    └── [agent-memory (Postgres):5400]
+    ├── [postgres:5432] ──► n8n database
+    │
+    └── [redis:6379] ──► Queue management
 ```
 
 ---
 
-*Documentation generated: 2026-01-18*
+*Documentation generated: 2026-01-27*

@@ -4,6 +4,10 @@
 !.env.example
 *.env
 
+# MCP configuration (contains API key reference)
+.mcp.json
+!.mcp.json.example
+
 # Backup files
 *.bak
 *.backup
@@ -34,6 +38,7 @@ Thumbs.db
 # Editor/IDE
 .idea/
 .vscode/
+.claude/
 *.swp
 *.swo
 *.sublime-*
