@@ -55,6 +55,9 @@ Thumbs.db
 tmp/
 .cache/
 
+# Work directory
+work/
+
 # Node.js (if ever used)
 node_modules/
 
