@@ -1,6 +1,6 @@
 # n8n Infrastructure Documentation
 
-**Version:** 1.0.0
+**Version:** 1.1.0
 
 Build, edit, debug, backup, maintain n8n workflows and the n8n installation with Claude Code.
 
@@ -74,11 +74,12 @@ All credentials and IDs stored in `.env` (git-ignored). See `.env.example` for r
 
 ## Claude Code Tooling
 
-This project uses Claude Code with n8n-specific MCP server and skills:
+This project uses Claude Code with n8n-specific MCP servers and skills:
 
 | Tool | Source | Purpose |
 |------|--------|---------|
-| n8n MCP Server | https://github.com/czlonkowski/n8n-mcp-cc-buildier | Programmatic workflow management |
+| n8n MCP Server | https://github.com/czlonkowski/n8n-mcp-cc-buildier | Node docs, templates, validation |
+| n8n Instance MCP | https://docs.n8n.io/advanced-ai/accessing-n8n-mcp-server/ | Direct workflow execution (search, get, execute) |
 | n8n Skills | https://github.com/czlonkowski/n8n-skills | Expression syntax, validation, patterns, Code nodes |
 
 ## Deployment

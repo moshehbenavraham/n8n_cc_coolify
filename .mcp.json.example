@@ -3,6 +3,13 @@
     "n8n-mcp": {
       "command": "${CLAUDE_PROJECT_DIR}/.claude/scripts/run-n8n-mcp.sh",
       "args": []
+    },
+    "n8n-instance-mcp": {
+      "type": "http",
+      "url": "http://localhost:5678/mcp-server/http",
+      "headers": {
+        "Authorization": "Bearer your-mcp-server-token"
+      }
     }
   }
 }

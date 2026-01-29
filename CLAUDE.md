@@ -4,9 +4,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 # Important Rules / Notes
 
- - You have SUDO access, use it carefully
+ - If you have SUDO access, use it carefully
  - If committing or pushing to repo, do NOT add attributions and do NOT add co-authors
  - ASCII UTF-8 LF only
+ = Never make up URLs (you have webtools to verify!)
  - Never make assumptions
  - Do not be lazy or take shortcuts
  - Pattern match precisely
@@ -14,7 +15,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a resource project to enable you to build, edit, and debug n8n workflows.  It includes a specialized n8n MCP server, specialized n8n Skills, and infrastructure documentation for a local WSL2 Ubuntu Docker + ngrok n8n stack.
+This is a resource project to enable you to build, edit, and debug n8n workflows.  It includes specialized n8n MCP servers, specialized n8n Skills, and infrastructure documentation for a local WSL2 Ubuntu Docker + ngrok n8n stack.
 
 **Actual Deployment**: The n8n Docker stack runs at `$N8N_DEPLOYMENT_PATH` (see .env) - you can directly access this as needed for reference/information but should not edit.
 
@@ -31,6 +32,14 @@ An MCP server is connected to `$N8N_URL` (see .env) providing programmatic workf
 **Management Tools** (13): `n8n_create_workflow`, `n8n_get_workflow`, `n8n_update_full_workflow`, `n8n_update_partial_workflow`, `n8n_delete_workflow`, `n8n_list_workflows`, `n8n_validate_workflow`, `n8n_autofix_workflow`, `n8n_test_workflow`, `n8n_executions`, `n8n_health_check`, `n8n_workflow_versions`, `n8n_deploy_template`
 
 **Capabilities**: Create/read/update/delete workflows, search 500+ nodes, validate configurations, deploy templates, view execution history, auto-fix common issues, trigger webhook/form/chat workflows.
+
+## n8n Instance MCP
+
+An official lightweight MCP server for direct workflow interaction via n8n's API.
+
+**Tools** (3): `search_workflows`, `get_workflow_details`, `execute_workflow`
+
+**Capabilities**: List/search workflows, get full workflow details with trigger info, execute workflows (webhook/form/chat triggers). Requires `availableInMCP: true` in workflow settings.
 
 ## n8n Skills
 
