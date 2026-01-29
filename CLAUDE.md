@@ -30,6 +30,14 @@ An MCP server is connected to `$N8N_URL` (see .env) providing programmatic workf
 
 **Capabilities**: Create/read/update/delete workflows, search 500+ nodes, validate configurations, deploy templates, view execution history, auto-fix common issues, trigger webhook/form/chat workflows.
 
+## n8n Instance MCP
+
+An official lightweight MCP server for direct workflow interaction via n8n's API.
+
+**Tools** (3): `search_workflows`, `get_workflow_details`, `execute_workflow`
+
+**Capabilities**: List/search workflows, get full workflow details with trigger info, execute workflows (webhook/form/chat triggers). Requires `availableInMCP: true` in workflow settings.
+
 ## n8n Skills
 
 Seven specialized skills provide expert guidance for n8n workflow development:
