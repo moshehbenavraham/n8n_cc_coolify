@@ -5,17 +5,18 @@
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_DIR="$(dirname "$(dirname "$SCRIPT_DIR")")"
 
-# Source the .env file and export all variables
+# Source only the needed variables from .env (handles special characters)
 if [ -f "$PROJECT_DIR/.env" ]; then
-    export $(grep -v '^#' "$PROJECT_DIR/.env" | xargs)
+    N8N_URL=$(grep '^N8N_URL=' "$PROJECT_DIR/.env" | cut -d'=' -f2-)
+    N8N_API_KEY=$(grep '^N8N_API_KEY=' "$PROJECT_DIR/.env" | cut -d'=' -f2-)
 fi
 
-# Run the MCP server
-exec docker run --rm -i \
-    --network n8n_n8n-network \
-    -e "N8N_API_URL=http://n8n-main:5678/api/v1" \
-    -e "N8N_API_KEY=$N8N_API_KEY" \
-    -e "MCP_MODE=stdio" \
-    -e "LOG_LEVEL=error" \
-    -e "DISABLE_CONSOLE_OUTPUT=true" \
-    ghcr.io/czlonkowski/n8n-mcp:latest
+# Set n8n-mcp required environment variables
+export N8N_API_URL="${N8N_URL}/api/v1"
+export N8N_API_KEY
+export MCP_MODE="stdio"
+export LOG_LEVEL="error"
+export DISABLE_CONSOLE_OUTPUT="true"
+
+# Run the MCP server using npx
+exec npx -y n8n-mcp@latest
