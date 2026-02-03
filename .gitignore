@@ -62,3 +62,6 @@ __pycache__/
 *.pyc
 .venv/
 venv/
+
+# Voice AI
+voice_ai/
