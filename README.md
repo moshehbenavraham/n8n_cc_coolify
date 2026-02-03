@@ -1,6 +1,6 @@
 # n8n Infrastructure Documentation
 
-**Version:** 1.1.0
+**Version:** 1.2.0
 
 Build, edit, debug, backup, maintain n8n workflows and the n8n installation with Claude Code.
 
