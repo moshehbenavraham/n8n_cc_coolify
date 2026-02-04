@@ -1,6 +1,6 @@
 # n8n Infrastructure Documentation
 
-**Version:** 1.2.0
+**Version:** 1.3.0
 
 Build, edit, debug, backup, maintain n8n workflows and the n8n installation with Claude Code.
 
@@ -81,6 +81,31 @@ This project uses Claude Code with n8n-specific MCP servers and skills:
 | n8n MCP Server | https://github.com/czlonkowski/n8n-mcp-cc-buildier | Node docs, templates, validation |
 | n8n Instance MCP | https://docs.n8n.io/advanced-ai/accessing-n8n-mcp-server/ | Direct workflow execution (search, get, execute) |
 | n8n Skills | https://github.com/czlonkowski/n8n-skills | Expression syntax, validation, patterns, Code nodes |
+
+## Scripts
+
+Utility scripts in `scripts/` (source `.env` first):
+
+```bash
+source .env
+
+# Upgrade node typeVersions across all workflows
+./scripts/upgrade_node_versions.sh preview all    # Preview changes
+./scripts/upgrade_node_versions.sh apply all      # Apply upgrades
+
+# Fix and deploy workflows with validation errors
+./scripts/fix_and_deploy_workflows.sh             # Cleans non-standard properties
+
+# Bulk deploy workflows from voice_ai/workflows/
+./scripts/deploy_voice_ai_workflows.sh
+
+# Tag management (Community Edition)
+python scripts/n8n_tags.py list
+python scripts/n8n_tags.py create "My Tag"
+
+# Project management (Enterprise only)
+python scripts/n8n_projects.py list
+```
 
 ## Deployment
 

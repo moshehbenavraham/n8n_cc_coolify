@@ -85,6 +85,19 @@ The n8n stack runs locally via Docker Compose in WSL2 Ubuntu. Public access is p
 
 **GitHub Repo**: `moshehbenavraham/n8n-aiwithapex` (branch: `main`)
 
+## Scripts
+
+Utility scripts in `scripts/` folder (run from project root, source `.env` first):
+
+| Script | Purpose |
+|--------|---------|
+| `upgrade_node_versions.sh` | Batch upgrade node typeVersions across workflows. Usage: `./scripts/upgrade_node_versions.sh [preview\|apply] [workflow_id\|all]` |
+| `fix_and_deploy_workflows.sh` | Clean non-standard node properties and deploy workflows. Fixes "additional properties" API errors. |
+| `deploy_voice_ai_workflows.sh` | Bulk deploy all workflows from `voice_ai/workflows/` directory |
+| `deploy_remaining.sh` | Resume interrupted deployment (skips already-deployed workflows) |
+| `n8n_tags.py` | Tag management CLI: list, create, delete, rename tags (Community Edition) |
+| `n8n_projects.py` | Project management CLI (Enterprise only) |
+
 ## Project-Specific Rules
 
 - Container management uses standard `docker compose` commands

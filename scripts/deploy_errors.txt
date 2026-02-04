@@ -1,0 +1,7 @@
+FAILED: Process voice, images & documents with GPT-4o, MongoDB & Gmail tools - HTTP 400 - request/body/nodes/7 must NOT have additional properties
+FAILED: 🎙️ Convert voice notes to X posts with Google Drive and AssemblyAI - HTTP 400 - request/body/nodes/0 must NOT have additional properties
+FAILED: Convert voice memos to blog posts with Deepgram, GPT-3.5 & Google Sheets dashboard - HTTP 400 - request/body/nodes/1 must NOT have additional properties
+FAILED: Manage Notion to-do tasks via Telegram with voice messages & OpenAI - HTTP 400 - request/body/nodes/16 must NOT have additional properties
+FAILED: Voice & text Telegram assistant with GPT-4.1-mini and conversation memory - HTTP 400 - request/body/nodes/10 must NOT have additional properties
+FAILED: Generate AI videos from scripts with DeepSeek, TTS, and Together.ai - HTTP  - 
+FAILED: Restaurant GPT-4 receptionist for bookings & delivery using Vapi, Telegram, Airtable - HTTP  - 
