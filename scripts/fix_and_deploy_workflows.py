@@ -137,7 +137,7 @@ def deploy_workflow(workflow: dict) -> dict:
 
 
 def main():
-    base_path = Path('/home/aiwithapex/n8n_cc_coolify')
+    base_path = Path(__file__).parent.parent
 
     results = {
         'success': [],

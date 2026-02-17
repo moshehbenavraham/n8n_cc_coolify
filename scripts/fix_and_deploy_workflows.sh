@@ -4,10 +4,12 @@
 
 # Don't exit on error - continue processing
 
-# Load environment
-source /home/aiwithapex/n8n_cc_coolify/.env
+# Resolve project root from script location
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+BASE_PATH="$(dirname "$SCRIPT_DIR")"
 
-BASE_PATH="/home/aiwithapex/n8n_cc_coolify"
+# Load environment
+source "$BASE_PATH/.env"
 TEMP_FILE="/tmp/workflow_deploy.json"
 
 # Standard node properties (JSON array for jq)

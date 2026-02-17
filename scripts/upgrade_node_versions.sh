@@ -2,8 +2,12 @@
 # Batch upgrade node typeVersions across all workflows
 # Usage: ./upgrade_node_versions.sh [preview|apply] [workflow_id|all]
 
+# Resolve project root from script location
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
+
 # Extract API key directly from .env file
-N8N_API_KEY=$(grep "^N8N_API_KEY=" /home/aiwithapex/n8n_cc_coolify/.env | cut -d= -f2-)
+N8N_API_KEY=$(grep "^N8N_API_KEY=" "$PROJECT_DIR/.env" | cut -d= -f2-)
 export N8N_API_KEY
 
 MODE="${1:-preview}"

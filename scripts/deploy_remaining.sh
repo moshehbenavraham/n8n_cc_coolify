@@ -1,12 +1,16 @@
 #!/bin/bash
 # Continue deploying remaining voice_ai workflows
 
-source /home/aiwithapex/n8n_cc_coolify/.env
+# Resolve project root from script location
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
 
-WORKFLOW_DIR="/home/aiwithapex/n8n_cc_coolify/voice_ai/workflows"
+source "$PROJECT_DIR/.env"
+
+WORKFLOW_DIR="$PROJECT_DIR/voice_ai/workflows"
 API_URL="${N8N_LOCAL_URL}/api/v1"
-LOG_FILE="/home/aiwithapex/n8n_cc_coolify/scripts/deploy_log.txt"
-ERROR_LOG="/home/aiwithapex/n8n_cc_coolify/scripts/deploy_errors.txt"
+LOG_FILE="$SCRIPT_DIR/deploy_log.txt"
+ERROR_LOG="$SCRIPT_DIR/deploy_errors.txt"
 
 # Get already deployed names
 deployed_file=$(mktemp)
