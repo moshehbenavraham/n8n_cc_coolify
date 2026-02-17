@@ -80,6 +80,17 @@ Packages load at runtime. Full list: https://pyodide.org/en/stable/usage/package
 
 Commits to `main` automatically trigger Coolify to rebuild and deploy the n8n stack. The repo contains `docker-compose.coolify.yml` and related configuration.
 
+## Scripts
+
+Utility scripts in `scripts/` folder (run from project root, source `.env` first):
+
+| Script | Purpose |
+|--------|---------|
+| `upgrade_node_versions.sh` | Batch upgrade node typeVersions across workflows. Usage: `./scripts/upgrade_node_versions.sh [preview\|apply] [workflow_id\|all]` |
+| `fix_and_deploy_workflows.sh` | Clean non-standard node properties and deploy workflows. Fixes "additional properties" API errors. Usage: `./scripts/fix_and_deploy_workflows.sh <file.json> ...` |
+| `n8n_tags.py` | Tag management CLI: list, create, delete, rename tags (Community Edition) |
+| `n8n_projects.py` | Project management CLI (Enterprise only) |
+
 ## Project-Specific Rules
 
 - Use Coolify dashboard or API for deployments when possible

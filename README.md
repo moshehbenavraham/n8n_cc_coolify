@@ -35,6 +35,7 @@ See [`docs/README_docs.md`](docs/README_docs.md) for full index.
 | Doc | Description |
 |-----|-------------|
 | [00-coding-agent-prompt](docs/00-coding-agent-prompt.md) | Claude Code prompting guide |
+| [01-prompting-cc](docs/01-prompting-cc.md) | n8n workflow engineering prompt |
 | [01-coolify](docs/01-coolify.md) | Coolify configuration |
 | [02-n8n](docs/02-n8n.md) | n8n setup and management |
 | [03-agent-memory](docs/03-agent-memory-postgres.md) | Chat history database |
@@ -85,6 +86,28 @@ This project uses Claude Code with n8n-specific MCP servers and skills:
 | n8n MCP Server | https://github.com/czlonkowski/n8n-mcp-cc-buildier | Node docs, templates, validation |
 | n8n Instance MCP | https://docs.n8n.io/advanced-ai/accessing-n8n-mcp-server/ | Direct workflow execution (search, get, execute) |
 | n8n Skills | https://github.com/czlonkowski/n8n-skills | Expression syntax, validation, patterns, Code nodes |
+
+## Scripts
+
+Utility scripts in `scripts/` (source `.env` first):
+
+```bash
+source .env
+
+# Upgrade node typeVersions across all workflows
+./scripts/upgrade_node_versions.sh preview all    # Preview changes
+./scripts/upgrade_node_versions.sh apply all      # Apply upgrades
+
+# Fix and deploy workflows with validation errors
+./scripts/fix_and_deploy_workflows.sh workflow.json  # Cleans non-standard properties
+
+# Tag management (Community Edition)
+python scripts/n8n_tags.py list
+python scripts/n8n_tags.py create "My Tag"
+
+# Project management (Enterprise only)
+python scripts/n8n_projects.py list
+```
 
 ## Deployment
 
