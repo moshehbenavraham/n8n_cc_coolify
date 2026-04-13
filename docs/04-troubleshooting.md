@@ -1,6 +1,6 @@
 # Troubleshooting
 
-Server: See .env for server details | OS: Ubuntu 24.04 LTS
+WSL2 Ubuntu | Docker Compose | ngrok
 
 ---
 
@@ -9,18 +9,19 @@ Server: See .env for server details | OS: Ubuntu 24.04 LTS
 ```bash
 # Source environment variables first
 source .env
+cd $N8N_DEPLOYMENT_PATH
 
 # Check container health
-sudo docker ps -f name=$N8N_NETWORK_ID
+docker compose ps
 
 # Check logs for errors
-sudo docker logs $(sudo docker ps -qf name=n8n-$N8N_NETWORK_ID | head -1) --tail 100
+docker compose logs n8n --tail 100
 
 # Check Redis queue
-sudo docker exec $(sudo docker ps -qf name=redis-$N8N_NETWORK_ID) redis-cli LLEN bull:jobs:wait
+docker compose exec redis redis-cli LLEN bull:jobs:wait
 
 # Restart the stack
-sudo docker restart $(sudo docker ps -qf name=$N8N_NETWORK_ID)
+docker compose restart
 ```
 
 ## Database Connection Issues
@@ -28,32 +29,26 @@ sudo docker restart $(sudo docker ps -qf name=$N8N_NETWORK_ID)
 ```bash
 # Source environment variables first
 source .env
+cd $N8N_DEPLOYMENT_PATH
 
 # Test n8n DB connection
-sudo docker exec $(sudo docker ps -qf name=postgres-$N8N_NETWORK_ID) pg_isready
-
-# Test agent memory DB connection
-sudo docker exec $AGENT_MEMORY_CONTAINER_ID pg_isready
+docker compose exec postgres pg_isready
 
 # Check database logs
-sudo docker logs $(sudo docker ps -qf name=postgres-$N8N_NETWORK_ID) --tail 50
-sudo docker logs $AGENT_MEMORY_CONTAINER_ID --tail 50
+docker compose logs postgres --tail 50
 ```
 
-## Coolify Issues
+## ngrok Tunnel Issues
 
 ```bash
-# Check all Coolify containers
-sudo docker ps -f name=coolify
+# Check if ngrok is running
+pgrep -a ngrok
 
-# View Coolify logs
-sudo docker logs coolify --tail 100
+# Restart ngrok tunnel (example)
+ngrok http 5678
 
-# Restart Coolify stack
-sudo docker restart coolify coolify-db coolify-redis coolify-realtime
-
-# Check Traefik routing
-sudo docker logs coolify-proxy --tail 50
+# Verify tunnel URL matches .env
+echo $N8N_URL
 ```
 
 ## Disk Space Issues
@@ -64,12 +59,12 @@ df -h /
 sudo du -sh /var/lib/docker/
 
 # Clean Docker resources
-sudo docker system prune -a --volumes  # CAUTION: removes unused data
+docker system prune -a --volumes  # CAUTION: removes unused data
 
 # Check volume sizes
-sudo du -sh /var/lib/docker/volumes/*
+docker volume ls
 ```
 
 ---
 
-*Documentation generated: 2026-01-18*
+*Documentation generated: 2026-01-27*

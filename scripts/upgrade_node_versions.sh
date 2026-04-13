@@ -2,11 +2,9 @@
 # Batch upgrade node typeVersions across all workflows
 # Usage: ./upgrade_node_versions.sh [preview|apply] [workflow_id|all]
 
-# Resolve project root from script location
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
 
-# Load environment from .env file
 if [ -f "$PROJECT_DIR/.env" ]; then
     set -a
     source "$PROJECT_DIR/.env"
@@ -15,11 +13,9 @@ fi
 
 MODE="${1:-preview}"
 TARGET="${2:-all}"
-API_URL="${N8N_URL:-http://localhost:5678}"
+API_URL="${N8N_LOCAL_URL:-${N8N_URL:-http://localhost:5678}}"
 
-# Known latest typeVersions (update as needed)
 declare -A LATEST_VERSIONS=(
-    # Core nodes
     ["n8n-nodes-base.httpRequest"]="4.2"
     ["n8n-nodes-base.set"]="3.4"
     ["n8n-nodes-base.if"]="2.2"
@@ -31,34 +27,24 @@ declare -A LATEST_VERSIONS=(
     ["n8n-nodes-base.filter"]="2.2"
     ["n8n-nodes-base.itemLists"]="3.1"
     ["n8n-nodes-base.splitOut"]="1.1"
-
-    # Triggers
     ["n8n-nodes-base.webhook"]="2.1"
     ["n8n-nodes-base.formTrigger"]="2.2"
     ["n8n-nodes-base.scheduleTrigger"]="1.2"
-
-    # Communication
     ["n8n-nodes-base.telegram"]="1.2"
     ["n8n-nodes-base.telegramTrigger"]="1.2"
     ["n8n-nodes-base.slack"]="2.2"
     ["n8n-nodes-base.gmail"]="2.1"
-
-    # AI/LangChain nodes
     ["@n8n/n8n-nodes-langchain.agent"]="2"
     ["@n8n/n8n-nodes-langchain.lmChatOpenAi"]="1.2"
     ["@n8n/n8n-nodes-langchain.openAi"]="1.8"
     ["@n8n/n8n-nodes-langchain.memoryBufferWindow"]="1.3"
     ["@n8n/n8n-nodes-langchain.toolWorkflow"]="2.2"
-
-    # Storage/Database
     ["n8n-nodes-base.googleSheets"]="4.5"
     ["n8n-nodes-base.googleDrive"]="3.2"
     ["n8n-nodes-base.postgres"]="2.5"
     ["n8n-nodes-base.mysql"]="2.4"
     ["n8n-nodes-base.airtable"]="2.1"
     ["n8n-nodes-base.notion"]="2.2"
-
-    # Other common nodes
     ["n8n-nodes-base.executeWorkflow"]="1.2"
     ["n8n-nodes-base.respondToWebhook"]="1.1"
     ["n8n-nodes-base.dateTime"]="2.2"
@@ -69,13 +55,15 @@ echo "Node Version Upgrade Tool"
 echo "Mode: $MODE | Target: $TARGET"
 echo "========================="
 
-# Get workflow IDs
+if [ -z "$N8N_API_KEY" ]; then
+    echo "Error: N8N_API_KEY is not set."
+    exit 1
+fi
+
 if [ "$TARGET" = "all" ]; then
-    # Fetch all workflow IDs first
     echo "Fetching workflow list..."
     WF_IDS=$(curl -s -H "X-N8N-API-KEY: $N8N_API_KEY" "$API_URL/api/v1/workflows?limit=250" | jq -r '.data[].id')
 
-    # Get next page if exists
     CURSOR=$(curl -s -H "X-N8N-API-KEY: $N8N_API_KEY" "$API_URL/api/v1/workflows?limit=250" | jq -r '.nextCursor // empty')
     while [ -n "$CURSOR" ]; do
         WF_IDS="$WF_IDS $(curl -s -H "X-N8N-API-KEY: $N8N_API_KEY" "$API_URL/api/v1/workflows?limit=250&cursor=$CURSOR" | jq -r '.data[].id')"
@@ -92,14 +80,12 @@ TOTAL_NODES_TO_UPGRADE=0
 for wf_id in $WF_IDS; do
     ((TOTAL++))
 
-    # Fetch workflow
     WF_DATA=$(curl -s -H "X-N8N-API-KEY: $N8N_API_KEY" "$API_URL/api/v1/workflows/$wf_id")
     WF_NAME=$(echo "$WF_DATA" | jq -r '.name // "Unknown"')
 
     echo ""
     echo "[$TOTAL] $WF_NAME"
 
-    # Find nodes needing upgrade
     UPGRADE_COUNT=0
     NODES_TO_UPGRADE=()
 
@@ -109,7 +95,6 @@ for wf_id in $WF_IDS; do
         latest_ver="${LATEST_VERSIONS[$node_type]:-}"
         [ -z "$latest_ver" ] && continue
 
-        # Compare versions
         if awk "BEGIN {exit !($current_ver < $latest_ver)}" 2>/dev/null; then
             echo "    ↑ $node_name: v$current_ver → v$latest_ver"
             ((UPGRADE_COUNT++))
@@ -124,7 +109,6 @@ for wf_id in $WF_IDS; do
     if [ $UPGRADE_COUNT -eq 0 ]; then
         echo "    ✓ All nodes current"
     elif [ "$MODE" = "apply" ]; then
-        # Build JSON object mapping node names to new versions
         UPGRADES_JSON="{"
         FIRST=true
         for node_info in "${NODES_TO_UPGRADE[@]}"; do
@@ -139,8 +123,6 @@ for wf_id in $WF_IDS; do
         done
         UPGRADES_JSON+="}"
 
-        # Apply updates using jq with the upgrades map
-        # Also filter to only include properties accepted by PUT
         UPDATED_WF=$(echo "$WF_DATA" | jq --argjson upgrades "$UPGRADES_JSON" '
             {
                 name: .name,
@@ -153,7 +135,6 @@ for wf_id in $WF_IDS; do
                 staticData: .staticData
             } | with_entries(select(.value != null))')
 
-        # PUT the full updated workflow
         RESULT=$(curl -s -X PUT \
             -H "X-N8N-API-KEY: $N8N_API_KEY" \
             -H "Content-Type: application/json" \

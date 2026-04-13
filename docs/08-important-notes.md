@@ -1,19 +1,19 @@
 # Important Notes
 
-Server: See .env for server details | OS: Ubuntu 24.04 LTS
+WSL2 Ubuntu | Docker Compose | ngrok
 
 ---
 
 1. **Encryption Key**: The `N8N_ENCRYPTION_KEY` is critical. If lost, all credentials in n8n become unrecoverable.
 
-2. **Agent Memory DB**: Exposed on port 5400. Firewall allows Docker internal access (172.17.0.0/16). Review if external access is needed.
+2. **Workers**: n8n runs in queue mode with 3 workers + 3 runners for parallel execution.
 
-3. **Workers**: n8n runs in queue mode with 3 workers + 3 runners for parallel execution.
+3. **ngrok URL**: The ngrok tunnel URL changes on restart (unless using a paid plan with reserved domains). Update `.env` and MCP server config when it changes.
 
-4. **Coolify Management**: All services are managed via Coolify dashboard. Avoid manual Docker changes when possible.
+4. **Local Only**: This stack runs locally in WSL2. External access requires the ngrok tunnel to be active.
 
-5. **Traefik**: Handles SSL via Let's Encrypt automatically. Certificates stored in `/data/coolify/ssl/`.
+5. **Docker Compose**: All container management uses standard `docker compose` commands from `$N8N_DEPLOYMENT_PATH`.
 
 ---
 
-*Documentation generated: 2026-01-18*
+*Documentation generated: 2026-01-27*

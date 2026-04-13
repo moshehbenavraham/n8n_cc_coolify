@@ -1,11 +1,8 @@
 {
   "mcpServers": {
     "n8n-mcp": {
-      "command": "/path/to/project/.claude/scripts/run-n8n-mcp.sh",
-      "args": [],
-      "env": {
-        "CLAUDE_PROJECT_DIR": "/path/to/project"
-      }
+      "command": "./scripts/run-n8n-mcp.sh",
+      "args": []
     },
     "n8n-instance-mcp": {
       "type": "http",
