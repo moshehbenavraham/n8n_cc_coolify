@@ -128,6 +128,37 @@ def parse_deploy_log(log_path):
     return mapping
 
 
+def fetch_live_workflow_ids(config):
+    """Fetch workflow name -> ID mapping from the live n8n instance."""
+    headers = {"X-N8N-API-KEY": config["api_key"]}
+    mapping = {}
+    next_cursor = None
+
+    while True:
+        params = {"limit": 250}
+        if next_cursor:
+            params["cursor"] = next_cursor
+
+        response = requests.get(
+            f"{config['base_url']}/api/v1/workflows",
+            headers=headers,
+            params=params,
+            timeout=30,
+        )
+        response.raise_for_status()
+
+        payload = response.json()
+        for workflow in payload.get("data", []):
+            name = workflow.get("name")
+            workflow_id = workflow.get("id")
+            if name and workflow_id and name not in mapping:
+                mapping[name] = workflow_id
+
+        next_cursor = payload.get("nextCursor")
+        if not next_cursor:
+            return mapping
+
+
 def build_name_to_path_mapping(workflow_dir):
     """Build mapping from workflow name to file path (relative to workflows dir)."""
     mapping = {}
@@ -229,21 +260,36 @@ def main():
     deploy_log = script_dir / "deploy_log.txt"
     workflow_dir = project_root / "voice_ai" / "workflows"
 
-    if not deploy_log.exists():
-        print(f"Error: Deploy log not found at {deploy_log}")
-        sys.exit(1)
-
     if not workflow_dir.exists():
         print(f"Error: Workflow directory not found at {workflow_dir}")
         sys.exit(1)
 
-    print("Parsing deploy log...")
-    name_to_id = parse_deploy_log(deploy_log)
-    print(f"Found {len(name_to_id)} deployed workflows")
+    deploy_log_mapping = {}
+    if deploy_log.exists():
+        print("Parsing deploy log...")
+        deploy_log_mapping = parse_deploy_log(deploy_log)
+        print(f"Found {len(deploy_log_mapping)} workflows in deploy log")
+    else:
+        print(f"Deploy log not found at {deploy_log}, skipping log bootstrap")
+
+    print("Fetching live workflow list...")
+    try:
+        live_mapping = fetch_live_workflow_ids(config)
+    except requests.RequestException as exc:
+        print(f"Error: Failed to fetch live workflows - {exc}")
+        sys.exit(1)
+    print(f"Found {len(live_mapping)} workflows in n8n")
 
     print("Building name to path mapping...")
     name_to_path = build_name_to_path_mapping(workflow_dir)
     print(f"Found {len(name_to_path)} workflow files")
+
+    name_to_id = dict(deploy_log_mapping)
+    name_to_id.update(live_mapping)
+
+    missing_from_log = sorted(set(name_to_path) - set(deploy_log_mapping))
+    if deploy_log_mapping and missing_from_log:
+        print(f"Deploy log is missing {len(missing_from_log)} workflow(s); using live API IDs for them")
 
     # Process workflows
     success = 0
@@ -254,11 +300,17 @@ def main():
     print("\nApplying tags...")
     print("-" * 80)
 
-    for name, workflow_id in name_to_id.items():
+    for name in sorted(name_to_path):
         if args.limit and processed >= args.limit:
             break
 
         processed += 1
+
+        workflow_id = name_to_id.get(name)
+        if not workflow_id:
+            print(f"[{processed}] SKIP: {name[:50]}... (not deployed in n8n)")
+            skipped += 1
+            continue
 
         # Find the directory path for this workflow
         dir_path = name_to_path.get(name)

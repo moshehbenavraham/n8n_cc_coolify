@@ -31,9 +31,10 @@ deploy_workflow() {
 
     jq --argjson nodeProps "$STANDARD_NODE_PROPS" \
        --argjson settingsProps "$STANDARD_SETTINGS_PROPS" '
+        . as $root |
         (if .workflow.workflow then .workflow.workflow else .workflow end) as $wf |
         {
-            name: ($wf.name // "Imported Workflow"),
+            name: ($wf.name // $root.workflow.name // $root.name // "Imported Workflow"),
             nodes: [$wf.nodes[] | with_entries(select(.key as $k | $nodeProps | index($k)))],
             connections: $wf.connections,
             settings: (($wf.settings // {}) | with_entries(select(.key as $k | $settingsProps | index($k))))

@@ -81,11 +81,13 @@ def clean_node(node: dict) -> dict:
 
 def clean_workflow(workflow_data: dict) -> dict:
     """Clean all nodes in a workflow."""
+    root_workflow = workflow_data.get('workflow', {})
+
     # Navigate to the nested workflow structure
-    if 'workflow' in workflow_data and 'workflow' in workflow_data['workflow']:
-        inner_workflow = workflow_data['workflow']['workflow']
+    if 'workflow' in workflow_data and 'workflow' in root_workflow:
+        inner_workflow = root_workflow['workflow']
     elif 'workflow' in workflow_data:
-        inner_workflow = workflow_data['workflow']
+        inner_workflow = root_workflow
     else:
         inner_workflow = workflow_data
 
@@ -93,7 +95,7 @@ def clean_workflow(workflow_data: dict) -> dict:
     nodes = inner_workflow.get('nodes', [])
     connections = inner_workflow.get('connections', {})
     settings = inner_workflow.get('settings', {})
-    name = inner_workflow.get('name', workflow_data.get('workflow', {}).get('name', 'Imported Workflow'))
+    name = inner_workflow.get('name') or root_workflow.get('name') or workflow_data.get('name', 'Imported Workflow')
 
     # Clean each node
     cleaned_nodes = [clean_node(node) for node in nodes]

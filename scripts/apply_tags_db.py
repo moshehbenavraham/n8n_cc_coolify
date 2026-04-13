@@ -11,6 +11,9 @@ import os
 import re
 import subprocess
 import sys
+import urllib.error
+import urllib.parse
+import urllib.request
 from pathlib import Path
 
 # Tag IDs from workflow-index.md
@@ -107,6 +110,18 @@ def run_sql(query):
     return result.stdout.strip()
 
 
+def get_config():
+    """Get n8n configuration from environment."""
+    url = os.environ.get("N8N_LOCAL_URL") or os.environ.get("N8N_URL")
+    api_key = os.environ.get("N8N_API_KEY")
+
+    if not url or not api_key:
+        print("Error: N8N_LOCAL_URL or N8N_URL, and N8N_API_KEY, must be set")
+        sys.exit(1)
+
+    return {"base_url": url.rstrip("/"), "api_key": api_key}
+
+
 def parse_deploy_log(log_path):
     """Parse deploy log to get workflow name -> ID mapping."""
     mapping = {}
@@ -118,6 +133,43 @@ def parse_deploy_log(log_path):
                 workflow_id = match.group(2)
                 mapping[name] = workflow_id
     return mapping
+
+
+def fetch_live_workflow_ids(config):
+    """Fetch workflow name -> ID mapping from the live n8n instance."""
+    mapping = {}
+    next_cursor = None
+
+    while True:
+        query = {"limit": 250}
+        if next_cursor:
+            query["cursor"] = next_cursor
+
+        url = (
+            f"{config['base_url']}/api/v1/workflows?"
+            f"{urllib.parse.urlencode(query)}"
+        )
+        request = urllib.request.Request(
+            url,
+            headers={"X-N8N-API-KEY": config["api_key"]},
+        )
+
+        try:
+            with urllib.request.urlopen(request, timeout=30) as response:
+                payload = json.loads(response.read().decode("utf-8"))
+        except urllib.error.URLError as exc:
+            print(f"Error: Failed to fetch live workflows - {exc}")
+            sys.exit(1)
+
+        for workflow in payload.get("data", []):
+            name = workflow.get("name")
+            workflow_id = workflow.get("id")
+            if name and workflow_id and name not in mapping:
+                mapping[name] = workflow_id
+
+        next_cursor = payload.get("nextCursor")
+        if not next_cursor:
+            return mapping
 
 
 def build_name_to_path_mapping(workflow_dir):
@@ -170,15 +222,12 @@ def main():
     args = parser.parse_args()
 
     load_env()
+    config = get_config()
 
     script_dir = Path(__file__).parent
     project_root = script_dir.parent
     deploy_log = script_dir / "deploy_log.txt"
     workflow_dir = project_root / "voice_ai" / "workflows"
-
-    if not deploy_log.exists():
-        print(f"Error: Deploy log not found at {deploy_log}")
-        sys.exit(1)
 
     if not workflow_dir.exists():
         print(f"Error: Workflow directory not found at {workflow_dir}")
@@ -192,24 +241,44 @@ def main():
         sys.exit(1)
     print(f"Connected. Found {test_result.strip()} tags in database.")
 
-    print("Parsing deploy log...")
-    name_to_id = parse_deploy_log(deploy_log)
-    print(f"Found {len(name_to_id)} deployed workflows")
+    deploy_log_mapping = {}
+    if deploy_log.exists():
+        print("Parsing deploy log...")
+        deploy_log_mapping = parse_deploy_log(deploy_log)
+        print(f"Found {len(deploy_log_mapping)} workflows in deploy log")
+    else:
+        print(f"Deploy log not found at {deploy_log}, skipping log bootstrap")
+
+    print("Fetching live workflow list...")
+    live_mapping = fetch_live_workflow_ids(config)
+    print(f"Found {len(live_mapping)} workflows in n8n")
 
     print("Building name to path mapping...")
     name_to_path = build_name_to_path_mapping(workflow_dir)
     print(f"Found {len(name_to_path)} workflow files")
+
+    name_to_id = dict(deploy_log_mapping)
+    name_to_id.update(live_mapping)
+
+    missing_from_log = sorted(set(name_to_path) - set(deploy_log_mapping))
+    if deploy_log_mapping and missing_from_log:
+        print(f"Deploy log is missing {len(missing_from_log)} workflow(s); using live API IDs for them")
 
     # Build SQL statements
     sql_statements = []
     processed = 0
     skipped = 0
 
-    for name, workflow_id in name_to_id.items():
+    for name in sorted(name_to_path):
         if args.limit and processed >= args.limit:
             break
 
         processed += 1
+
+        workflow_id = name_to_id.get(name)
+        if not workflow_id:
+            skipped += 1
+            continue
 
         dir_path = name_to_path.get(name)
         if not dir_path:

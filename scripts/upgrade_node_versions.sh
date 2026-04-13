@@ -4,6 +4,13 @@
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
+TEMP_UPDATE_FILE="$(mktemp)"
+
+cleanup() {
+    rm -f "$TEMP_UPDATE_FILE"
+}
+
+trap cleanup EXIT
 
 if [ -f "$PROJECT_DIR/.env" ]; then
     set -a
@@ -89,7 +96,14 @@ for wf_id in $WF_IDS; do
     UPGRADE_COUNT=0
     NODES_TO_UPGRADE=()
 
-    while IFS=$'\t' read -r node_name node_type current_ver; do
+    while IFS= read -r node_json; do
+        [ -z "$node_json" ] && continue
+
+        node_payload=$(printf '%s' "$node_json" | base64 -d)
+        node_name=$(printf '%s' "$node_payload" | jq -r '.name')
+        node_type=$(printf '%s' "$node_payload" | jq -r '.type')
+        current_ver=$(printf '%s' "$node_payload" | jq -r '.typeVersion')
+
         [ -z "$node_type" ] && continue
 
         latest_ver="${LATEST_VERSIONS[$node_type]:-}"
@@ -101,10 +115,10 @@ for wf_id in $WF_IDS; do
             ((TOTAL_NODES_TO_UPGRADE++))
 
             if [ "$MODE" = "apply" ]; then
-                NODES_TO_UPGRADE+=("$node_name|$latest_ver")
+                NODES_TO_UPGRADE+=("$(jq -cn --arg name "$node_name" --argjson version "$latest_ver" '{name: $name, version: $version}' | base64 -w0)")
             fi
         fi
-    done < <(echo "$WF_DATA" | jq -r '.nodes[] | "\(.name)\t\(.type)\t\(.typeVersion)"')
+    done < <(echo "$WF_DATA" | jq -r '.nodes[] | {name, type, typeVersion} | @base64')
 
     if [ $UPGRADE_COUNT -eq 0 ]; then
         echo "    ✓ All nodes current"
@@ -112,8 +126,9 @@ for wf_id in $WF_IDS; do
         UPGRADES_JSON="{"
         FIRST=true
         for node_info in "${NODES_TO_UPGRADE[@]}"; do
-            node_name="${node_info%%|*}"
-            new_ver="${node_info##*|}"
+            upgrade_payload=$(printf '%s' "$node_info" | base64 -d)
+            node_name=$(printf '%s' "$upgrade_payload" | jq -r '.name')
+            new_ver=$(printf '%s' "$upgrade_payload" | jq -r '.version')
             if [ "$FIRST" = true ]; then
                 UPGRADES_JSON+="$(printf '%s' "$node_name" | jq -Rs .):$new_ver"
                 FIRST=false
@@ -135,10 +150,12 @@ for wf_id in $WF_IDS; do
                 staticData: .staticData
             } | with_entries(select(.value != null))')
 
+        printf '%s' "$UPDATED_WF" > "$TEMP_UPDATE_FILE"
+
         RESULT=$(curl -s -X PUT \
             -H "X-N8N-API-KEY: $N8N_API_KEY" \
             -H "Content-Type: application/json" \
-            -d "$UPDATED_WF" \
+            --data-binary "@$TEMP_UPDATE_FILE" \
             "$API_URL/api/v1/workflows/$wf_id")
 
         if echo "$RESULT" | jq -e '.id' > /dev/null 2>&1; then
@@ -153,7 +170,12 @@ done
 echo ""
 echo "========================="
 echo "Processed: $TOTAL workflows"
-echo "Nodes to upgrade: $TOTAL_NODES_TO_UPGRADE"
-[ "$MODE" = "preview" ] && echo ""
-[ "$MODE" = "preview" ] && echo "Run with 'apply' to apply upgrades:"
-[ "$MODE" = "preview" ] && echo "  ./upgrade_node_versions.sh apply [workflow_id|all]"
+if [ "$MODE" = "preview" ]; then
+    echo "Nodes to upgrade: $TOTAL_NODES_TO_UPGRADE"
+    echo ""
+    echo "Run with 'apply' to apply upgrades:"
+    echo "  ./upgrade_node_versions.sh apply [workflow_id|all]"
+else
+    echo "Workflows upgraded: $UPGRADED"
+    echo "Upgrades applied: $TOTAL_NODES_TO_UPGRADE"
+fi
