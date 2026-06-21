@@ -1,0 +1,692 @@
+{
+  "name": "Chatterbox-multi",
+  "nodes": [
+    {
+      "parameters": {
+        "url": "={{ $('Setup defaults').item.json.AI_AGENTS_NO_CODE_TOOLS_URL }}/api/v1/media/storage/{{ $('Start generating TTS (chatterbox)').last().json.file_id }}/status",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        4080,
+        496
+      ],
+      "id": "fb3644de-adf7-4a73-957d-a351a157fcaa",
+      "name": "Get status of TTS generation",
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "ready",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "91402596-3978-4dfc-91b7-9ffe3521b862"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "ready"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "0c29765e-4213-434c-9bf3-c5e854dd6ee8",
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "processing",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "processing"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "4a6cfd86-e690-417e-aa6d-ae497e1177ae",
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "not_found",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "failed"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        4288,
+        480
+      ],
+      "id": "ba0d6d6c-43af-4a6f-9c0a-08ded2483485",
+      "name": "TTS status switch"
+    },
+    {
+      "parameters": {
+        "amount": 1
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        3872,
+        496
+      ],
+      "id": "23ebbd79-dcb7-4a2d-9a89-bc91878693d6",
+      "name": "Wait until the TTS gets generated",
+      "webhookId": "dba6da80-9c2f-43b8-b374-1459d543d2f1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Setup defaults').item.json.AI_AGENTS_NO_CODE_TOOLS_URL }}/api/v1/media/audio-tools/tts/chatterbox",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "text",
+              "value": "={{ $('Setup the parameters').item.json.Text }}"
+            },
+            {
+              "name": "sample_audio_id",
+              "value": "={{ $json.file_id || \"\" }}"
+            },
+            {
+              "name": "exaggeration",
+              "value": "={{ $('Setup the parameters').item.json['Exaggeration (0-1)'] || 0.5 }}"
+            },
+            {
+              "name": "cfg_weight",
+              "value": "={{ $('Setup the parameters').item.json['Cfg weight (0-1)'] || 0.5 }}"
+            },
+            {
+              "name": "temperature",
+              "value": "={{ $('Setup the parameters').item.json['Temperature (0-1)'] || 0.8 }}"
+            },
+            {
+              "name": "language",
+              "value": "={{ Object.entries($('Get languages').item.json.languages).find(item => item[1] === $('Setup the parameters').item.json.Lanugage)?.[0] }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3440,
+        496
+      ],
+      "id": "45ffadf9-b700-473b-9e45-e1486c33d770",
+      "name": "Start generating TTS (chatterbox)"
+    },
+    {
+      "parameters": {
+        "errorMessage": "Error occoured while generating the TTS"
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        4672,
+        672
+      ],
+      "id": "93606b66-424c-4e4a-8983-d3241cee64fa",
+      "name": "Stop and Error"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Setup defaults').item.json.AI_AGENTS_NO_CODE_TOOLS_URL }}/api/v1/media/storage",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "file",
+              "inputDataFieldName": "Voice_sample"
+            },
+            {
+              "name": "media_type",
+              "value": "audio"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3248,
+        384
+      ],
+      "id": "80c0ab6f-28a0-403a-b148-1db64aaca23e",
+      "name": "Upload sample audio to the server"
+    },
+    {
+      "parameters": {
+        "content": "# Generate TTS",
+        "height": 556,
+        "width": 1656,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2816,
+        256
+      ],
+      "id": "09328995-6e28-4c76-bb82-0890323c414b",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7bbb518a-c4f1-49a5-9e72-3e9d939b131b",
+              "name": "AI_AGENTS_NO_CODE_TOOLS_URL",
+              "value": "<< paste here your server url >>",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1648,
+        496
+      ],
+      "id": "4636e199-ce8b-4e13-bc53-78a3713c1972",
+      "name": "Configure me"
+    },
+    {
+      "parameters": {
+        "content": "# Configure me ?\n",
+        "height": 560,
+        "width": 300,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1536,
+        256
+      ],
+      "id": "a70c9356-43b9-4790-816c-07f8424137d4",
+      "name": "Sticky Note12"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.AI_AGENTS_NO_CODE_TOOLS_URL }}/health",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2128,
+        416
+      ],
+      "id": "21c24b48-d661-42fc-9e8b-46231755f461",
+      "name": "HTTP Request",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "errorMessage": "The server is not running or isn't configured"
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        2128,
+        640
+      ],
+      "id": "4037d106-846b-4a38-8345-dcf53a9a8cca",
+      "name": "Server isn't ready"
+    },
+    {
+      "parameters": {
+        "content": "# Test connection",
+        "height": 560,
+        "width": 420,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1888,
+        256
+      ],
+      "id": "84c4bbfa-e9bd-4198-a779-2bf83fc22625",
+      "name": "Sticky Note15"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7d55d6da-a78c-4a28-9343-0ea9035a0aa3",
+              "name": "AI_AGENTS_NO_CODE_TOOLS_URL",
+              "value": "={{   ((u) => {   let s = u.trim();   if (!/^https?:\\/\\//i.test(s)) s = 'https://' + s;   const parts = s.split('/');   return parts[0] + '//' + parts[2]; })($json.AI_AGENTS_NO_CODE_TOOLS_URL)  }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1920,
+        496
+      ],
+      "id": "ff2e13e1-1bc8-47c9-ad74-9a9e3a91335e",
+      "name": "Setup defaults"
+    },
+    {
+      "parameters": {
+        "formTitle": "Chatterbox Multilingual",
+        "formDescription": "Try Resemble AI's first production-grade open source TTS model supporting 23 languages out of the box.\n\nPlease note, that some of the languages could product odd sounds, and other unexpected output.",
+        "options": {
+          "buttonLabel": "Get started"
+        }
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.3,
+      "position": [
+        1344,
+        496
+      ],
+      "id": "d2cc566e-f43d-4daf-ae26-08a5f7769ab5",
+      "name": "On form submission",
+      "webhookId": "46e3e623-3d03-49fb-8693-5ce23f365209"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Setup defaults').item.json.AI_AGENTS_NO_CODE_TOOLS_URL }}/api/v1/media/audio-tools/tts/chatterbox/languages",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept-Language",
+              "value": "en-US,en;q=0.9,hu;q=0.8,de;q=0.7,nl;q=0.6"
+            },
+            {
+              "name": "Connection",
+              "value": "keep-alive"
+            },
+            {
+              "name": "Referer",
+              "value": "http://192.168.68.60:8051/docs"
+            },
+            {
+              "name": "User-Agent",
+              "value": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36"
+            },
+            {
+              "name": "accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {
+          "allowUnauthorizedCerts": true
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2448,
+        480
+      ],
+      "id": "3abd5bb3-fdb0-49ae-931f-11b344ee1811",
+      "name": "Get languages"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Setup defaults').item.json.AI_AGENTS_NO_CODE_TOOLS_URL }}/api/v1/media/storage/{{ $('Start generating TTS (chatterbox)').last().json.file_id }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        4656,
+        384
+      ],
+      "id": "8b948a72-c277-4345-9f03-9e76be1c065a",
+      "name": "Donwload audio"
+    },
+    {
+      "parameters": {
+        "operation": "completion",
+        "completionTitle": "Generating the speech",
+        "completionMessage": "You can close this form",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.form",
+      "typeVersion": 2.3,
+      "position": [
+        3648,
+        496
+      ],
+      "id": "4a4b2c6f-8b52-4ba0-8958-b61d35159edc",
+      "name": "Form1",
+      "webhookId": "b7b3fbcf-32a6-4d77-a787-ca48c3fe7181"
+    },
+    {
+      "parameters": {
+        "content": "# Setup",
+        "height": 560,
+        "width": 420,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2352,
+        256
+      ],
+      "id": "99860fd8-8bed-47c2-acf8-6e1432535d1f",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "# Done",
+        "height": 304,
+        "width": 420,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        4512,
+        256
+      ],
+      "id": "ba2ec6a2-c595-4b97-b8d8-c97a57bfebf4",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "cfdb9c8b-2ab1-4c56-a5ae-474925cb7aa3",
+              "leftValue": "={{ $json['Voice sample'] }}",
+              "rightValue": "",
+              "operator": {
+                "type": "object",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2928,
+        480
+      ],
+      "id": "023d844d-c949-4446-a1d9-8c2c1acc47c0",
+      "name": "Has voice sample?"
+    },
+    {
+      "parameters": {
+        "defineForm": "json",
+        "jsonOutput": "={{\n\n  JSON.stringify([\n   {\n      fieldLabel: \"Text\",\n      fieldType: \"textarea\",\n      placeholder: \"text to speech\",\n      requiredField: true\n   },\n   {\n      fieldLabel: \"Lanugage\",\n      requiredField: true,\n      fieldType: \"dropdown\",\n      fieldOptions: {\n        values: Object.values($json.languages).map(item => ({ option: item }))\n      }\n   },\n  {\n\t\tfieldLabel: \"Voice sample\",\n\t\tfieldType: \"file\",\n\t\tmultipleFiles: false,\n\t\tacceptFileTypes: \".wav, .mp3\"\n\t},\n    {\n      fieldLabel: \"Pause between sentences (milliseconds)\",\n      placeholder: \"default: 350ms\",\n      fieldType: \"number\"\n    },\n    {\n      fieldLabel: \"Exaggeration (0-1)\",\n      placeholder: \"default: 0.5\",\n      fieldType: \"number\"\n    },\n    {\n      fieldLabel: \"Cfg weight (0-1)\",\n      placeholder: \"default: 0.8\",\n      fieldType: \"number\"\n    },\n    {\n      fieldLabel: \"Temperature (0-1)\",\n      placeholder: \"default: 0.5\",\n      fieldType: \"number\"\n    }\n    \n], null, 2);\n\n}}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.form",
+      "typeVersion": 2.3,
+      "position": [
+        2608,
+        480
+      ],
+      "id": "fe4e4315-c1d3-4d13-8983-e020588f9391",
+      "name": "Setup the parameters",
+      "webhookId": "a2744394-6a08-40cc-bf62-a3aa30ef1a28"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Get status of TTS generation": {
+      "main": [
+        [
+          {
+            "node": "TTS status switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TTS status switch": {
+      "main": [
+        [
+          {
+            "node": "Donwload audio",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait until the TTS gets generated",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Stop and Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait until the TTS gets generated": {
+      "main": [
+        [
+          {
+            "node": "Get status of TTS generation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start generating TTS (chatterbox)": {
+      "main": [
+        [
+          {
+            "node": "Form1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload sample audio to the server": {
+      "main": [
+        [
+          {
+            "node": "Start generating TTS (chatterbox)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Configure me": {
+      "main": [
+        [
+          {
+            "node": "Setup defaults",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Get languages",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Server isn't ready",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Setup defaults": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Configure me",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get languages": {
+      "main": [
+        [
+          {
+            "node": "Setup the parameters",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Form1": {
+      "main": [
+        [
+          {
+            "node": "Wait until the TTS gets generated",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has voice sample?": {
+      "main": [
+        [
+          {
+            "node": "Upload sample audio to the server",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Start generating TTS (chatterbox)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Setup the parameters": {
+      "main": [
+        [
+          {
+            "node": "Has voice sample?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "c27ab78c-e274-4156-8062-6dfac8a3c7d5",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "636db6b6ab21a21c6458e2137f340e33dc3e49f5a1c560c8d1e2372c227cf40e"
+  },
+  "id": "qjCSmSqO7DO0MogO",
+  "tags": []
+}

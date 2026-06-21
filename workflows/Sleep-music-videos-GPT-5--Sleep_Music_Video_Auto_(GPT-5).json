@@ -1,0 +1,1997 @@
+{
+  "name": "My workflow 89",
+  "nodes": [
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7bbb518a-c4f1-49a5-9e72-3e9d939b131b",
+              "name": "AI_AGENTS_NO_CODE_TOOLS_URL",
+              "value": "<< paste your server URL here >>",
+              "type": "string"
+            },
+            {
+              "id": "be15f2fa-ce57-4843-b283-bdfc397967aa",
+              "name": "CONCEPT_PROMPT",
+              "value": "=<Instructions>\nCreate one concept for a new sleep video on youtube.\nMy main theme is cute animals and characters in 3d style.\nThe length of the video is going to be 3 hours long, and it will be one looped video and a generated, classical music lullaby.\nFor the visual, make sure to create something where looping makes sense: small, gentle movements, that looks great when it's on repeat.\n</Instructions>\n<Examples>\n\t<Example>\n\t\t<Title>\n          Brahms Lullaby For Babies To Go To Sleep Make Bedtime Super Easy Good Night And Sweet Dreams\n    </Title>\n\t\t<Visual>\n      This whimsical and serene image is a screenshot from a YouTube sleep video, designed to be calming and help viewers relax.\n      The scene features two adorable, fluffy kittens with large, expressive eyes. One kitten is a soft pink, while the other is a gentle baby blue. They are set against a dreamy night sky filled with soft, purple and blue clouds, twinkling stars, and a crescent moon.\n      Adding to the magical atmosphere are glowing, heart-shaped bubbles floating in the air and the silhouette of a fairytale-like castle in the distance. The overall art style is very soft and cute, typical of content created to aid with sleep and relaxation.\n    </Visual>\n\t</Example>\n\t<Example>\n\t\t<Title>\n          Soft Music for Sleep and Relaxing o Listening For 3 Minutes, Fall Into Deep Sleep o Remove Insomnia\n    </Title>\n\t\t<Visual>\n      This charming and heartwarming image, likely from a YouTube sleep video, captures a moment of pure sweetness and comfort.\n      At the center of the composition is an irresistibly cute, fluffy white bunny with large, expressive dark eyes. The tiny creature is depicted nibbling on a large bar of milk chocolate, holding it with its small paws.\n      The enchanting scene is further enhanced by an array of delectable chocolates scattered around the bunny, including truffles and other candy pieces. A warm, gentle glow emanates from a lit candle in the soft-focused background, casting a serene and cozy ambiance over the entire setting. Adding to the whimsical atmosphere, a cup or holder decorated with bunny ears can be seen in the background. The overall color palette is a soothing blend of warm browns, soft pinks, and creamy whites, creating a visually relaxing and dreamy experience perfect for a sleep video.\n    </Visual>\n\t</Example>\n</Examples>",
+              "type": "string"
+            },
+            {
+              "id": "65e843d3-1444-4a19-b5b1-8328a50ee4a2",
+              "name": "CREATE_PROMPTS_PROMPT",
+              "value": "=<Instructions>\nI'm creating a sleep video on youtube for the concept below. Help me to create the following materials:\n\n1. Image prompt\n\nCreate a prompt for a nice visual, suitable for children and very cute.\n\n2. Video prompt\n\nMake sure the generated, 12s video can be easily looped, and the loops make sense. Make sure to include in the prompt, that things should not move in straight line, for example clouds should be still, a car shouldn't cross into the picture.\n\n3. Music prompt\n\nCreate a prompt for a classical lullaby.\nInclude in the prompt: the music should be fully instrumental and designed for looping with no distinct intro or outro, just a continous main theme.\nThe music should be 60bpm at most.\n</Instructions>\n<Concept>\n{CONCEPT}\n</Concept>",
+              "type": "string"
+            },
+            {
+              "id": "ddbc95bb-eaad-40d4-97b7-85babae95fac",
+              "name": "THUMBNAIL_PROMPT",
+              "value": "=Create an image prompt to generate a thumbnail image that will be rendered using the input image attached to this prompt.\nOn top of the image, display a large text title, Centered in the middle of the image. Don't make other changes on the image.\nThe text style can include, glow, shadow, color. The colors should be described with words, not rgb or hex - just describe the desired colors with english. \n\nUsing the following concept, create a great prompt for the thumbnail.\nConcept: {CONCEPT}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        816,
+        720
+      ],
+      "id": "ae0bf984-f51b-4e8d-b196-0fc98ac05e76",
+      "name": "Configure me"
+    },
+    {
+      "parameters": {
+        "content": "# Configure me ?\n",
+        "height": 576,
+        "width": 204,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        768,
+        480
+      ],
+      "id": "fc9da532-e6fd-4926-a6e6-a7c7dad0a36b",
+      "name": "Sticky Note12"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.AI_AGENTS_NO_CODE_TOOLS_URL }}/health",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1264,
+        640
+      ],
+      "id": "d5a068d5-08e3-4697-8176-531a1b66bd0e",
+      "name": "HTTP Request",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "errorMessage": "The server is not running or isn't configured"
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1264,
+        864
+      ],
+      "id": "bc7aa85b-8019-4ac3-af87-cd588a8c54ef",
+      "name": "Server isn't ready"
+    },
+    {
+      "parameters": {
+        "content": "# Test connection \ndon't delete/touch this",
+        "height": 576,
+        "width": 420,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1024,
+        480
+      ],
+      "id": "df30b892-7c8b-4e42-9194-f5cbdebd44c0",
+      "name": "Sticky Note15"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7d55d6da-a78c-4a28-9343-0ea9035a0aa3",
+              "name": "AI_AGENTS_NO_CODE_TOOLS_URL",
+              "value": "={{   ((u) => {   let s = u.trim();   if (!/^https?:\\/\\//i.test(s)) s = 'https://' + s;   const parts = s.split('/');   return parts[0] + '//' + parts[2]; })($json.AI_AGENTS_NO_CODE_TOOLS_URL)  }}",
+              "type": "string"
+            },
+            {
+              "id": "7860d761-c2a2-4447-8f73-7d11becf3bfb",
+              "name": "=AMBIENT_SOUNDS",
+              "value": "={{ $('On form submission').item.json['Add ambient sound'].length ? $('On form submission').item.json['Add ambient sound'].map(item => `${item.toLowerCase().replace(/ /g, '_')}:${$('Close the form').item.json[item]}`).join(',') : '' }}",
+              "type": "string"
+            },
+            {
+              "id": "2c39a473-d46e-40ae-87c5-8b8380c04f43",
+              "name": "duration_minutes",
+              "value": "={{ $('On form submission').item.json['Duration in minutes'] || 10 }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1056,
+        720
+      ],
+      "id": "de313ba8-b819-4cca-bab1-2a95b423ca89",
+      "name": "Setup defaults"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Setup defaults').first().json.AI_AGENTS_NO_CODE_TOOLS_URL }}/api/v1/media/storage/{{ $('Start creating the sleep video').item.json.file_id }}/status",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        4080,
+        624
+      ],
+      "id": "19346e03-7a0d-4338-b9f1-1b87baf085a7",
+      "name": "Get video generation status",
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "ready",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "91402596-3978-4dfc-91b7-9ffe3521b862"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "ready"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "0c29765e-4213-434c-9bf3-c5e854dd6ee8",
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "processing",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "processing"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "4a6cfd86-e690-417e-aa6d-ae497e1177ae",
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "not_found",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "failed"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        4272,
+        624
+      ],
+      "id": "56024ef5-17a5-4006-a392-5a355ce899c2",
+      "name": "Video generation switch"
+    },
+    {
+      "parameters": {
+        "amount": 10
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        3888,
+        624
+      ],
+      "id": "5d4443a0-ba15-407f-a4fc-d7f407757a0c",
+      "name": "Wait until the video gets generated",
+      "webhookId": "db783307-9458-4e7a-a131-93c672559194"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Setup defaults').first().json.AI_AGENTS_NO_CODE_TOOLS_URL }}/api/v1/media/video-tools/long-form-ambient",
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "video_id",
+              "value": "={{ $json.video_id }}"
+            },
+            {
+              "name": "audio_id",
+              "value": "={{ $json.music_id }}"
+            },
+            {
+              "name": "duration_minutes",
+              "value": "={{ $('Setup defaults').item.json.duration_minutes }}"
+            },
+            {
+              "name": "ambient_sounds",
+              "value": "={{ $('Setup defaults').item.json.AMBIENT_SOUNDS }}"
+            }
+          ]
+        },
+        "options": {
+          "redirect": {
+            "redirect": {}
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3696,
+        624
+      ],
+      "id": "30f93ea6-ca16-44e7-9d65-db18f5e20918",
+      "name": "Start creating the sleep video"
+    },
+    {
+      "parameters": {
+        "errorMessage": "Something happened while generating the video - contact Miri!"
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        4480,
+        768
+      ],
+      "id": "02b3d5fc-82bd-4cef-bb7c-5f7eb1d5114d",
+      "name": "Stop and Error"
+    },
+    {
+      "parameters": {
+        "content": "# Generate the final video",
+        "height": 656,
+        "width": 1216,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        3408,
+        400
+      ],
+      "id": "1ed6ebb7-06b4-477f-b87d-db05ce05ed5d",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "# Done",
+        "height": 656,
+        "width": 192,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        4672,
+        400
+      ],
+      "id": "ac8fb5a8-88f1-4adc-bc7c-028f82b4484f",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        2336,
+        80
+      ],
+      "id": "0b4bda23-a7cd-4028-86ad-a30680f0ca9b",
+      "name": "Wait for seed image",
+      "webhookId": "5ba253c4-2ea2-4ecc-81cc-251ca00a5058"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "COMPLETED",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "6fc5bea4-1567-474b-bfca-5394eb303217"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "COMPLETED"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "0882f634-2472-4d24-a1c3-a39f0cd94855",
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "IN_PROGRESS",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "IN_PROGRESS"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "e6c8b207-13ac-4537-8c5c-677039bc2fef",
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "IN_QUEUE",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "IN_QUEUE"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        2784,
+        80
+      ],
+      "id": "e36cb5e5-1831-479e-843a-40bf4a5e59b2",
+      "name": "Seed image status"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('? Generate seed image').item.json.response_url }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3200,
+        128
+      ],
+      "id": "370a09e5-fff3-4559-88d4-e28463454fc5",
+      "name": "Get the seed image",
+      "alwaysOutputData": false,
+      "retryOnFail": true,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "BUYuOe8V0hqLtA02",
+          "name": "fal.ai"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        3504,
+        624
+      ],
+      "id": "d373540b-15b2-4d77-b538-9706bd6a18a6",
+      "name": "Merge1"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "COMPLETED",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "6fc5bea4-1567-474b-bfca-5394eb303217"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "COMPLETED"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "0882f634-2472-4d24-a1c3-a39f0cd94855",
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "IN_PROGRESS",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "IN_PROGRESS"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "e6c8b207-13ac-4537-8c5c-677039bc2fef",
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "IN_QUEUE",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "IN_QUEUE"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        2560,
+        448
+      ],
+      "id": "a3604294-cd5c-448e-89e7-1b1e0417f3fd",
+      "name": "Looping video status"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('? Start generating the looping video').item.json.response_url }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2800,
+        464
+      ],
+      "id": "803d9c43-81b3-41d4-94da-9338d849b47e",
+      "name": "Get the looping video",
+      "alwaysOutputData": false,
+      "retryOnFail": true,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "BUYuOe8V0hqLtA02",
+          "name": "fal.ai"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Setup defaults').first().json.AI_AGENTS_NO_CODE_TOOLS_URL }}/api/v1/media/storage",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "media_type",
+              "value": "video"
+            },
+            {
+              "name": "url",
+              "value": "={{ $json.video.url }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3008,
+        464
+      ],
+      "id": "ef19c1f8-f748-4cb2-97ad-3764f158ca35",
+      "name": "Upload the looping video to the server"
+    },
+    {
+      "parameters": {
+        "jsCode": "for (const item of $input.all()) {\n  const output = item.json.output.find(item => item.type === 'message');\n  if (output.status !== 'completed') {\n    throw new Error('OpenAI call failed');\n  }\n  const textContent = output?.content?.[0].text;\n  if (!textContent) {\n    throw new Error('No content received from OpenAI');\n  }\n\n  \n  item.json = {\n    output: JSON.parse(textContent)\n  }\n}\n\nreturn $input.all();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1744,
+        592
+      ],
+      "id": "40f9936c-5dba-48f8-b17e-c5dfb2023a61",
+      "name": "Parse concept"
+    },
+    {
+      "parameters": {
+        "jsCode": "for (const item of $input.all()) {\n  const output = item.json.output.find(item => item.type === 'message');\n  if (output.status !== 'completed') {\n    throw new Error('OpenAI call failed');\n  }\n  const textContent = output?.content?.[0].text;\n  if (!textContent) {\n    throw new Error('No content received from OpenAI');\n  }\n\n  \n  item.json = {\n    output: JSON.parse(textContent)\n  }\n}\n\nreturn $input.all();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1744,
+        832
+      ],
+      "id": "f8021823-7ca9-4c17-bcc9-05f8a3670108",
+      "name": "Parse prompts"
+    },
+    {
+      "parameters": {
+        "content": "# Create script",
+        "height": 576,
+        "width": 420,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1488,
+        480
+      ],
+      "id": "001bcd67-5e12-41e2-bbd9-19ab432a6763",
+      "name": "Sticky Note16"
+    },
+    {
+      "parameters": {
+        "content": "# Generate music",
+        "height": 336,
+        "width": 1396,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1952,
+        720
+      ],
+      "id": "fa509870-e987-47da-899e-1347a9ffaa05",
+      "name": "Sticky Note18"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Setup defaults').first().json.AI_AGENTS_NO_CODE_TOOLS_URL }}/api/v1/media/storage",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "file",
+              "inputDataFieldName": "=data"
+            },
+            {
+              "name": "media_type",
+              "value": "audio"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2464,
+        816
+      ],
+      "id": "9b229265-34ef-4719-80d0-afce4fe0c1c9",
+      "name": "Upload music to the server"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "09899c0c-4e96-40f6-9038-718fb42d4ed4",
+              "name": "music_id",
+              "value": "={{ $json.file_id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2688,
+        816
+      ],
+      "id": "a633cfa3-1f10-4b2b-8838-261422f4f744",
+      "name": "Map music file_id"
+    },
+    {
+      "parameters": {
+        "content": "# Generate seed image",
+        "height": 288,
+        "width": 1396,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1952,
+        16
+      ],
+      "id": "bacf960e-7644-47d1-ba07-48a0cbbcccd7",
+      "name": "Sticky Note19"
+    },
+    {
+      "parameters": {
+        "content": "# Generate looping video",
+        "height": 320,
+        "width": 1396,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1952,
+        352
+      ],
+      "id": "528d3085-5b46-478e-b41c-b3e72c819cfd",
+      "name": "Sticky Note20"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        2208,
+        464
+      ],
+      "id": "63a5bf23-13ac-4400-ace8-cfb67c3ed5ec",
+      "name": "Wait for the looping video",
+      "webhookId": "bcc50e10-521d-4106-80bf-cccf7b1b6257"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "09899c0c-4e96-40f6-9038-718fb42d4ed4",
+              "name": "video_id",
+              "value": "={{ $json.file_id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        3200,
+        464
+      ],
+      "id": "10694eba-0325-4d74-bbf7-e17e64f1b405",
+      "name": "Map the loopin video file_id"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/responses",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "openAiApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n   \"model\":\"gpt-5\",\n   \"input\": {{ JSON.stringify($('Configure me').item.json.CONCEPT_PROMPT) }},\n   \"reasoning\":{\n      \"effort\":\"minimal\",\n      \"summary\":\"auto\"\n   },\n   \"text\":{\n      \"format\": {\n        \"type\": \"json_schema\",\n        \"name\": \"video_concept\",\n        \"schema\": {\n           \"type\":\"object\",\n           \"properties\":{\n              \"title\":{\n                 \"type\":\"string\",\n                 \"description\":\"the title of the video idea\"\n              },\n              \"visual\":{\n                 \"type\":\"string\",\n                 \"description\":\"the visual characteristics of the video\"\n              }\n           },\n           \"required\":[\n              \"title\",\n              \"visual\"\n           ],\n           \"additionalProperties\": false\n        }\n      },\n      \"verbosity\":\"high\"\n   },\n   \"stream\":false,\n   \"store\":false\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1568,
+        592
+      ],
+      "id": "1d63265b-772f-4977-a35c-9086a0a3bf8f",
+      "name": "? Create concept",
+      "credentials": {
+        "openAiApi": {
+          "id": "tGvJRP2th9CbI2oq",
+          "name": "OpenAi account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/responses",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "openAiApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n   \"model\":\"gpt-5\",\n   \"input\": {{ JSON.stringify($('Configure me').item.json.CREATE_PROMPTS_PROMPT.replace('{CONCEPT}', `\n  ${$json.output.title}\n\n  ${$json.output.visual}\n`)) }},\n   \"reasoning\":{\n      \"effort\":\"low\",\n      \"summary\":\"auto\"\n   },\n   \"text\":{\n      \"format\": {\n        \"type\": \"json_schema\",\n        \"name\": \"video_concept\",\n        \"schema\": {\n           \"type\":\"object\",\n           \"properties\": {\n                \"music_prompt\": {\n                    \"type\": \"string\",\n                    \"description\": \"the music prompt for music generation\"\n                },\n                \"image_prompt\": {\n                    \"type\": \"string\",\n                    \"description\": \"the image prompt to generate the seed image for the video generation\"\n                },\n                \"video_prompt\": {\n                    \"type\": \"string\",\n                    \"description\": \"the video prompt to generate the looping video\"\n                }\n            },\n            \"required\": [\n                \"music_prompt\",\n                \"image_prompt\",\n                \"video_prompt\"\n            ],\n           \"additionalProperties\": false\n        }\n      },\n      \"verbosity\":\"high\"\n   },\n   \"stream\":false,\n   \"store\":false\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1568,
+        832
+      ],
+      "id": "1603a9c5-35ae-426e-b3ed-3e99b059a579",
+      "name": "? Create prompts",
+      "credentials": {
+        "openAiApi": {
+          "id": "tGvJRP2th9CbI2oq",
+          "name": "OpenAi account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "# How to set up this automation?\n\n## 1. Add your server URL to the `Configure me` node and setup the desired video length\n## Next, add credentials to the nodes marked with the ? emoji\n## 2. Setup your OpenAI credentials in the `Create concept` and `Create prompts` nodes\n## 3. Setup your Fal.ai credentials in the `Generate seed image`, `Get status of the seed image`, `Start generating the looping video` and the `Get status of the looping video`, `Create thumbnail prompt`, `Generate thumbnail image` and `Get status of the thumbnail image` prompt\n## 4. Setup your ElevenLabs credentials in the `Create music plan` and `Generate music` nodes",
+        "height": 436,
+        "width": 1908,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "3fcf8b69-4e47-4bd9-8b43-d957a8ba1913",
+      "name": "Sticky Note14"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.elevenlabs.io/v1/music/plan",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "prompt",
+              "value": "={{ $json.output.music_prompt.slice(0, 2000) }}"
+            },
+            {
+              "name": "music_length_ms",
+              "value": "240000"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2016,
+        816
+      ],
+      "id": "5587c985-0bdb-406d-904c-c3096e4cfcad",
+      "name": "? Create music plan",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "lTjJlaw5BpPoTt5b",
+          "name": "ElevenLabs full key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.elevenlabs.io/v1/music",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"composition_plan\": {\n    \"positive_global_styles\": {{ JSON.stringify($json.positive_global_styles) }},\n    \"negative_global_styles\": {{ JSON.stringify($json.negative_global_styles) }},\n    \"sections\": {{ JSON.stringify($json.sections) }}\n  },\n  \"model_id\": \"music_v1\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2240,
+        816
+      ],
+      "id": "7055a788-e4ec-4bda-afdf-fb0baed7caa6",
+      "name": "? Generate music",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "lTjJlaw5BpPoTt5b",
+          "name": "ElevenLabs full key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://queue.fal.run/fal-ai/imagen4/preview",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "prompt",
+              "value": "={{ $json.output.image_prompt }}"
+            },
+            {
+              "name": "aspect_ratio",
+              "value": "=16:9"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2016,
+        96
+      ],
+      "id": "a10da965-e350-487f-bbe1-8dfd2d7286af",
+      "name": "? Generate seed image",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "BUYuOe8V0hqLtA02",
+          "name": "fal.ai"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "={{ $('? Generate seed image').item.json.status_url }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2544,
+        80
+      ],
+      "id": "0376c389-0ac4-49ef-a69c-ab43f86d8c5a",
+      "name": "? Get status of the seed image",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "BUYuOe8V0hqLtA02",
+          "name": "fal.ai"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://queue.fal.run/fal-ai/bytedance/seedance/v1/lite/image-to-video",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "prompt",
+              "value": "={{ $('Parse prompts').item.json.output.video_prompt }}"
+            },
+            {
+              "name": "resolution",
+              "value": "=480p"
+            },
+            {
+              "name": "duration",
+              "value": "12"
+            },
+            {
+              "name": "camera_fixed",
+              "value": "true"
+            },
+            {
+              "name": "image_url",
+              "value": "={{ $('Get the seed image').item.json.images?.[0].url }}"
+            },
+            {
+              "name": "end_image_url",
+              "value": "={{ $('Get the seed image').item.json.images?.[0].url }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2000,
+        448
+      ],
+      "id": "c689c09a-c141-428a-9839-2f4120911393",
+      "name": "? Start generating the looping video",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "BUYuOe8V0hqLtA02",
+          "name": "fal.ai"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "={{ $('? Start generating the looping video').item.json.status_url }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2384,
+        464
+      ],
+      "id": "6b2e34db-cfad-44fa-9a05-7e2e8a63d75c",
+      "name": "? Get the status of the looping video",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "BUYuOe8V0hqLtA02",
+          "name": "fal.ai"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "formTitle": "Create a sleep music video",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Duration in minutes",
+              "fieldType": "number",
+              "placeholder": "default: 10"
+            },
+            {
+              "fieldLabel": "Add ambient sound",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "City streets"
+                  },
+                  {
+                    "option": "Distant thunder"
+                  },
+                  {
+                    "option": "Fireplace"
+                  },
+                  {
+                    "option": "Rain heavy"
+                  },
+                  {
+                    "option": "Rain medium"
+                  },
+                  {
+                    "option": "Rain window"
+                  },
+                  {
+                    "option": "Stream"
+                  },
+                  {
+                    "option": "Thunderstorm"
+                  },
+                  {
+                    "option": "Wall clock"
+                  },
+                  {
+                    "option": "Waves seagulls"
+                  }
+                ]
+              },
+              "multiselect": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [
+        64,
+        704
+      ],
+      "id": "5dc1c4b0-470f-4c9a-8b3e-80195cbd4cef",
+      "name": "On form submission",
+      "webhookId": "b5424aa8-010d-4295-b866-781b4192cf86"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "4b2c83eb-43a2-4fe7-aefc-f544505b50ae",
+              "leftValue": "={{ $json['Add ambient sound'] }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "array",
+                "operation": "lengthGt",
+                "rightType": "number"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        208,
+        704
+      ],
+      "id": "2e2ab5bc-5f80-4d05-925f-3a05facca041",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "defineForm": "json",
+        "jsonOutput": "={{ \n  JSON.stringify(\n    $json['Add ambient sound'].map(item => ({\n      \"fieldLabel\":item,\n      \"placeholder\": \"volume (0-1)\",\n      \"requiredField\":true\n   }))\n  );\n}}",
+        "options": {
+          "formTitle": "Set the volume of the ambient sound(s)"
+        }
+      },
+      "type": "n8n-nodes-base.form",
+      "typeVersion": 1,
+      "position": [
+        368,
+        560
+      ],
+      "id": "bf3dc4cb-cac0-4274-a3c7-cdeeada46c7e",
+      "name": "Form",
+      "webhookId": "6c23ad58-bd12-455d-a5e0-db3dc2e419de"
+    },
+    {
+      "parameters": {
+        "operation": "completion",
+        "completionTitle": "In progress",
+        "completionMessage": "Wait until the generation completes",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.form",
+      "typeVersion": 1,
+      "position": [
+        528,
+        720
+      ],
+      "id": "2b73c0b7-ca5c-4fa3-aa01-61872afab3ea",
+      "name": "Close the form",
+      "webhookId": "4b64c6af-3e89-4e2a-bf0d-b721c4c44e54"
+    },
+    {
+      "parameters": {
+        "content": "# Starting the workflow",
+        "height": 576,
+        "width": 708,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        480
+      ],
+      "id": "df3209b8-ea6e-48cb-9f8d-4cd3c7b40a84",
+      "name": "Sticky Note21"
+    },
+    {
+      "parameters": {
+        "content": "# Create a thumbnail",
+        "height": 336,
+        "width": 1684,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        3408,
+        16
+      ],
+      "id": "1f242c71-ec82-429c-a801-af8f878743ed",
+      "name": "Sticky Note22"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/responses",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "openAiApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n   \"model\":\"gpt-5\",\n   \"input\": [{\n      \"role\": \"user\",\n      \"content\": [\n        {\n          \"type\": \"input_text\",\n          \"text\": {{ JSON.stringify($('Configure me').item.json.THUMBNAIL_PROMPT.replace('{CONCEPT}', $('Parse concept').item.json.output.title)) }}\n        },\n        {\n          \"type\": \"input_image\",\n          \"image_url\": \"{{ $('Get the seed image').item.json.images?.[0].url }}\"\n        }\n      ]\n   }],\n   \"reasoning\":{\n      \"effort\":\"minimal\",\n      \"summary\":\"auto\"\n   },\n   \"text\":{\n      \"format\": {\n        \"type\": \"json_schema\",\n        \"name\": \"video_concept\",\n        \"schema\": {\n           \"type\":\"object\",\n           \"properties\":{\n              \"thumbnail_prompt\":{\n                 \"type\":\"string\",\n                 \"description\":\"the image prompt to generate the thumbnail image\"\n              }\n           },\n           \"required\":[\n              \"thumbnail_prompt\"\n           ],\n           \"additionalProperties\": false\n        }\n      },\n      \"verbosity\":\"high\"\n   },\n   \"stream\":false,\n   \"store\":false\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3488,
+        144
+      ],
+      "id": "492b59c7-e03e-4c9b-a312-ef7477ef109c",
+      "name": "? Create thumbnail prompt",
+      "credentials": {
+        "openAiApi": {
+          "id": "tGvJRP2th9CbI2oq",
+          "name": "OpenAi account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "for (const item of $input.all()) {\n  const output = item.json.output.find(item => item.type === 'message');\n  if (output.status !== 'completed') {\n    throw new Error('OpenAI call failed');\n  }\n  const textContent = output?.content?.[0].text;\n  if (!textContent) {\n    throw new Error('No content received from OpenAI');\n  }\n\n  \n  item.json = {\n    output: JSON.parse(textContent)\n  }\n}\n\nreturn $input.all();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3712,
+        144
+      ],
+      "id": "3a5e0e77-7043-40e3-84cc-8fcbb8241c61",
+      "name": "Parse thumbnail prompt"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://queue.fal.run/fal-ai/qwen-image-edit",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"prompt\": {{ JSON.stringify($json.output.thumbnail_prompt) }},\n  \"image_url\": {{ JSON.stringify($('Get the seed image').item.json.images[0].url) }},\n  \"image_size\": {\n    \"width\": 1280,\n    \"height\": 720\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3952,
+        144
+      ],
+      "id": "dc258c8f-7e4c-4d11-afde-de10063af85d",
+      "name": "? Generate thumbnail image",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "BUYuOe8V0hqLtA02",
+          "name": "fal.ai"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        4192,
+        144
+      ],
+      "id": "08e3f75f-582c-4a8a-ad09-6b986ffbc47d",
+      "name": "Wait for the thumbnail image",
+      "webhookId": "5ba253c4-2ea2-4ecc-81cc-251ca00a5058"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('? Generate thumbnail image').item.json.status_url }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        4368,
+        144
+      ],
+      "id": "3c0e4221-c052-490f-980c-444828a5a6fb",
+      "name": "? Get status of the thumbnail image",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "BUYuOe8V0hqLtA02",
+          "name": "fal.ai"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "COMPLETED",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "6fc5bea4-1567-474b-bfca-5394eb303217"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "COMPLETED"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "0882f634-2472-4d24-a1c3-a39f0cd94855",
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "IN_PROGRESS",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "IN_PROGRESS"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "e6c8b207-13ac-4537-8c5c-677039bc2fef",
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "IN_QUEUE",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "IN_QUEUE"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        4576,
+        128
+      ],
+      "id": "a424f2dd-2e6c-4e3f-9158-1aef42971f9b",
+      "name": "Thumbnail image status"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('? Generate thumbnail image').item.json.response_url }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        4944,
+        176
+      ],
+      "id": "d75710c3-c051-4ce2-8448-c28240a4d2dc",
+      "name": "Get the thumbnail image",
+      "alwaysOutputData": false,
+      "retryOnFail": true,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "BUYuOe8V0hqLtA02",
+          "name": "fal.ai"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3e7587f9-c8eb-4bd2-9cef-060f096ad80e",
+              "name": "video_url",
+              "value": "={{ $('Setup defaults').first().json.AI_AGENTS_NO_CODE_TOOLS_URL }}/api/v1/media/storage/{{ $('Start creating the sleep video').item.json.file_id }}",
+              "type": "string"
+            },
+            {
+              "id": "7df5ac8d-7de4-4e0f-9d31-93fc954bdbab",
+              "name": "thumbnail_url",
+              "value": "={{ $('Get the thumbnail image').item.json.images?.[0].url }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        4720,
+        608
+      ],
+      "id": "5d107230-dd1d-4c55-9c56-5a6c50928c66",
+      "name": "Download URLs"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Configure me": {
+      "main": [
+        [
+          {
+            "node": "Setup defaults",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "? Create concept",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Server isn't ready",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Setup defaults": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get video generation status": {
+      "main": [
+        [
+          {
+            "node": "Video generation switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Video generation switch": {
+      "main": [
+        [
+          {
+            "node": "Download URLs",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait until the video gets generated",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Stop and Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait until the video gets generated": {
+      "main": [
+        [
+          {
+            "node": "Get video generation status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start creating the sleep video": {
+      "main": [
+        [
+          {
+            "node": "Wait until the video gets generated",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait for seed image": {
+      "main": [
+        [
+          {
+            "node": "? Get status of the seed image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Seed image status": {
+      "main": [
+        [
+          {
+            "node": "Get the seed image",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait for seed image",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait for seed image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get the seed image": {
+      "main": [
+        [
+          {
+            "node": "? Create thumbnail prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Looping video status": {
+      "main": [
+        [
+          {
+            "node": "Get the looping video",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait for the looping video",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait for the looping video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get the looping video": {
+      "main": [
+        [
+          {
+            "node": "Upload the looping video to the server",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge1": {
+      "main": [
+        [
+          {
+            "node": "Start creating the sleep video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload the looping video to the server": {
+      "main": [
+        [
+          {
+            "node": "Map the loopin video file_id",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse concept": {
+      "main": [
+        [
+          {
+            "node": "? Create prompts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse prompts": {
+      "main": [
+        [
+          {
+            "node": "? Generate seed image",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "? Create music plan",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload music to the server": {
+      "main": [
+        [
+          {
+            "node": "Map music file_id",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Map music file_id": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Wait for the looping video": {
+      "main": [
+        [
+          {
+            "node": "? Get the status of the looping video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Map the loopin video file_id": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "? Create concept": {
+      "main": [
+        [
+          {
+            "node": "Parse concept",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "? Create prompts": {
+      "main": [
+        [
+          {
+            "node": "Parse prompts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "? Create music plan": {
+      "main": [
+        [
+          {
+            "node": "? Generate music",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "? Generate music": {
+      "main": [
+        [
+          {
+            "node": "Upload music to the server",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "? Generate seed image": {
+      "main": [
+        [
+          {
+            "node": "Wait for seed image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "? Get status of the seed image": {
+      "main": [
+        [
+          {
+            "node": "Seed image status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "? Start generating the looping video": {
+      "main": [
+        [
+          {
+            "node": "Wait for the looping video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "? Get the status of the looping video": {
+      "main": [
+        [
+          {
+            "node": "Looping video status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Form",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Close the form",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Form": {
+      "main": [
+        [
+          {
+            "node": "Close the form",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Close the form": {
+      "main": [
+        [
+          {
+            "node": "Configure me",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "? Create thumbnail prompt": {
+      "main": [
+        [
+          {
+            "node": "Parse thumbnail prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse thumbnail prompt": {
+      "main": [
+        [
+          {
+            "node": "? Generate thumbnail image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "? Generate thumbnail image": {
+      "main": [
+        [
+          {
+            "node": "Wait for the thumbnail image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait for the thumbnail image": {
+      "main": [
+        [
+          {
+            "node": "? Get status of the thumbnail image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "? Get status of the thumbnail image": {
+      "main": [
+        [
+          {
+            "node": "Thumbnail image status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Thumbnail image status": {
+      "main": [
+        [
+          {
+            "node": "Get the thumbnail image",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait for the thumbnail image",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait for the thumbnail image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get the thumbnail image": {
+      "main": [
+        [
+          {
+            "node": "? Start generating the looping video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "a7fe18d4-e559-487c-a1c1-0c5a2fb4dcf8",
+  "meta": {
+    "instanceId": "636db6b6ab21a21c6458e2137f340e33dc3e49f5a1c560c8d1e2372c227cf40e"
+  },
+  "id": "lhd6wtD0az29ltX3",
+  "tags": []
+}

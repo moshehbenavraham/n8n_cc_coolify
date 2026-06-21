@@ -1,0 +1,557 @@
+{
+  "name": "Premium: Reddit pagination - authenticated old data format",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "subreddit"
+            },
+            {
+              "name": "max_pages",
+              "type": "number"
+            },
+            {
+              "name": "source"
+            },
+            {
+              "name": "timing"
+            },
+            {
+              "name": "after"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -700,
+        -40
+      ],
+      "id": "f96d4607-973a-4c09-bc4a-c78c33a2355c",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b9b7713f-412c-4f2f-8203-51be6300db31",
+              "name": "subreddit",
+              "value": "={{ $json.subreddit }}",
+              "type": "string"
+            },
+            {
+              "id": "327ce582-122a-4aee-ba16-883cb0b7b599",
+              "name": "max_pages",
+              "value": "={{ $json.max_pages || 1 }}",
+              "type": "number"
+            },
+            {
+              "id": "33db5009-42c9-4ece-b55b-7751fa52c30a",
+              "name": "source",
+              "value": "={{ \n['best', 'hot', 'top', 'new', 'rising']\n.includes($json.source) ? \n  $json.source \n  : 'top' \n}}",
+              "type": "string"
+            },
+            {
+              "id": "5b322ab7-9acb-4299-99c0-820202b468d7",
+              "name": "timing",
+              "value": "={{ $('When Executed by Another Workflow').item.json.timing || '' }}",
+              "type": "string"
+            },
+            {
+              "id": "1fc33490-d51d-4068-b5c7-80f21def4a4b",
+              "name": "after",
+              "value": "={{ $json.after || '' }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -300,
+        -40
+      ],
+      "id": "96ede8a9-5cd8-422f-89ea-b6579626acdf",
+      "name": "Setup workflow"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3bf7cded-2a36-494e-a97d-4d8dfab79d09",
+              "name": "reddit_url",
+              "value": "=https://oauth.reddit.com/r/{{ $('Setup workflow').item.json.subreddit }}/{{ $('Setup workflow').item.json.source }}.json?{{\n\n[\n  [\"limit\", 100], \n  $('Setup workflow').item.json.source === \"top\" && [\"t\", $('Setup workflow').item.json.timing],\n  $json.results?.length > 0 ? [\"after\", $json.results[0].data.name] : \n  $('Setup workflow').item.json.after ? \n    [\"after\", $('Setup workflow').item.json.after] : \n    ''\n]\n.filter(Boolean)\n.map(item => `${item[0]}=${item[1]}`)\n.join('&')\n\n}}",
+              "type": "string"
+            },
+            {
+              "id": "e6baa149-5c9b-47c2-b669-bfb229200b94",
+              "name": "results",
+              "value": "={{ $json.results || [] }}",
+              "type": "array"
+            },
+            {
+              "id": "1b2d4cda-7579-40f9-bd6f-50e890606cde",
+              "name": "page",
+              "value": "={{ $json.page || 1 }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        60,
+        180
+      ],
+      "id": "aa9f768d-d2e2-44b2-8c7e-6394b3443948",
+      "name": "Create reddit url"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "038d786a-dfbb-4c54-8af3-9b6f8f280459",
+              "leftValue": "={{ $json.page }}",
+              "rightValue": "={{ $('Setup workflow').item.json.max_pages }}",
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            },
+            {
+              "id": "820dc25e-f6a0-4fb1-8bf9-566e1a2e5ada",
+              "leftValue": "={{ $json.current_results_length }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1240,
+        -60
+      ],
+      "id": "0e3c3525-4300-4996-9f03-3bb28900f0fa",
+      "name": "finished?"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.error.status }}",
+                    "rightValue": 401,
+                    "operator": {
+                      "type": "number",
+                      "operation": "equals"
+                    },
+                    "id": "77ac165c-2754-4056-870b-cb02e3f539d5"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "401: unauthorized"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "45e2368f-cbfa-4643-9fb2-030899dba801",
+                    "leftValue": "={{ ![401, 429].includes($json.error.status) }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "true",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Other errors"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "a0581bc7-db7a-41b6-b39a-9d5d30170a38",
+                    "leftValue": "={{ $json.error.status }}",
+                    "rightValue": 429,
+                    "operator": {
+                      "type": "number",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "429: too many requests"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        560,
+        300
+      ],
+      "id": "6435babf-fae8-4a92-ab9e-ced2c84fb4ed",
+      "name": "Request error"
+    },
+    {
+      "parameters": {
+        "errorMessage": "={{ $json.error }}"
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        860,
+        300
+      ],
+      "id": "cae4b291-30a9-4b5f-b54c-18e4be939e4a",
+      "name": "Request can't recover"
+    },
+    {
+      "parameters": {
+        "amount": 20
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        780,
+        440
+      ],
+      "id": "2b77accf-ce7a-41fa-8617-2d48a87a80bf",
+      "name": "Wait until the rate limit goes away",
+      "webhookId": "375f5782-ca34-4a7e-8df6-a90a95088290"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "70213b33-0116-4f75-8531-0bf02402e222",
+              "name": "results",
+              "value": "={{ [...$json.data.children, ...$('Create reddit url').item.json.results] }}",
+              "type": "array"
+            },
+            {
+              "id": "b54cad1d-a636-4237-8247-3c2b5602a944",
+              "name": "page",
+              "value": "={{ $('Create reddit url').item.json.page + 1 }}",
+              "type": "number"
+            },
+            {
+              "id": "364cf592-bd3d-44dc-aaae-f2c0550fba51",
+              "name": "current_results_length",
+              "value": "={{ $json.data.children.length }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1080,
+        -60
+      ],
+      "id": "8197dcbb-6fb9-447f-b920-5f73462395c8",
+      "name": "Edit loop variables"
+    },
+    {
+      "parameters": {
+        "amount": "=5"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1700,
+        440
+      ],
+      "id": "634e94f3-50d9-4871-9137-b69db6505941",
+      "name": "Wait between iterations",
+      "webhookId": "b057a2e0-1837-4114-8a52-d19ed761d369"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d8570967-8284-4f0b-b377-781c5fc04e58",
+              "name": "data",
+              "value": "={{ { children: $json.results } }}",
+              "type": "object"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1680,
+        -360
+      ],
+      "id": "601bf9fc-f870-4534-ae1c-7eebb30ab2ee",
+      "name": "Set fields to return"
+    },
+    {
+      "parameters": {
+        "content": "# Make sure to set the Reddit authentication\n\n1. Open the `Reddit request` node and create a new `Reddit OAuth2 API` credential. Copy the value of the `OAuth Redirect URL` field.\n2. Create an app here: [https://www.reddit.com/prefs/apps/](https://www.reddit.com/prefs/apps/)\n3. Paste in the `redirect uri`\n4. After saving it, copy the app id (at the top, under the name of the app) and the secret, and paste it to the credentials\n5. Once you pasted it, you'll see the option to `Connect my account` - click on it, and after setting this up you are good to go",
+        "height": 860,
+        "width": 720
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        280,
+        -240
+      ],
+      "id": "79afc5bb-b43a-4731-98d8-876171aa6b8a",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "# return",
+        "height": 340,
+        "width": 400,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1560,
+        -520
+      ],
+      "id": "eb16448f-69d1-4220-94be-9dacd0645986",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "errorMessage": "There's a problem with your Reddit credentials!"
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        860,
+        120
+      ],
+      "id": "f2a2fcf6-773d-489c-9322-dc624f59a6da",
+      "name": "Reddit auth error"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.reddit_url }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "redditOAuth2Api",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        380,
+        180
+      ],
+      "id": "5195a954-2949-45e0-abbc-9704dcd34780",
+      "name": "Reddit request",
+      "credentials": {
+        "redditOAuth2Api": {
+          "id": "zQEpKbhU2bbodCzs",
+          "name": "Reddit account 4"
+        }
+      },
+      "onError": "continueErrorOutput"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Setup workflow",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Setup workflow": {
+      "main": [
+        [
+          {
+            "node": "Create reddit url",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create reddit url": {
+      "main": [
+        [
+          {
+            "node": "Reddit request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "finished?": {
+      "main": [
+        [
+          {
+            "node": "Set fields to return",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait between iterations",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Request error": {
+      "main": [
+        [
+          {
+            "node": "Reddit auth error",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Request can't recover",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait until the rate limit goes away",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait until the rate limit goes away": {
+      "main": [
+        [
+          {
+            "node": "Reddit request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit loop variables": {
+      "main": [
+        [
+          {
+            "node": "finished?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait between iterations": {
+      "main": [
+        [
+          {
+            "node": "Create reddit url",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reddit request": {
+      "main": [
+        [
+          {
+            "node": "Edit loop variables",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Request error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "acb15f24-0a6e-4cf6-9bfb-47d76ef53850",
+  "meta": {
+    "instanceId": "636db6b6ab21a21c6458e2137f340e33dc3e49f5a1c560c8d1e2372c227cf40e"
+  },
+  "id": "faDAjH9op4Ojq2ne",
+  "tags": []
+}

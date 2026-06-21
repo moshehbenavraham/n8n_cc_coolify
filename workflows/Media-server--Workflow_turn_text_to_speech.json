@@ -1,0 +1,839 @@
+{
+  "name": "Premium workflow: text to speech",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        1360,
+        480
+      ],
+      "id": "22bd4cce-9d02-4d1e-9fca-d9f3e6993ede",
+      "name": "When clicking 'Execute workflow'"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Configuration').item.json.ai_agents_az_toolkit_url }}/api/v1/media/storage/{{ $('Setup file id').item.json.file_id }}/status",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        4560,
+        480
+      ],
+      "id": "38a233d2-e2b6-4a23-96b2-3ce69bff0711",
+      "name": "Get status of TTS generation",
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "ready",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "91402596-3978-4dfc-91b7-9ffe3521b862"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "ready"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "0c29765e-4213-434c-9bf3-c5e854dd6ee8",
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "processing",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "processing"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "4a6cfd86-e690-417e-aa6d-ae497e1177ae",
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "not_found",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "failed"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        4740,
+        480
+      ],
+      "id": "2327e3e6-1c62-4ea7-b517-6a358d2417ce",
+      "name": "TTS status switch"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3872ce04-285c-403b-b5aa-d097a9a5baca",
+              "name": "ai_agents_az_toolkit_url",
+              "value": "http://192.168.68.60:8000",
+              "type": "string"
+            },
+            {
+              "id": "52ced52c-3410-4d92-b29d-3fae25d7fdbb",
+              "name": "text",
+              "value": "If you're in a dark place right now, I want you to know--this too shall pass. I've been there. I hit rock bottom. My business failed, my bank account was empty, and I felt completely lost.",
+              "type": "string"
+            },
+            {
+              "id": "7f58fc2c-48a2-4bed-b21a-84a080c84daf",
+              "name": "tts_engine",
+              "value": "kokoro",
+              "type": "string"
+            },
+            {
+              "id": "351324cf-a658-48f5-9150-0c8a9304fb41",
+              "name": "kokoro_voice",
+              "value": "af_heart",
+              "type": "string"
+            },
+            {
+              "id": "f094be8b-c33a-44ba-8fc9-cb08d9cce918",
+              "name": "kokoro_speed",
+              "value": 1,
+              "type": "number"
+            },
+            {
+              "id": "4b98a5f0-83c9-46c9-b7dd-10a4e7633577",
+              "name": "chatterbox_exaggeration",
+              "value": 0.5,
+              "type": "number"
+            },
+            {
+              "id": "95751284-1328-4522-b4b2-cb00002db8e2",
+              "name": "chatterbox_cfg_weight",
+              "value": "0.5",
+              "type": "string"
+            },
+            {
+              "id": "637133d4-83eb-4535-b7c3-233009ab5208",
+              "name": "chatterbox_clone_voice",
+              "value": false,
+              "type": "boolean"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1980,
+        480
+      ],
+      "id": "491cae4d-56f3-455b-8ea2-8b4cdcab6047",
+      "name": "Configuration"
+    },
+    {
+      "parameters": {
+        "amount": 1
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        4320,
+        480
+      ],
+      "id": "7af0ad2e-8338-42c6-bbb7-0bbeeefb0e85",
+      "name": "Wait until the TTS gets generated",
+      "webhookId": "87ccbc5c-76e8-474d-90c3-7875d3d95907"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Configuration').item.json.ai_agents_az_toolkit_url }}/api/v1/media/audio-tools/tts/chatterbox",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "text",
+              "value": "={{ $('Configuration').item.json.text }}"
+            },
+            {
+              "name": "sample_audio_id",
+              "value": "={{ $('Configuration').item.json.chatterbox_clone_voice ? $json.file_id : '' }}"
+            },
+            {
+              "name": "exaggeration",
+              "value": "={{ $('Configuration').item.json.chatterbox_exaggeration }}"
+            },
+            {
+              "name": "cfg_weight",
+              "value": "={{ $('Configuration').item.json.chatterbox_cfg_weight }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3820,
+        580
+      ],
+      "id": "892b45d6-b3fb-4f18-a37f-629ef3b701ad",
+      "name": "Start generating TTS (chatterbox)"
+    },
+    {
+      "parameters": {
+        "url": "https://www.reddit.com/r/selfimprovement/top.json?t=month&limit=100",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2360,
+        -1520
+      ],
+      "id": "3d422ecf-7f6c-4e07-a118-9b9b741fe5f2",
+      "name": "Get stories from reddit1"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "12roXp7Ds8S0nA_Us2MjdKkAldJYUdTV80A7vcjwR6yI",
+          "mode": "list",
+          "cachedResultName": "reddit stories",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/12roXp7Ds8S0nA_Us2MjdKkAldJYUdTV80A7vcjwR6yI/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/12roXp7Ds8S0nA_Us2MjdKkAldJYUdTV80A7vcjwR6yI/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "title": "={{ $json.data.title }}",
+            "content": "={{ $json.data.selftext }}",
+            "id": "={{ $json.data.id }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "title",
+              "displayName": "title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "content",
+              "displayName": "content",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        2800,
+        -1520
+      ],
+      "id": "ec01b84d-6515-421b-9322-2fc86dce0165",
+      "name": "Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "y3SQnJ2q0kAJw5OI",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "data.children",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        2580,
+        -1520
+      ],
+      "id": "526a31bc-48e5-437c-85fe-d2f17886ff10",
+      "name": "Split Out2"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Configuration').item.json.tts_engine }}",
+                    "rightValue": "kokoro",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "5ae108d7-13b2-41aa-ab18-45a80515ad51"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "kokoro"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "a3dbceb9-96f7-4f78-b5e4-81bd6cb9a422",
+                    "leftValue": "={{ $('Configuration').item.json.tts_engine }}",
+                    "rightValue": "chatterbox",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "chatterbox"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        3460,
+        500
+      ],
+      "id": "42abc01f-a17d-472d-a713-b00eccb2c094",
+      "name": "TTS switch"
+    },
+    {
+      "parameters": {
+        "content": "# Add stories - add a trigger node",
+        "height": 340,
+        "width": 1060
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2020,
+        -1620
+      ],
+      "id": "28dd555b-0808-427c-8805-27f18df6d604",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d41f1ef6-7591-41b7-805d-94b58caba5c4",
+              "name": "tts_audio_id",
+              "value": "={{ $('Configuration').item.json.ai_agents_az_toolkit_url }}/api/v1/media/storage/{{ $('Setup file id').item.json.file_id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        5020,
+        260
+      ],
+      "id": "f28bc1d1-bf6c-44ab-a98c-6dee1d9bc88b",
+      "name": "Setup download URL"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f8588fbe-2dbf-4f96-a95d-857bc160b852",
+              "name": "file_id",
+              "value": "={{ $json.file_id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        4080,
+        480
+      ],
+      "id": "fdae1968-e98c-4ee0-b524-ca5d8639a9b0",
+      "name": "Setup file id"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Configuration').item.json.ai_agents_az_toolkit_url }}/api/v1/media/audio-tools/tts/kokoro",
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "text",
+              "value": "={{ $('Configuration').item.json.text }}"
+            },
+            {
+              "name": "kokoro_voice",
+              "value": "={{ $('Configuration').item.json.kokoro_voice }}"
+            },
+            {
+              "name": "kokoro_speed",
+              "value": "={{ $('Configuration').item.json.kokoro_speed }}"
+            }
+          ]
+        },
+        "options": {
+          "redirect": {
+            "redirect": {}
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3820,
+        380
+      ],
+      "id": "6f61545c-182f-4902-b14d-dddd79fb5520",
+      "name": "Start generating TTS (chatterbox)1"
+    },
+    {
+      "parameters": {
+        "errorMessage": "Error occoured while generating the TTS"
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        5040,
+        600
+      ],
+      "id": "40294765-4ce6-4ab3-9e0f-7b06d8d49ea5",
+      "name": "Stop and Error"
+    },
+    {
+      "parameters": {
+        "url": "https://github.com/Houss3m/audio-samples/raw/refs/heads/main/elon%20musk%20sample.wav",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2920,
+        220
+      ],
+      "id": "dfa4d26d-3156-40e5-b8b1-2492fc3b9015",
+      "name": "Download audio sample from Elon Musk"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Configuration').item.json.ai_agents_az_toolkit_url }}/api/v1/media/storage",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "file",
+              "inputDataFieldName": "data"
+            },
+            {
+              "name": "media_type",
+              "value": "audio"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3140,
+        220
+      ],
+      "id": "fdd68c2d-6652-443e-b09d-d7f4f096d034",
+      "name": "Upload sample audio to the server"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "16092868-0d1a-48eb-b9df-419bfcd58451",
+              "leftValue": "={{ $json.chatterbox_clone_voice }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2700,
+        480
+      ],
+      "id": "fa16467a-abce-46c4-8033-ed9748de677c",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "content": "# Voice cloning - use wav",
+        "height": 300,
+        "width": 760
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2680,
+        140
+      ],
+      "id": "afc19f48-0212-43c9-8b4e-c5094609c02a",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "# Setup the text to speech here\n\n## Valid values for TTS engine: \n\n- `kokoro`\n- `chatterbox`",
+        "height": 840,
+        "width": 300
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1880,
+        100
+      ],
+      "id": "097e1e78-39a2-4bef-9042-7ea2584e28b0",
+      "name": "Sticky Note2"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking 'Execute workflow'": {
+      "main": [
+        [
+          {
+            "node": "Configuration",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get status of TTS generation": {
+      "main": [
+        [
+          {
+            "node": "TTS status switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TTS status switch": {
+      "main": [
+        [
+          {
+            "node": "Setup download URL",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait until the TTS gets generated",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Stop and Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Configuration": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait until the TTS gets generated": {
+      "main": [
+        [
+          {
+            "node": "Get status of TTS generation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start generating TTS (chatterbox)": {
+      "main": [
+        [
+          {
+            "node": "Setup file id",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get stories from reddit1": {
+      "main": [
+        [
+          {
+            "node": "Split Out2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out2": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TTS switch": {
+      "main": [
+        [
+          {
+            "node": "Start generating TTS (chatterbox)1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Start generating TTS (chatterbox)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Setup download URL": {
+      "main": [
+        []
+      ]
+    },
+    "Setup file id": {
+      "main": [
+        [
+          {
+            "node": "Wait until the TTS gets generated",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start generating TTS (chatterbox)1": {
+      "main": [
+        [
+          {
+            "node": "Setup file id",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download audio sample from Elon Musk": {
+      "main": [
+        [
+          {
+            "node": "Upload sample audio to the server",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload sample audio to the server": {
+      "main": [
+        [
+          {
+            "node": "TTS switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Download audio sample from Elon Musk",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "TTS switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "283c3b9f-b841-4ac8-8d86-0d7200d13a81",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "636db6b6ab21a21c6458e2137f340e33dc3e49f5a1c560c8d1e2372c227cf40e"
+  },
+  "id": "bx0JaEY6VEZqReQg",
+  "tags": []
+}

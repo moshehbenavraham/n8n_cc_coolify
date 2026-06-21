@@ -1,0 +1,179 @@
+{
+  "name": "Subworkflow: sleepless historian - create story",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "topic"
+            },
+            {
+              "name": "desired_length_minutes",
+              "type": "number"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -288,
+        0
+      ],
+      "id": "cfd9dda7-7689-4cfa-a52b-d7cd1ce577f9",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f9bf3171-1634-4c3a-9627-04a8a7753b55",
+              "name": "story",
+              "value": "={{ $json.output[0].content[0].text.story.replace(/\\n/g, ' ').replace(/--/g, ', ').replace(/\\./, '. ').replace(/  /g, ' ') }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        384,
+        0
+      ],
+      "id": "b118eaa4-e073-4047-b28d-5edc65233618",
+      "name": "Setup return data"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-5-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-5-MINI"
+        },
+        "responses": {
+          "values": [
+            {
+              "content": "=<instructions>\nResearch the topic below using the search tool, and write a cohesive, long essay on the subject. The length should be around {{ $json.desired_length_minutes * 1000 }} characters long.\nMake sure to write the story with 8th grade reading level, and keep it interesting. Write it with phrases that sound nice with a deep, calming voice. No citation should be included, just the text in clear text format.\n</instructions>\n<topic>\n{{ $json.topic }}\n</topic>"
+            }
+          ]
+        },
+        "builtInTools": {
+          "webSearch": {
+            "searchContextSize": "medium"
+          }
+        },
+        "options": {
+          "textFormat": {
+            "textOptions": {
+              "type": "json_schema",
+              "name": "story",
+              "schema": "{\n  \"type\": \"object\",\n    \"properties\": {\n      \"story\": {\n        \"type\": \"string\",\n        \"description\": \"A narrative story in text form, without any instructions, extra content, citation, nothing. Just the story. Clear text.\",\n        \"minLength\": 1\n      }\n    },\n    \"required\": [\n      \"story\"\n    ],\n    \"additionalProperties\": false\n}",
+              "strict": true
+            }
+          }
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.1,
+      "position": [
+        80,
+        0
+      ],
+      "id": "89f0db17-249b-4045-b8a1-903ab627b3c4",
+      "name": "Create story",
+      "credentials": {
+        "openAiApi": {
+          "id": "tGvJRP2th9CbI2oq",
+          "name": "OpenAi account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "8d7aee94-81c6-4be5-97ac-616474c6f2e9",
+              "name": "GOOGLE_CUSTOM_SEARCH",
+              "value": "d0cef6ee81f83445e",
+              "type": "string"
+            },
+            {
+              "id": "af744a1f-7f8c-4f20-9b70-7385654c701a",
+              "name": "desired_length_minutes",
+              "value": "={{ $json.desired_length_minutes || 5 }}",
+              "type": "number"
+            },
+            {
+              "id": "82b141fd-6b35-4dcd-9460-e92a59bfe13d",
+              "name": "topic",
+              "value": "={{ $json.topic }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -96,
+        0
+      ],
+      "id": "f5e7d60f-0344-450a-902f-1dbdee138a6b",
+      "name": "Setup subworkflow"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Setup subworkflow",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create story": {
+      "main": [
+        [
+          {
+            "node": "Setup return data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Setup subworkflow": {
+      "main": [
+        [
+          {
+            "node": "Create story",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "e88dab92-8545-4918-a2d7-1cf50b6b4daf",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "636db6b6ab21a21c6458e2137f340e33dc3e49f5a1c560c8d1e2372c227cf40e"
+  },
+  "id": "1Tv7lsvK5xyVFm8p",
+  "tags": []
+}

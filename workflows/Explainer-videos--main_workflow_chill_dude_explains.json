@@ -1,0 +1,1753 @@
+{
+  "name": "Explainer video example workflow (chill dude style)",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "sRCdsCcPy0UOod4k",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/sRCdsCcPy0UOod4k",
+          "cachedResultName": "Chill Dude!"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "REQUIRED_stories": "={{ $('Create stories').item.json.output.stories }}",
+            "REQUIRED_image_instructions": "={{ $('Setup defaults').item.json.art_style }}",
+            "video_id": "={{ null }}",
+            "intro_video_id": "={{ $('Intro').first().json.intro_video_id }}",
+            "outro_video_id": "={{ $('Outro').first().json.outro_video_id }}",
+            "video_orientation": "={{ $('On form submission').first().json['Aspect ratio'] }}",
+            "voice_sample_id": "={{ $('Upload voice sample to the server').first().json.file_id }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "REQUIRED_stories",
+              "displayName": "REQUIRED_stories",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "array",
+              "removed": false
+            },
+            {
+              "id": "REQUIRED_image_instructions",
+              "displayName": "REQUIRED_image_instructions",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "video_id",
+              "displayName": "video_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "number",
+              "removed": false
+            },
+            {
+              "id": "intro_video_id",
+              "displayName": "intro_video_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "outro_video_id",
+              "displayName": "outro_video_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "voice_sample_id",
+              "displayName": "voice_sample_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "video_orientation",
+              "displayName": "video_orientation",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        -2640,
+        608
+      ],
+      "id": "6d0acec0-1e05-411c-80b6-dc004d2f6737",
+      "name": "Call 'Chill Dude!'"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7d55d6da-a78c-4a28-9343-0ea9035a0aa3",
+              "name": "AI_AGENTS_NO_CODE_TOOLS_URL",
+              "value": "={{   ((u) => {   let s = u.trim();   if (!/^https?:\\/\\//i.test(s)) s = 'https://' + s;   const parts = s.split('/');   return parts[0] + '//' + parts[2]; })($json.AI_AGENTS_NO_CODE_TOOLS_URL)  }}",
+              "type": "string"
+            },
+            {
+              "id": "6124f357-2634-483b-9cfb-5094bc19d607",
+              "name": "width",
+              "value": "={{ $('On form submission').item.json['Aspect ratio'].toLowerCase().includes('landscape') ? 1920 : 1080 }}",
+              "type": "number"
+            },
+            {
+              "id": "c1bc1a43-a582-491e-a6e1-daebf28f9f4e",
+              "name": "height",
+              "value": "={{ $('On form submission').item.json['Aspect ratio'].toLowerCase().includes('landscape') ? 1080 : 1920 }}",
+              "type": "number"
+            },
+            {
+              "id": "8733cc54-3b65-4eaf-a789-39e05694ad7b",
+              "name": "art_style",
+              "value": "={{ $('On form submission').item.json['Art style'] }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2304,
+        -672
+      ],
+      "id": "38a6a31c-1220-487d-9002-d4421d10d759",
+      "name": "Setup defaults"
+    },
+    {
+      "parameters": {
+        "content": "# Test connection",
+        "height": 560,
+        "width": 420,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -2336,
+        -912
+      ],
+      "id": "87d27d9d-fd09-488a-a0a6-8d6b4eeb5ec1",
+      "name": "Sticky Note15"
+    },
+    {
+      "parameters": {
+        "errorMessage": "The server is not running or isn't configured"
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        -2096,
+        -528
+      ],
+      "id": "b1d6f75d-ba08-458b-89ad-f651e84cd305",
+      "name": "Server isn't ready"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.AI_AGENTS_NO_CODE_TOOLS_URL }}/health",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -2096,
+        -752
+      ],
+      "id": "a8e67e7f-018a-4eea-a0b9-1b89f26c8612",
+      "name": "HTTP Request",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "content": "# Configure me ?\n",
+        "height": 560,
+        "width": 300,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -2688,
+        -912
+      ],
+      "id": "deb37d7d-29eb-4b0e-ac69-b02388dcc219",
+      "name": "Sticky Note12"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7bbb518a-c4f1-49a5-9e72-3e9d939b131b",
+              "name": "AI_AGENTS_NO_CODE_TOOLS_URL",
+              "value": "<<add your server URL>>",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2592,
+        -672
+      ],
+      "id": "9b666c71-5285-410b-83d5-c0879835d524",
+      "name": "Configure me"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Setup defaults').first().json.AI_AGENTS_NO_CODE_TOOLS_URL }}/api/v1/media/video-tools/generate/tts-captioned-video",
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "specifyBody": "string",
+        "body": "={{ \n\n  Object.entries({\n    background_id: $('Upload intro image to the server').item.json.file_id,\n    audio_id: $('Start generating intro speech (chatterbox)').item.json.file_id,\n    caption_on: false,\n    image_effect: 'still',\n    width: $('Setup defaults').item.json.width,\n    height: $('Setup defaults').item.json.height\n  }).reduce((c, a) => { return [ ...c, `${a[0]}=${a[1]}` ] }, []).join('&')\n\n}}",
+        "options": {
+          "redirect": {
+            "redirect": {}
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1312,
+        -112
+      ],
+      "id": "88c36a4e-4595-4faf-9a45-bbd184c7600b",
+      "name": "Start generating captioned TTS video"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Setup defaults').first().json.AI_AGENTS_NO_CODE_TOOLS_URL }}/api/v1/media/storage/{{ $('Start generating captioned TTS video').item.json.file_id }}/status",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -880,
+        -112
+      ],
+      "id": "f1c1ff28-b450-4bbe-9f60-6963de11c501",
+      "name": "Get video generation status",
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "ready",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "91402596-3978-4dfc-91b7-9ffe3521b862"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "ready"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "0c29765e-4213-434c-9bf3-c5e854dd6ee8",
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "processing",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "processing"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "4a6cfd86-e690-417e-aa6d-ae497e1177ae",
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "not_found",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "failed"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -688,
+        -144
+      ],
+      "id": "b9b2c169-5acc-400b-a76b-7ec117eb61e5",
+      "name": "Video generation switch"
+    },
+    {
+      "parameters": {
+        "amount": 1
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -1072,
+        -112
+      ],
+      "id": "ac3c9300-c1ea-4d94-a546-6f759e81f149",
+      "name": "Wait until the video gets generated",
+      "webhookId": "0a15a64e-4548-44d6-8a6c-ac3a2290489d"
+    },
+    {
+      "parameters": {
+        "errorMessage": "Error while generating the video chunk"
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        -448,
+        -272
+      ],
+      "id": "d47b7b04-4f0f-439d-9def-9c87f6522e2a",
+      "name": "Video error"
+    },
+    {
+      "parameters": {
+        "amount": 1
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -1248,
+        272
+      ],
+      "id": "2d23d8c8-6418-4aad-8f02-08cf4dffea26",
+      "name": "Wait until the video gets generated1",
+      "webhookId": "0a15a64e-4548-44d6-8a6c-ac3a2290489d"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "953c2cc4-fae9-4720-87f0-f18c6958f9f1",
+              "name": "outro_video_id",
+              "value": "={{ $('Start generating outro video').item.json.file_id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -496,
+        272
+      ],
+      "id": "38032767-ea87-44d6-9bb8-198f152431fa",
+      "name": "Outro"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e6fe38fa-4606-4e50-ada3-1a112fdcc444",
+              "name": "intro_video_id",
+              "value": "={{ $('Start generating captioned TTS video').item.json.file_id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -448,
+        -128
+      ],
+      "id": "7ad01014-33d5-4d8a-b18c-41a9db094f1d",
+      "name": "Intro"
+    },
+    {
+      "parameters": {
+        "formTitle": "Create an explainer video",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Content",
+              "fieldType": "textarea",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Aspect ratio",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Landscape (16:9)"
+                  },
+                  {
+                    "option": "Portrait (9:16)"
+                  }
+                ]
+              },
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Art style",
+              "placeholder": "drop the art style you want to use",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Sample voice",
+              "fieldType": "file",
+              "acceptFileTypes": ".wav,.mp3",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.3,
+      "position": [
+        -2880,
+        -672
+      ],
+      "id": "2d05f60e-6fe5-4074-a142-9914425a8c95",
+      "name": "On form submission",
+      "webhookId": "420418a9-2b19-403c-b6fa-bed626005dae"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4.1-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4.1-mini"
+        },
+        "options": {
+          "timeout": 120000
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -1424,
+        -544
+      ],
+      "id": "2403e872-3f55-4e91-b1d5-38fab53e1fde",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "tGvJRP2th9CbI2oq",
+          "name": "OpenAi account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n\t\"stories\": [\"\", \"\", \"\"]\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        -1168,
+        -560
+      ],
+      "id": "e9e4f9d9-6575-47d7-9c52-f6f45088c230",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=From the following content, find, extract all the stories. Rewrite them as continous text, that will be used as a script for a youtube video, explainer style. Make the stories exciting, and the reading level below 8th grade. Each story should have at least 800 characters.\n\n{{ $('On form submission').item.json.Content }}",
+        "hasOutputParser": true,
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.7,
+      "position": [
+        -1376,
+        -752
+      ],
+      "id": "470cb596-785b-4439-8d33-dc37d4769da8",
+      "name": "Create stories",
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "jsCode": "return $('On form submission').first()"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1792,
+        -768
+      ],
+      "id": "924c6820-99f3-47a8-9cc9-01d3bf3b221d",
+      "name": "Relay sample audio"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Setup defaults').first().json.AI_AGENTS_NO_CODE_TOOLS_URL }}/api/v1/media/storage",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "file",
+              "inputDataFieldName": "=Sample_voice"
+            },
+            {
+              "name": "media_type",
+              "value": "audio"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1792,
+        -528
+      ],
+      "id": "a56a7d9a-0f17-4b7d-aee0-0ca00be5f2e5",
+      "name": "Upload voice sample to the server"
+    },
+    {
+      "parameters": {
+        "content": "# Intro video\n\nYou probably would have this pre-generated and uploaded instead of generating it every time",
+        "height": 352,
+        "width": 2384,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -2688,
+        -304
+      ],
+      "typeVersion": 1,
+      "id": "17f662fe-38a7-4d9a-9683-1fb41720ff76",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "J4CdzHvSiRhLbRi4",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/J4CdzHvSiRhLbRi4",
+          "cachedResultName": "Modal: flux dev subworkflow"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "height": "={{ $('Setup defaults').item.json.height }}",
+            "prompt": "=A stick figure in the middle of the screen, looking at the viewer\n\n{{ $('Setup defaults').item.json.art_style }}",
+            "width": "={{ $('Setup defaults').item.json.width }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "prompt",
+              "displayName": "prompt",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "width",
+              "displayName": "width",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "number",
+              "removed": false
+            },
+            {
+              "id": "height",
+              "displayName": "height",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "number",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        -2640,
+        -144
+      ],
+      "id": "24f34c02-579f-4d6b-afbb-f68ec1f40037",
+      "name": "Create intro image"
+    },
+    {
+      "parameters": {
+        "content": "# Upload voice",
+        "height": 560,
+        "width": 324,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1872,
+        -912
+      ],
+      "id": "693b9424-9591-46dd-a1c4-28b3175ac12b",
+      "name": "Sticky Note16"
+    },
+    {
+      "parameters": {
+        "content": "# Create stories",
+        "height": 560,
+        "width": 740,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1504,
+        -912
+      ],
+      "id": "8082fb5b-fe65-4343-85e7-2ba7bd0e3704",
+      "name": "Sticky Note17"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Setup defaults').first().json.AI_AGENTS_NO_CODE_TOOLS_URL }}/api/v1/media/storage",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "file",
+              "inputDataFieldName": "=data"
+            },
+            {
+              "name": "media_type",
+              "value": "image"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -2384,
+        -144
+      ],
+      "id": "55e69174-9ed8-4ccc-99b8-62ecef6b0ef5",
+      "name": "Upload intro image to the server"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Setup defaults').first().json.AI_AGENTS_NO_CODE_TOOLS_URL }}/api/v1/media/audio-tools/tts/chatterbox",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "text",
+              "value": "=Let's get into it"
+            },
+            {
+              "name": "sample_audio_id",
+              "value": "={{ $('Upload voice sample to the server').item.json.file_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -2160,
+        -144
+      ],
+      "id": "ca184cb7-75f9-45b6-b6bc-ea52e8780be0",
+      "name": "Start generating intro speech (chatterbox)"
+    },
+    {
+      "parameters": {
+        "amount": 1
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -1920,
+        -144
+      ],
+      "id": "d8301406-8a6b-4773-a39e-358ad5f0a679",
+      "name": "Wait until for intro",
+      "webhookId": "2514de72-3647-43da-b9b3-a42643e20fad"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Setup defaults').first().json.AI_AGENTS_NO_CODE_TOOLS_URL }}/api/v1/media/storage/{{ $('Start generating intro speech (chatterbox)').item.json.file_id }}/status",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1744,
+        -144
+      ],
+      "id": "0d4edb58-c9e4-4383-9fa1-7450293ba111",
+      "name": "Get status of intro speech \\ generation",
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "ready",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "91402596-3978-4dfc-91b7-9ffe3521b862"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "ready"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "0c29765e-4213-434c-9bf3-c5e854dd6ee8",
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "processing",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "processing"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "4a6cfd86-e690-417e-aa6d-ae497e1177ae",
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "not_found",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "failed"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -1568,
+        -144
+      ],
+      "id": "7dfcbfcb-0800-4e9b-9c89-fa2c2d49e930",
+      "name": "Intro speech status switch"
+    },
+    {
+      "parameters": {
+        "content": "# Outro video\n\nYou probably would have this pre-generated and uploaded instead of generating it every time",
+        "height": 352,
+        "width": 2336,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -2688,
+        96
+      ],
+      "typeVersion": 1,
+      "id": "745b4d5f-3573-44a8-ba05-72e8f9001ebf",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "# Generate main video",
+        "height": 320,
+        "width": 368,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -2688,
+        496
+      ],
+      "typeVersion": 1,
+      "id": "1f8efcbd-33d2-4085-a54a-99b97a1141e4",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        -912,
+        -528
+      ],
+      "id": "795e6c9b-01c3-4fb8-a5c0-7288e29a2f07",
+      "name": "No Operation, do nothing"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "J4CdzHvSiRhLbRi4",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/J4CdzHvSiRhLbRi4",
+          "cachedResultName": "Modal: flux dev subworkflow"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "height": "={{ $('Setup defaults').item.json.height }}",
+            "prompt": "=write \"The End\" in the middle of the screen, and have a stick figure waving under\n\n{{ $('Setup defaults').item.json.art_style }}",
+            "width": "={{ $('Setup defaults').item.json.width }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "prompt",
+              "displayName": "prompt",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "width",
+              "displayName": "width",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "number",
+              "removed": false
+            },
+            {
+              "id": "height",
+              "displayName": "height",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "number",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        -2640,
+        256
+      ],
+      "id": "8b548a47-69c8-4632-b0b6-166c0508dc57",
+      "name": "Create outro image"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Setup defaults').first().json.AI_AGENTS_NO_CODE_TOOLS_URL }}/api/v1/media/storage",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "file",
+              "inputDataFieldName": "=data"
+            },
+            {
+              "name": "media_type",
+              "value": "image"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -2432,
+        256
+      ],
+      "id": "d974233e-df9a-44a0-aa95-d1355986f071",
+      "name": "Upload outro image to the server"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Setup defaults').first().json.AI_AGENTS_NO_CODE_TOOLS_URL }}/api/v1/media/audio-tools/tts/chatterbox",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "text",
+              "value": "=If you liked the video, make sure to subscribe. I make videos like this every week. Until next time."
+            },
+            {
+              "name": "sample_audio_id",
+              "value": "={{ $('Upload voice sample to the server').item.json.file_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -2224,
+        256
+      ],
+      "id": "770fa9d5-c507-41ba-bce9-8eb3c5690203",
+      "name": "Start generating outro speech (chatterbox)"
+    },
+    {
+      "parameters": {
+        "amount": 1
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -2048,
+        256
+      ],
+      "id": "aab38ea9-d5e1-4016-b2a7-03abf8b56335",
+      "name": "Wait until the outro speech gets generated",
+      "webhookId": "2514de72-3647-43da-b9b3-a42643e20fad"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Setup defaults').first().json.AI_AGENTS_NO_CODE_TOOLS_URL }}/api/v1/media/storage/{{ $('Start generating outro speech (chatterbox)').item.json.file_id }}/status",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1872,
+        256
+      ],
+      "id": "429728c7-0982-4660-bf9a-8f7c38fd9379",
+      "name": "Get status of outro speech generation",
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "ready",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "91402596-3978-4dfc-91b7-9ffe3521b862"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "ready"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "0c29765e-4213-434c-9bf3-c5e854dd6ee8",
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "processing",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "processing"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "4a6cfd86-e690-417e-aa6d-ae497e1177ae",
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "not_found",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "failed"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -1696,
+        256
+      ],
+      "id": "af567b34-0308-4495-aa9c-5a257160035e",
+      "name": "Outro speech status switch"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Setup defaults').first().json.AI_AGENTS_NO_CODE_TOOLS_URL }}/api/v1/media/video-tools/generate/tts-captioned-video",
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "specifyBody": "string",
+        "body": "={{ \n\n  Object.entries({\n    background_id: $('Upload outro image to the server').item.json.file_id,\n    audio_id: $('Start generating outro speech (chatterbox)').item.json.file_id,\n    caption_on: false,\n    image_effect: 'still',\n    width: $('Setup defaults').item.json.width,\n    height: $('Setup defaults').item.json.height\n  }).reduce((c, a) => { return [ ...c, `${a[0]}=${a[1]}` ] }, []).join('&')\n\n}}",
+        "options": {
+          "redirect": {
+            "redirect": {}
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1456,
+        240
+      ],
+      "id": "76365b2b-ae71-48d4-b62b-aa55b3781b49",
+      "name": "Start generating outro video"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Setup defaults').first().json.AI_AGENTS_NO_CODE_TOOLS_URL }}/api/v1/media/storage/{{ $('Start generating outro video').item.json.file_id }}/status",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1056,
+        272
+      ],
+      "id": "520b7eb6-3b49-428f-b79a-e90fc1270a41",
+      "name": "Get outro video status",
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "ready",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "91402596-3978-4dfc-91b7-9ffe3521b862"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "ready"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "0c29765e-4213-434c-9bf3-c5e854dd6ee8",
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "processing",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "processing"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "4a6cfd86-e690-417e-aa6d-ae497e1177ae",
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "not_found",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "failed"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -864,
+        256
+      ],
+      "id": "ad6d5067-fc8c-4e5d-9247-d227007f45e3",
+      "name": "Outro video switch"
+    },
+    {
+      "parameters": {
+        "errorMessage": "Error during the TTS generation"
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        -1312,
+        -256
+      ],
+      "id": "71d05fa8-4e6b-49dd-86ea-5acf7fc8d1cc",
+      "name": "TTS error"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Call 'Chill Dude!'": {
+      "main": [
+        []
+      ]
+    },
+    "Setup defaults": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Relay sample audio",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Server isn't ready",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Configure me": {
+      "main": [
+        [
+          {
+            "node": "Setup defaults",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start generating captioned TTS video": {
+      "main": [
+        [
+          {
+            "node": "Wait until the video gets generated",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get video generation status": {
+      "main": [
+        [
+          {
+            "node": "Video generation switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Video generation switch": {
+      "main": [
+        [
+          {
+            "node": "Intro",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait until the video gets generated",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Video error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait until the video gets generated": {
+      "main": [
+        [
+          {
+            "node": "Get video generation status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait until the video gets generated1": {
+      "main": [
+        [
+          {
+            "node": "Get outro video status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Intro": {
+      "main": [
+        [
+          {
+            "node": "Create outro image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Configure me",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Create stories",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Create stories",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create stories": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Outro": {
+      "main": [
+        [
+          {
+            "node": "Call 'Chill Dude!'",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Relay sample audio": {
+      "main": [
+        [
+          {
+            "node": "Upload voice sample to the server",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload voice sample to the server": {
+      "main": [
+        [
+          {
+            "node": "Create stories",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create intro image": {
+      "main": [
+        [
+          {
+            "node": "Upload intro image to the server",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload intro image to the server": {
+      "main": [
+        [
+          {
+            "node": "Start generating intro speech (chatterbox)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start generating intro speech (chatterbox)": {
+      "main": [
+        [
+          {
+            "node": "Wait until for intro",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait until for intro": {
+      "main": [
+        [
+          {
+            "node": "Get status of intro speech \\ generation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get status of intro speech \\ generation": {
+      "main": [
+        [
+          {
+            "node": "Intro speech status switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Intro speech status switch": {
+      "main": [
+        [
+          {
+            "node": "Start generating captioned TTS video",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait until for intro",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "TTS error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "No Operation, do nothing": {
+      "main": [
+        [
+          {
+            "node": "Create intro image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create outro image": {
+      "main": [
+        [
+          {
+            "node": "Upload outro image to the server",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload outro image to the server": {
+      "main": [
+        [
+          {
+            "node": "Start generating outro speech (chatterbox)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start generating outro speech (chatterbox)": {
+      "main": [
+        [
+          {
+            "node": "Wait until the outro speech gets generated",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait until the outro speech gets generated": {
+      "main": [
+        [
+          {
+            "node": "Get status of outro speech generation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get status of outro speech generation": {
+      "main": [
+        [
+          {
+            "node": "Outro speech status switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Outro speech status switch": {
+      "main": [
+        [
+          {
+            "node": "Start generating outro video",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait until the outro speech gets generated",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "TTS error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start generating outro video": {
+      "main": [
+        [
+          {
+            "node": "Wait until the video gets generated1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get outro video status": {
+      "main": [
+        [
+          {
+            "node": "Outro video switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Outro video switch": {
+      "main": [
+        [
+          {
+            "node": "Outro",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait until the video gets generated1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Video error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "2f9e4335-4423-4960-b947-377a2b537a72",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "636db6b6ab21a21c6458e2137f340e33dc3e49f5a1c560c8d1e2372c227cf40e"
+  },
+  "id": "nCHRKnBU1Oecwsou",
+  "tags": []
+}

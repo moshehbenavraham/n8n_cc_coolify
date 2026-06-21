@@ -1,0 +1,126 @@
+{
+  "name": "Premium workflow: transcribe text",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        2660,
+        -640
+      ],
+      "id": "624af3a4-7be8-4d55-97b9-759d0b062d15",
+      "name": "When clicking 'Execute workflow'"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3872ce04-285c-403b-b5aa-d097a9a5baca",
+              "name": "ai_agents_az_toolkit_url",
+              "value": "http://192.168.68.60:8000",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2940,
+        -640
+      ],
+      "id": "dac5ebe9-e59c-4908-80dc-be48edf5333f",
+      "name": "Configuration"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Configuration').item.json.ai_agents_az_toolkit_url }}/api/v1/media/audio-tools/transcribe",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "audio_file",
+              "inputDataFieldName": "data"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3440,
+        -640
+      ],
+      "id": "6db0d058-ff1e-45da-bb63-d316459bf245",
+      "name": "Start generating TTS (chatterbox)"
+    },
+    {
+      "parameters": {
+        "url": "https://github.com/Houss3m/audio-samples/raw/refs/heads/main/elon%20musk%20sample.wav",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3160,
+        -640
+      ],
+      "id": "c8f93273-7c45-4eae-82b2-9128af21ef85",
+      "name": "HTTP Request"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking 'Execute workflow'": {
+      "main": [
+        [
+          {
+            "node": "Configuration",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Configuration": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Start generating TTS (chatterbox)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "54d18f6d-9c80-4a9b-b9ed-01023ea7ee6b",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "636db6b6ab21a21c6458e2137f340e33dc3e49f5a1c560c8d1e2372c227cf40e"
+  },
+  "id": "VWjv0VjjT7BfKZ3m",
+  "tags": []
+}

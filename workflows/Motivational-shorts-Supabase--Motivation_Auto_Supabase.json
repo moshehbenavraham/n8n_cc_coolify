@@ -1,0 +1,2774 @@
+{
+  "name": "Episode 11: AI shorts factory app: Skool edition (Supabase) (automated)",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        2440,
+        -1400
+      ],
+      "id": "e21ffb2d-6718-4842-bf30-a992b992064b",
+      "name": "Limit"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        2100,
+        -980
+      ],
+      "id": "a1167116-82ac-48e2-b316-abf8e516c698",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.together.xyz/v1/images/generations",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "model",
+              "value": "black-forest-labs/FLUX.1-schnell-Free"
+            },
+            {
+              "name": "prompt",
+              "value": "={{ $json.image_prompt }}"
+            },
+            {
+              "name": "width",
+              "value": "={{ 720 }}"
+            },
+            {
+              "name": "height",
+              "value": "={{ 1280 }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2320,
+        -960
+      ],
+      "id": "a8d58fba-ffea-46c9-a0cd-6861a77d9240",
+      "name": "Generate AI image",
+      "alwaysOutputData": false,
+      "credentials": {
+        "httpBearerAuth": {
+          "id": "Y58EiorQxBVC7D3s",
+          "name": "Together AI"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Configure me').item.json.ai_agents_no_code_tools_url }}/api/v1/media/storage",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "url",
+              "value": "={{ $json.data[0].url }}"
+            },
+            {
+              "name": "media_type",
+              "value": "image"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 10000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2620,
+        -1020
+      ],
+      "id": "4cdb94ad-cad1-40ab-bd29-981eceb8f466",
+      "name": "Upload image to server",
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Configure me').item.json.ai_agents_no_code_tools_url }}/api/v1/media/storage/{{ $('Start generating TTS (chatterbox)').item.json.file_id }}/status",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3520,
+        -900
+      ],
+      "id": "12040cb9-ddc9-44ab-8b78-b46b6549715b",
+      "name": "Get status of TTS generation",
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "ready",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "91402596-3978-4dfc-91b7-9ffe3521b862"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "ready"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "0c29765e-4213-434c-9bf3-c5e854dd6ee8",
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "processing",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "processing"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "4a6cfd86-e690-417e-aa6d-ae497e1177ae",
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "not_found",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "failed"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        3680,
+        -900
+      ],
+      "id": "3a0452c7-b131-49eb-8b4e-6e10693a6ab1",
+      "name": "TTS status switch"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Configure me').item.json.ai_agents_no_code_tools_url }}/api/v1/media/video-tools/generate/tts-captioned-video",
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "specifyBody": "string",
+        "body": "={{ \n\n[\n  `background_id=${$('Upload image to server').item.json.file_id}`,\n  $json.tts_audio_id ? `audio_id=${$json.tts_audio_id}` : false,\n  $json.tts_audio_id ? '' : `text=${encodeURIComponent($('Loop Over Items').item.json.text)}`,\n  $json.tts_audio_id ? '' :  `kokoro_voice=${$('Configure me').item.json.kokoro_voice}`,\n  $json.tts_audio_id ? '' : `kokoro_speed=${$('Configure me').item.json.kokoro_speed}`\n].filter(Boolean).join('&') \n\n}}",
+        "options": {
+          "redirect": {
+            "redirect": {}
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        4380,
+        -1040
+      ],
+      "id": "abf96bd3-18ca-46aa-82b1-38e11676441e",
+      "name": "Start generating captioned TTS video"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Configure me').item.json.ai_agents_no_code_tools_url }}/api/v1/media/storage/{{ $('Start generating captioned TTS video').item.json.file_id }}/status",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        4780,
+        -1040
+      ],
+      "id": "f65a77c0-cefe-46cb-b973-c2b8b3dddc74",
+      "name": "Get video generation status",
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "ready",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "91402596-3978-4dfc-91b7-9ffe3521b862"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "ready"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "0c29765e-4213-434c-9bf3-c5e854dd6ee8",
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "processing",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "processing"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "4a6cfd86-e690-417e-aa6d-ae497e1177ae",
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "not_found",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "failed"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        4960,
+        -1040
+      ],
+      "id": "cbed8691-a2b5-4090-bc15-e607b20fe82b",
+      "name": "Video generation switch"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a7fdacca-749e-4f69-84fd-50075e0e3409",
+              "name": "video_id",
+              "value": "={{ $('Start generating captioned TTS video').item.json.file_id }}",
+              "type": "string"
+            },
+            {
+              "id": "6c99c267-5c41-4697-ba19-b51d9e8c9a4e",
+              "name": "tts_id",
+              "value": "={{ $('Global TTS audio id').item.json.tts_audio_id }}",
+              "type": "string"
+            },
+            {
+              "id": "21dd08a7-f785-4829-8609-a99950f21572",
+              "name": "image_id",
+              "value": "={{ $('Upload image to server').item.json.file_id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        5220,
+        -840
+      ],
+      "id": "0f040580-820e-49df-981e-6d9eccf6206f",
+      "name": "Setup media fields"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        2380,
+        -500
+      ],
+      "id": "27d8dbaf-f460-44d0-ad39-b193a77375c3",
+      "name": "Combine loop items"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Configure me').item.json.ai_agents_no_code_tools_url }}/api/v1/media/video-tools/merge",
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "video_ids",
+              "value": "={{ $json.data.map(item => item.video_id).join(',') }}"
+            },
+            {
+              "name": "background_music_id",
+              "value": "={{ $('Configure me').item.json.background_music_id }}"
+            },
+            {
+              "name": "background_music_volume",
+              "value": "={{ $('Configure me').item.json.background_music_volume }}"
+            }
+          ]
+        },
+        "options": {
+          "redirect": {
+            "redirect": {}
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2580,
+        -500
+      ],
+      "id": "90718d7e-4356-4735-98e7-a582fc7cfa77",
+      "name": "Start merging the videos"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Configure me').item.json.ai_agents_no_code_tools_url }}/api/v1/media/storage/{{ $('Start merging the videos').item.json.file_id }}/status",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3000,
+        -500
+      ],
+      "id": "0d6dc913-70c1-4cac-8636-45ee223be940",
+      "name": "Get status of the video merge"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "ready",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "91402596-3978-4dfc-91b7-9ffe3521b862"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "ready"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "0c29765e-4213-434c-9bf3-c5e854dd6ee8",
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "processing",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "processing"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "4a6cfd86-e690-417e-aa6d-ae497e1177ae",
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "not_found",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "failed"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        3180,
+        -500
+      ],
+      "id": "6d2b7ea3-5941-4e48-ade5-dda2bec66d29",
+      "name": "Video merge status switch"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "13b0dde8-b067-41d2-b7c2-fa5addf56a25",
+              "name": "download_url",
+              "value": "={{ $('Configure me').item.json.ai_agents_no_code_tools_url }}/api/v1/media/storage/{{ $('Start merging the videos').item.json.file_id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        3980,
+        360
+      ],
+      "id": "2f92ea3d-b627-4074-a171-4c56576ad333",
+      "name": "Setup final video download URL"
+    },
+    {
+      "parameters": {
+        "amount": 10
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        2620,
+        -840
+      ],
+      "id": "2f92a447-92fd-43b5-bae6-be89c6d4c7be",
+      "name": "Wait for the error / rate limit to go away",
+      "webhookId": "a560efe1-214b-4bd1-abe9-f3e975de7f0d"
+    },
+    {
+      "parameters": {
+        "amount": 1
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        3340,
+        -900
+      ],
+      "id": "37e6818b-b144-462d-ad2a-e4df3f01ccf3",
+      "name": "Wait until the TTS gets generated",
+      "webhookId": "83468f41-991c-46ac-bd23-c092b5fa2009"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Configure me').item.json.ai_agents_no_code_tools_url }}/api/v1/media/audio-tools/tts/chatterbox",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "text",
+              "value": "={{ $('Loop Over Items').item.json.text }}"
+            },
+            {
+              "name": "sample_audio_id",
+              "value": "={{ $('Configure me').item.json.chatterbox_clone_voice_id ?? '' }}"
+            },
+            {
+              "name": "exaggeration",
+              "value": "={{ $('Configure me').item.json.chatterbox_exaggeration }}"
+            },
+            {
+              "name": "cfg_weight",
+              "value": "={{ $('Configure me').item.json.chatterbox_cfg_weight }}"
+            },
+            {
+              "name": "temperature",
+              "value": "={{ $('Configure me').item.json.chatterbox_temperature }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3160,
+        -900
+      ],
+      "id": "452fe268-015b-4301-b9e5-a90174dbcd30",
+      "name": "Start generating TTS (chatterbox)"
+    },
+    {
+      "parameters": {
+        "amount": 1
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        4580,
+        -1040
+      ],
+      "id": "46fba1e3-d2aa-4aed-a142-153a31efd19e",
+      "name": "Wait until the video gets generated",
+      "webhookId": "f5d2f68d-7349-467f-91ba-a764081269eb"
+    },
+    {
+      "parameters": {
+        "amount": 1
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        2800,
+        -500
+      ],
+      "id": "531d4b32-e11c-4170-b40b-ac06994d3bab",
+      "name": "Wait until the videos gets merged together",
+      "webhookId": "b7d7d8f6-b8f7-4b05-b943-ae3f202063a5"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Configure me').item.json.tts_engine }}",
+                    "rightValue": "kokoro",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "5ae108d7-13b2-41aa-ab18-45a80515ad51"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "kokoro"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "a3dbceb9-96f7-4f78-b5e4-81bd6cb9a422",
+                    "leftValue": "={{ $('Configure me').item.json.tts_engine }}",
+                    "rightValue": "chatterbox",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "chatterbox"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        2940,
+        -1020
+      ],
+      "id": "b4377813-4b29-4a70-be9d-6049eb221650",
+      "name": "TTS switch"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d41f1ef6-7591-41b7-805d-94b58caba5c4",
+              "name": "tts_audio_id",
+              "value": "={{ $('Start generating TTS (chatterbox)').item.json.file_id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        3940,
+        -920
+      ],
+      "id": "2cd069ec-6166-40d4-9e3d-79263ce9a524",
+      "name": "Setup TTS file_id"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "87d65a77-d25e-42b2-86ac-7b1c4efb2990",
+              "name": "text",
+              "value": "={{ $json.text.includes(\"<think>\") ? $json.text.split(\"</think>\")[1].trim() : $json.text.trim() }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        3240,
+        -1400
+      ],
+      "id": "af0381c1-c3db-4e65-a676-3f6486b28e1b",
+      "name": "Cleanup text"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4.1-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        4520,
+        -2400
+      ],
+      "id": "35433b36-49e6-4985-9977-d5135b2c1efd",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "tGvJRP2th9CbI2oq",
+          "name": "OpenAi account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "68de9e0e-e234-4509-a57a-4c4c42590620",
+              "name": "tts_audio_id",
+              "value": "={{ $json.tts_audio_id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        4200,
+        -1040
+      ],
+      "id": "a4cbf920-53ff-42d5-9970-f1532076378d",
+      "name": "Global TTS audio id"
+    },
+    {
+      "parameters": {
+        "content": "# Pick your choice of LLM ?\n? Make sure to deactive/delete the rest of the LLMs after selecting one",
+        "height": 700,
+        "width": 700,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        3980,
+        -2880
+      ],
+      "id": "ef1ca8f1-43f8-4720-91ca-e6e3b8ff545a",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        4060,
+        -2740
+      ],
+      "id": "f59490e8-8577-4d8b-a8ae-1c49c10f1892",
+      "name": "Ollama Chat Model",
+      "credentials": {
+        "ollamaApi": {
+          "id": "cWXUsJ0LsqnzOEx0",
+          "name": "Ollama account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatDeepSeek",
+      "typeVersion": 1,
+      "position": [
+        4380,
+        -2740
+      ],
+      "id": "00601cc4-b2b1-42ce-a671-8220a5d6279c",
+      "name": "DeepSeek Chat Model",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        4520,
+        -2740
+      ],
+      "id": "3a85df71-dd68-4a71-8246-7ffa6546dfdc",
+      "name": "OpenRouter Chat Model",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        4060,
+        -2400
+      ],
+      "id": "86d4fba2-68ac-4eca-aba6-80be7944208c",
+      "name": "Google Gemini Chat Model",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatAzureOpenAi",
+      "typeVersion": 1,
+      "position": [
+        4060,
+        -2580
+      ],
+      "id": "58c63f7f-f38d-4603-9367-ffe061faf718",
+      "name": "Azure OpenAI Chat Model",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatXAiGrok",
+      "typeVersion": 1,
+      "position": [
+        4220,
+        -2580
+      ],
+      "id": "6480cea5-4aa8-4c45-ba30-646a277cb590",
+      "name": "xAI Grok Chat Model",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "claude-sonnet-4-20250514",
+          "cachedResultName": "Claude 4 Sonnet"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "typeVersion": 1.3,
+      "position": [
+        4380,
+        -2580
+      ],
+      "id": "cde57849-d8e9-4bb0-a5b2-0c785959ffee",
+      "name": "Anthropic Chat Model",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatXAiGrok",
+      "typeVersion": 1,
+      "position": [
+        4520,
+        -2580
+      ],
+      "id": "2454363b-42da-4690-b408-50a18f42c6e4",
+      "name": "xAI Grok Chat Model1",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        4380,
+        -2400
+      ],
+      "id": "3fb17be9-8d9b-41bf-b7c3-cb0348498073",
+      "name": "Groq Chat Model",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatAwsBedrock",
+      "typeVersion": 1,
+      "position": [
+        4220,
+        -2740
+      ],
+      "id": "027fce6f-d4e6-4ffb-8cd2-fb1ec989caf5",
+      "name": "AWS Bedrock Chat Model",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatMistralCloud",
+      "typeVersion": 1,
+      "position": [
+        4220,
+        -2400
+      ],
+      "id": "53208921-f2e3-49d3-8fb1-f410f60cd4bc",
+      "name": "Mistral Cloud Chat Model",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "content": "# 4. Pick a story ?\n\n? set credentials in the  Supabase node and select \nthe right database",
+        "height": 400,
+        "width": 600
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2280,
+        -1620
+      ],
+      "id": "22c35c0f-4d3c-43ec-ba52-0742fdb0a76a",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "content": "# 5. Create script from the story",
+        "height": 400,
+        "width": 880
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2920,
+        -1620
+      ],
+      "id": "15316437-adcc-4f42-8520-91adce8f02fd",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "content": "# 9. Merge the videos",
+        "height": 360,
+        "width": 1180
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2280,
+        -620
+      ],
+      "id": "4484ebdf-9efc-4d8e-b49f-fd8590736cc2",
+      "name": "Sticky Note6"
+    },
+    {
+      "parameters": {
+        "content": "# 6. Generate an image with Flux ?\n\n? add your credentials to the `Generate AI image` node",
+        "height": 520,
+        "width": 580
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2280,
+        -1180
+      ],
+      "id": "9bd13cca-bba5-4468-a423-d6cad555cc42",
+      "name": "Sticky Note7"
+    },
+    {
+      "parameters": {
+        "content": "# 7. Create speech from text",
+        "height": 520,
+        "width": 1200
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2900,
+        -1180
+      ],
+      "id": "112a266c-60da-46bf-8b5f-21d147a39e34",
+      "name": "Sticky Note8"
+    },
+    {
+      "parameters": {
+        "content": "# 8. Generate captioned video",
+        "height": 520,
+        "width": 1240
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        4140,
+        -1180
+      ],
+      "id": "1204e5e0-3eb9-4532-9256-9eebb708135d",
+      "name": "Sticky Note9"
+    },
+    {
+      "parameters": {
+        "content": "# 10. Save to the database ?\n\n? set credentials in the Supabase node and select \nthe right database",
+        "height": 360,
+        "width": 380
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        3500,
+        -620
+      ],
+      "id": "6657e019-ce67-485b-85b2-aa4b26f76776",
+      "name": "Sticky Note11"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Setup final video download URL').item.json.download_url }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        4380,
+        360
+      ],
+      "id": "bb6bb2a8-5e49-4fda-b2f6-748000ab4b8f",
+      "name": "Download the video"
+    },
+    {
+      "parameters": {
+        "text": "=<Instructions>\nBreak up the text to multiple chunks that I can use for generating a youtube video, and for each chunk add an image generation prompt.\n\nAlso create a title and a description for the video.\n\nUse the following art style for the image prompts:\n\nArt style:\n{{ $('Configure me').item.json.art_style }}\n\n</Instructions>\n\n<Text>\n{{ $json.text }}\n</Text>\n\n/nothink",
+        "schemaType": "manual",
+        "inputSchema": "{\n    \"type\": \"object\",\n    \"properties\": {\n        \"scenes\": {\n            \"type\": \"array\",\n            \"description\": \"user name\",\n            \"items\": {\n                \"type\": \"object\",\n                \"properties\": {\n                    \"text\": {\n                        \"type\": \"string\",\n                        \"description\": \"the text of the scene, it will be used for TTS\"\n                    },\n                    \"image_prompt\": {\n                        \"type\": \"string\",\n                        \"description\": \"prompt for image generation\"\n                    }\n                },\n                \"required\": [\n                    \"text\",\n                    \"image_prompt\"\n                ]\n            }\n        },\n        \"title\": {\n            \"type\": \"string\",\n            \"description\": \"the title of the youtube video\"\n        },\n        \"description\": {\n            \"type\": \"string\",\n            \"description\": \"the description of the youtube video\"\n        },\n        \"tags\": {\n            \"type\": \"array\",\n            \"description\": \"tags for sharing the video on youtube\",\n            \"items\": {\n                \"type\": \"string\"\n            }\n        }\n    },\n    \"required\": [\n        \"scenes\",\n        \"title\",\n        \"description\",\n        \"tags\"\n    ]\n}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+      "typeVersion": 1.1,
+      "position": [
+        3360,
+        -1400
+      ],
+      "id": "35cf5a66-6981-4af2-b0a6-03e1a61df97c",
+      "name": "Create the script"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=<Instructions>\nUsing the below content, create 10s-60s long {{ $('Configure me').item.json.content_type }}.\nThe generated script will be used in a YouTube video.\nReturn clear text, no markdowns or any other styling is needed.\n</Instructions>\n\n<Post>\n{{ $('Limit').item.json.title }}\n\n{{ $('Limit').item.json.content }}\n</Post>\n\n/nothink",
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.7,
+      "position": [
+        2960,
+        -1400
+      ],
+      "id": "a43cf521-3b8a-42d1-b05a-1b0197ffc82f",
+      "name": "Create the motivational speech"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "output.scenes",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        3640,
+        -1400
+      ],
+      "id": "7c6bd4fe-008b-4340-a2c7-8acc3093e616",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "content": "# 11. Upload to YouTube ?\n\n? set the credentials in the `Start Youtube upload` and the `Upload video to YouTube` nodes",
+        "height": 360,
+        "width": 880,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        3920,
+        240
+      ],
+      "id": "d54e83cc-4c67-4080-baaf-40d6fe60b3fd",
+      "name": "Sticky Note13"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://www.googleapis.com/upload/youtube/v3/videos?part=snippet,status&uploadType=resumable",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "youTubeOAuth2Api",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "X-Upload-Content-Type",
+              "value": "video/mp4"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "RAW/JSON",
+        "body": "={\n  \"snippet\": {\n    \"title\": \"{{ $('Create the script').item.json.output.title }}\",\n    \"description\": \"{{ $('Create the script').item.json.output.description }}\",\n    \"tags\": \"\",\n    \"categoryId\": \"24\",\n    \"defaultLanguage\": \"en\",\n    \"defaultAudioLanguage\": \"en\"\n  },\n  \"status\": {\n    \"privacyStatus\": \"public\",\n    \"license\": \"youtube\",\n    \"embeddable\": true,\n    \"publicStatsViewable\": true,\n    \"madeForKids\": false\n  }\n}\n",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true
+            }
+          }
+        }
+      },
+      "id": "3e6fbbc8-5108-45fa-9c6e-d7fac42c9fbf",
+      "name": "Start Youtube upload",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        4180,
+        360
+      ],
+      "credentials": {
+        "youTubeOAuth2Api": {
+          "id": "EvIEz3KvgFMPW9Ap",
+          "name": "YouTube account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "={{ $('Download the video').item.json.headers.location }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "youTubeOAuth2Api",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "video/mp4"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "binaryData",
+        "inputDataFieldName": "data",
+        "options": {}
+      },
+      "id": "3531487b-888a-4479-b791-4d535d387db2",
+      "name": "Upload video to YouTube",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        4580,
+        360
+      ],
+      "credentials": {
+        "youTubeOAuth2Api": {
+          "id": "EvIEz3KvgFMPW9Ap",
+          "name": "YouTube account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "content": "# How to set up this automation?\n\n## Make sure to use n8n `1.97.1` or higher, lower versions could break the Google Sheet node\n\n## 1. Create a Supabase database with the following fields: `id` (text), `title` (text), `content` (text), `video_id` (text)\n## 2. Fix all the Supabase nodes to use the correct database\n## 3. Start the `AI Agents No-Code Tools` server\n## 4. Open the `Configure me` node, and setup the server url. Optionally, you can set the Postiz server URL for for scheduling the social media posts. You can also edit the subreddit, content type and art style if you want\n## 5. Create a free account on [Together AI](http://together.ai/), [create and API key](https://api.together.ai/settings/api-keys) and copy it\n## 6. Set up the `Generate AI Image` Node - create a new Bearer Auth credential and paste the API key from Together AI\n## 7. Connect the desired social media sharing option, and if you selected YouTube, set up the `Start YouTube upload` and `Upload video to YouTube` nodes - select/setup your YouTube credentials\n",
+        "height": 560,
+        "width": 1640,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2280,
+        -2720
+      ],
+      "id": "8bf52a91-3b87-4769-b417-1c953fe3c7f7",
+      "name": "Sticky Note14"
+    },
+    {
+      "parameters": {
+        "url": "=https://www.reddit.com/r/{{ $('Configure me').item.json.subreddit }}/top.json?t=month&limit=100",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2860,
+        -1840
+      ],
+      "id": "836d2dd1-e225-470f-ae05-ab90457cfdb8",
+      "name": "Get stories from reddit"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "data.children",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        3020,
+        -1840
+      ],
+      "id": "33b30ea6-8a55-47e3-95b2-7272612f84ac",
+      "name": "For Each story"
+    },
+    {
+      "parameters": {
+        "content": "# 2. Update reddit stories ?\n\n? set credentials in both Supabase nodes and select \nthe right database",
+        "height": 460,
+        "width": 1520
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2280,
+        -2120
+      ],
+      "id": "ba9d719b-f7ab-4efd-bf41-ed40c394c7fb",
+      "name": "Sticky Note17"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "673ecb92-5253-45ae-ab8b-17d673845442",
+              "leftValue": "={{ $('Configure me').item.json.update_reddit_stories }}",
+              "rightValue": "yes",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "9a8bc757-1144-451d-b36a-18e74140a30e",
+              "leftValue": "={{ $('Aggregate').item.json.data?.[0].keys().length == 0 }}",
+              "rightValue": 1,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2600,
+        -1860
+      ],
+      "id": "989d7013-9640-48b8-b5b5-daac62907d2b",
+      "name": "Update reddit stories?"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7bbb518a-c4f1-49a5-9e72-3e9d939b131b",
+              "name": "ai_agents_no_code_tools_url",
+              "value": "http://192.168.68.60:8000",
+              "type": "string"
+            },
+            {
+              "id": "485a5788-cda6-4015-aa8d-d7b7ff012266",
+              "name": "subreddit",
+              "value": "selfimprovement",
+              "type": "string"
+            },
+            {
+              "id": "afa3df27-f529-452f-8976-63a0af466584",
+              "name": "content_type",
+              "value": "motivational speech",
+              "type": "string"
+            },
+            {
+              "id": "ddd725fb-b9f6-45d6-90df-88c50ba53a20",
+              "name": "art_style",
+              "value": "=Use the following prompt as a template for the image generation prompt, use the content to create a unique image for the scene.\n\nCreate a cinematic image in a dramatic, high-contrast photographic style, with a cool blue color grading. The subject is a figure [doing something, like walking under a waterfall, sitting under a tree, watching the sunset, whatever makes sense from the content's perspective], captured from a distance. The foreground should be softly blurred to focus attention on the landscape details. The mood should convey strength, wisdom, and a sense of calm determination. The overall visual should feel inspirational and dignified, resembling a powerful nature documentary scene.",
+              "type": "string"
+            },
+            {
+              "id": "79226bcb-3a26-4d30-b3a3-e578cda677f9",
+              "name": "postiz_api_url",
+              "value": "https://postiz.aiagentsaz.com/api/public/v1",
+              "type": "string"
+            },
+            {
+              "id": "940d954d-74de-455b-a85d-16827783fe30",
+              "name": "tts_engine",
+              "value": "kokoro",
+              "type": "string"
+            },
+            {
+              "id": "16d582b3-84bf-4b2c-89fa-30603ee6e0e2",
+              "name": "background_music_id",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "34f8b468-b669-46ed-be9d-e77e15f36380",
+              "name": "background_music_volume",
+              "value": 0.2,
+              "type": "number"
+            },
+            {
+              "id": "1be1b5e1-1baf-4f21-8309-c02aa1437ef9",
+              "name": "update_reddit_stories",
+              "value": false,
+              "type": "boolean"
+            },
+            {
+              "id": "a7b1dd3c-0109-4f88-89f9-f236e6bea8f7",
+              "name": "kokoro_voice",
+              "value": "af_heart",
+              "type": "string"
+            },
+            {
+              "id": "5a691031-4de0-4791-821d-4dec80388969",
+              "name": "kokoro_speed",
+              "value": 1,
+              "type": "number"
+            },
+            {
+              "id": "a725aaf1-c91e-4d5b-87f9-d540d309098c",
+              "name": "chatterbox_exaggeration",
+              "value": 0.5,
+              "type": "number"
+            },
+            {
+              "id": "d048e31d-f1cb-48ac-9ff2-13f1028c843e",
+              "name": "chatterbox_cfg_weight",
+              "value": 0.5,
+              "type": "number"
+            },
+            {
+              "id": "96943158-11f6-4731-9d4b-dbae0862d7ab",
+              "name": "chatterbox_temperature",
+              "value": 0.8,
+              "type": "number"
+            },
+            {
+              "id": "15051422-f020-4a19-a2bd-6a67e93af778",
+              "name": "chatterbox_clone_voice_id",
+              "value": "",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1640,
+        -1900
+      ],
+      "id": "210f123d-b9d5-418f-9300-cc4e87bf29dd",
+      "name": "Configure me"
+    },
+    {
+      "parameters": {
+        "content": "# Configure me ?\n",
+        "height": 520,
+        "width": 300,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1540,
+        -2120
+      ],
+      "id": "252e7b32-cc9c-4d10-940b-b1bf497fbcad",
+      "name": "Sticky Note12"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "9aa0ae35-303b-40f5-8556-2af39e621abf",
+              "leftValue": "={{ $('Limit').item.json.keys().length }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2560,
+        -1400
+      ],
+      "id": "2c9ee3c6-79d6-45b6-8531-6b9928acfe13",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "errorMessage": "No more stories! Please download more"
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        2740,
+        -1560
+      ],
+      "id": "b3060542-8483-4062-9585-2461329cead7",
+      "name": "No more stories"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        2460,
+        -1860
+      ],
+      "id": "1d188211-1704-4c51-8779-7eab849b24ab",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.ai_agents_no_code_tools_url }}/health",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2000,
+        -1960
+      ],
+      "id": "710d874d-0ec1-407b-9ab9-981e2271004b",
+      "name": "HTTP Request",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "errorMessage": "The server is not running or isn't configured"
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        2000,
+        -1740
+      ],
+      "id": "9f78da58-f621-4ed9-ac84-2f72cf159e43",
+      "name": "Server isn't ready"
+    },
+    {
+      "parameters": {
+        "content": "# Test connection",
+        "height": 520,
+        "width": 360
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1880,
+        -2120
+      ],
+      "id": "dffdbd9a-3a0e-4f86-8a18-4cda8d494d87",
+      "name": "Sticky Note15"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        3640,
+        -1840
+      ],
+      "id": "0dd46004-302a-4899-9c45-f19a08786adc",
+      "name": "Combine"
+    },
+    {
+      "parameters": {
+        "content": "# cleanup (removing tmp files)\nif you want to delete the generated video too, add it's id to the array",
+        "height": 360,
+        "width": 540
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        4840,
+        20
+      ],
+      "id": "f0c41b87-0d17-4388-9ca6-0a8c69fa1f4e",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "27bcaf96-fcaa-41cb-8a51-436870ce2110",
+              "name": "file_ids",
+              "value": "={{ [...$('Combine loop items').item.json.data.map(item => [item.video_id, item.tts_id, item.image_id]).flat(), $('Configure me').item.json.chatterbox_clone_voice_id, $('Configure me').item.json.background_music_id].filter(Boolean) }}",
+              "type": "array"
+            },
+            {
+              "id": "ff26af44-84ff-46a0-8532-5eeca8dbb099",
+              "name": "",
+              "value": "",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        4880,
+        140
+      ],
+      "id": "8f0958cb-78a2-4e4f-9ca6-0b69bd8aec26",
+      "name": "Set file ids to delete"
+    },
+    {
+      "parameters": {
+        "method": "DELETE",
+        "url": "={{ $('Configure me').item.json.ai_agents_no_code_tools_url }}/api/v1/media/storage/{{ $json.file_ids }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        5200,
+        140
+      ],
+      "id": "dcb18160-04ba-4f45-ba4c-ecc1053d1c1b",
+      "name": "Delete tmp files"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "file_ids",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        5040,
+        140
+      ],
+      "id": "c21c97be-438e-4ddb-bb9e-9b78ffb7ec75",
+      "name": "For each file"
+    },
+    {
+      "parameters": {
+        "content": "# ? [Join our Skool community for support, premium content and more!](https://www.skool.com/ai-agents-az/about?w9)\n\n## Be part of a growing community and help us create more content like this",
+        "height": 260,
+        "width": 700,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1540,
+        -2420
+      ],
+      "id": "88a66605-65ca-4429-b50a-81c037d11eb3",
+      "name": "Sticky Note16"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "reddit_motivational_videos",
+        "limit": 1,
+        "filterType": "string",
+        "filterString": "video_id=is.null"
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        2320,
+        -1860
+      ],
+      "id": "3a6e2a3b-511f-4745-8ffd-780d51591bba",
+      "name": "Check if data exists",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "ITjsOe1zjbHScIWk",
+          "name": "Supabase revange videos"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "tableId": "reddit_motivational_videos",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "id",
+              "fieldValue": "={{ $json.data.id }}"
+            },
+            {
+              "fieldId": "title",
+              "fieldValue": "={{ $json.data.title }}"
+            },
+            {
+              "fieldId": "content",
+              "fieldValue": "={{ $json.data.selftext }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        3380,
+        -1860
+      ],
+      "id": "e0d29d86-2368-42f0-a987-3018f33bced6",
+      "name": "Save database row",
+      "credentials": {
+        "supabaseApi": {
+          "id": "ITjsOe1zjbHScIWk",
+          "name": "Supabase revange videos"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "reddit_motivational_videos",
+        "limit": 1,
+        "filterType": "string",
+        "filterString": "video_id=is.null"
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        2320,
+        -1400
+      ],
+      "id": "5edac40d-16e7-48a7-8a18-622de8da7f80",
+      "name": "Get row for processing",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "ITjsOe1zjbHScIWk",
+          "name": "Supabase revange videos"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "reddit_motivational_videos",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "condition": "eq",
+              "keyValue": "={{ $('Limit').item.json.id }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "video_id",
+              "fieldValue": "={{ $('Start merging the videos').item.json.file_id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        3640,
+        -440
+      ],
+      "id": "c58ffc7c-aef5-443b-87a9-cb3ad784f8fe",
+      "name": "Save video id to the db",
+      "credentials": {
+        "supabaseApi": {
+          "id": "ITjsOe1zjbHScIWk",
+          "name": "Supabase revange videos"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "# 11. Schedule with Postiz",
+        "height": 820,
+        "width": 880,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        3920,
+        -620
+      ],
+      "id": "4c872ae9-879a-4a27-a2b8-6b79fb1f46d4",
+      "name": "Sticky Note20"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Configure me').item.json.ai_agents_no_code_tools_url }}/api/v1/media/storage/{{ $('Start merging the videos').item.json.file_id }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        4020,
+        -500
+      ],
+      "id": "f0a6eb5e-12b7-4ebf-9066-6fdd10ebdd11",
+      "name": "Download the video for Postiz"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Configure me').item.json.postiz_api_url }}/upload",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "file",
+              "inputDataFieldName": "data"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        4240,
+        -500
+      ],
+      "id": "6840d7e3-3f40-4b2c-a33c-c72ab38fceac",
+      "name": "Upload video to Postiz",
+      "credentials": {
+        "httpBearerAuth": {
+          "id": "qaxoCSbcbmatcO44",
+          "name": "Local postiz"
+        },
+        "httpCustomAuth": {
+          "id": "X84DBVwdxIyjeWnM",
+          "name": "Custom Auth account"
+        },
+        "httpHeaderAuth": {
+          "id": "vLZnCmQuaqpFY5LK",
+          "name": "Postiz auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Configure me').item.json.postiz_api_url }}/integrations",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        4460,
+        -500
+      ],
+      "id": "519c6c69-0fb3-4707-be3a-3f789b92c3b4",
+      "name": "Get Postiz integrations",
+      "credentials": {
+        "httpBearerAuth": {
+          "id": "qaxoCSbcbmatcO44",
+          "name": "Local postiz"
+        },
+        "httpCustomAuth": {
+          "id": "X84DBVwdxIyjeWnM",
+          "name": "Custom Auth account"
+        },
+        "httpHeaderAuth": {
+          "id": "vLZnCmQuaqpFY5LK",
+          "name": "Postiz auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        4640,
+        -500
+      ],
+      "id": "e85096d7-5c3d-4964-bc2a-d920048fb065",
+      "name": "Merge integrations"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1f7adeed-3cd0-47bb-8bf5-5887d2c82cad",
+              "name": "postiz_integration_id",
+              "value": "={{ $json.data.find(integration => integration.identifier === 'youtube')?.id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        4000,
+        -20
+      ],
+      "id": "881689ca-320d-43c4-a9c0-46d9bb5dc5da",
+      "name": "Set integration id for YouTube"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Configure me').item.json.postiz_api_url }}/posts",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"type\": \"schedule\",\n  \"date\": \"{{ $now.plus(1, 'days').toISO() }}\",\n  \"tags\": [],\n  \"shortLink\": false,\n  \"posts\": [\n    {\n      \"integration\": {\n        \"id\": \"{{ $json.postiz_integration_id }}\"\n      },\n      \"value\": [\n        {\n          \"content\": \"{{ $('Create the script').item.json.output.description }}\",\n          \"image\": [\n            {\n              \"id\": \"{{ $('Upload video to Postiz').item.json.id }}\",\n              \"path\": \"{{ $('Upload video to Postiz').item.json.path }}\"\n            }\n          ]\n        }\n      ],\n      \"settings\": {\n      \"title\": \"{{ $('Create the script').item.json.output.title }}\",\n      \"type\": \"unlisted\",\n      \"tags\": {{ JSON.stringify($('Create the script').item.json.output.tags.map(tag => ({ value: tag, label: tag }))) }}\n  }\n    }\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        4540,
+        -20
+      ],
+      "id": "1dee1d95-3e0b-45b8-b6ce-bb3fe49af144",
+      "name": "Schedule YouTube video",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "vLZnCmQuaqpFY5LK",
+          "name": "Postiz auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "# Setup the integration\n\nYou should implement your own logic here.\n\n1. You can hard-code the desired integration id\n2. You can filter the integrations by your own logic\n\nMake sure to modify the `settings` field if you are sharing to other platforms than YouTube",
+        "height": 500,
+        "width": 380
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        3960,
+        -320
+      ],
+      "id": "cc053bbe-9de1-43ff-85aa-19e9837749de",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        1320,
+        -1880
+      ],
+      "id": "41823fe0-cdcb-4445-8ca8-e0b65264aab0",
+      "name": "When clicking 'Execute workflow'"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        3200,
+        -2020
+      ],
+      "id": "aa10b8e7-9235-422d-812a-b0849d79f109",
+      "name": "Loop Over Items1"
+    }
+  ],
+  "pinData": {
+    "Create the motivational speech": [
+      {
+        "json": {
+          "text": "If you want to attract the right woman, stop pretending to be someone you're not. Women can see through fake niceness--it's the inauthenticity that pushes them away. True kindness comes from genuine confidence, not a hidden agenda. Don't be a 'nice guy' trying to get something in return, and don't be an asshole who can't build real connections. Be authentic. Be real. When you show your true self, the right person will be drawn to you, and meaningful relationships will follow. Embrace who you are, and the rest will fall into place."
+        }
+      }
+    ],
+    "Create the script": [
+      {
+        "json": {
+          "output": {
+            "scenes": [
+              {
+                "text": "If you want to attract the right woman, stop pretending to be someone you're not. Women can see through fake niceness--it's the inauthenticity that pushes them away.",
+                "image_prompt": "Create a cinematic image in a dramatic, high-contrast photographic style, with a cool blue color grading. The subject is a figure standing alone on a rugged cliff, looking out thoughtfully over a vast ocean. The foreground is softly blurred to focus attention on the landscape details. The mood conveys strength, wisdom, and a sense of calm determination. The overall visual feels inspirational and dignified, resembling a powerful nature documentary scene."
+              },
+              {
+                "text": "True kindness comes from genuine confidence, not a hidden agenda. Don't be a 'nice guy' trying to get something in return, and don't be an asshole who can't build real connections.",
+                "image_prompt": "Create a cinematic image in a dramatic, high-contrast photographic style, with a cool blue color grading. The subject is a figure walking along a forest path with a confident, relaxed posture, captured from a distance. The foreground is softly blurred to focus attention on the natural surroundings. The mood conveys strength, wisdom, and a sense of calm determination. The overall visual feels inspirational and dignified, resembling a powerful nature documentary scene."
+              },
+              {
+                "text": "Be authentic. Be real. When you show your true self, the right person will be drawn to you, and meaningful relationships will follow.",
+                "image_prompt": "Create a cinematic image in a dramatic, high-contrast photographic style, with a cool blue color grading. The subject is a figure sitting quietly beside a peaceful lake at sunset, reflecting on the water. The foreground is softly blurred to focus attention on the serene landscape. The mood conveys strength, wisdom, and a sense of calm determination. The overall visual feels inspirational and dignified, resembling a powerful nature documentary scene."
+              },
+              {
+                "text": "Embrace who you are, and the rest will fall into place.",
+                "image_prompt": "Create a cinematic image in a dramatic, high-contrast photographic style, with a cool blue color grading. The subject is a figure standing tall on a mountaintop, arms open wide, overlooking a vast valley below. The foreground is softly blurred to focus attention on the expansive landscape. The mood conveys strength, wisdom, and a sense of calm determination. The overall visual feels inspirational and dignified, resembling a powerful nature documentary scene."
+              }
+            ],
+            "title": "Attract the Right Woman by Being Your Authentic Self",
+            "description": "Discover why authenticity matters in attracting meaningful relationships. Learn how genuine confidence and true kindness create real connections, and why pretending or playing games only pushes people away. Embrace who you are and find the love you deserve.",
+            "tags": [
+              "authenticity",
+              "relationships",
+              "self-confidence",
+              "dating advice",
+              "personal growth"
+            ]
+          }
+        }
+      }
+    ],
+    "Generate AI image": [
+      {
+        "json": {
+          "id": "nyaVFhB-2kFHot-95188906ee8ffe40-PDX",
+          "model": "black-forest-labs/FLUX.1-schnell-Free",
+          "object": "list",
+          "data": [
+            {
+              "index": 0,
+              "url": "https://api.together.ai/imgproxy/VJ58UKSnN3GNed0N51_X7HubGXN73ix6M_SwEB1kn2Q/format:jpeg/aHR0cHM6Ly90b2dldGhlci1haS1iZmwtaW1hZ2VzLXByb2QuczMudXMtd2VzdC0yLmFtYXpvbmF3cy5jb20vaW1hZ2VzLzA1ZGVhMWY5NTI0NzA5OGQxZDI1ODg0YjQzNWM0NTgyZDc2MDc4NjQwNDc2NDkyYjQzNTlmNjk1OTY4YmM4NzQ_WC1BbXotQWxnb3JpdGhtPUFXUzQtSE1BQy1TSEEyNTYmWC1BbXotQ29udGVudC1TaGEyNTY9VU5TSUdORUQtUEFZTE9BRCZYLUFtei1DcmVkZW50aWFsPUFTSUFZV1pXNEhWQ0tEM0pMTkFJJTJGMjAyNTA2MTglMkZ1cy13ZXN0LTIlMkZzMyUyRmF3czRfcmVxdWVzdCZYLUFtei1EYXRlPTIwMjUwNjE4VDA1NTUwMlomWC1BbXotRXhwaXJlcz0zNjAwJlgtQW16LVNlY3VyaXR5LVRva2VuPUlRb0piM0pwWjJsdVgyVmpFSjclMkYlMkYlMkYlMkYlMkYlMkYlMkYlMkYlMkYlMkZ3RWFDWFZ6TFhkbGMzUXRNaUpHTUVRQ0lHJTJGdFlhSUxrSzk3OXNzSTZBem9ZJTJCTWpHU3MlMkJjTkVGTHRiaEtEcFhzSW9IQWlBcUxVajRvSUxwJTJCJTJCVEtlb1BOelZPRmZJcHNUdEh5bDVETlM3MCUyQnM5c21CQ3FaQlFpSCUyRiUyRiUyRiUyRiUyRiUyRiUyRiUyRiUyRiUyRjhCRUFBYUREVTVPRGN5TmpFMk16YzRNQ0lNQjZCTDRiVTdiUVYlMkZTa0hzS3UwRVZZUkFmd2Q2QUROc1duUEVtN2dieU93eTRDSWR0YWRvRVpiJTJGajc3MzRveGtPRFdTckpqJTJGclVsM2dmdkpyMndRRUJuNlIlMkYxRWo4c1dBdjNNUiUyRlFDV3gzcEVnNEZYSE5Oc2p2S0FpdnVBSTJhV1NwVFhOT0tHV2xFWiUyRnp5d3JzJTJGSVdPVU8wUzdyJTJGSGl3aXowQWh5Q0M5NmZvaFNiYWlEbXMlMkIwNWZCQWpSRWtVNnhhZTVGT0NtckQ2VGtudm9YOEU2TUhsY0dZQTNneHk5dUdaUmdET2ElMkJ5N09weXdkYnE5ZFhsdU9qNFBBNUx6ek10WlYyWmRhVFV4NGt5bHdOeUU0NUJoekFVQlYlMkIySjRvS1N2UlpuY1hLYjcyWGdVQjNSand1dVJaN0R0WGlCanZjSk5EcSUyRnU1TUlnamF6dHBEQWdPU3pQY2F5UkZsUWlxSENZbHBaeFhlbjUwNzdwNSUyQlM1azhZSzYySGdSOTQlMkJNVG8wc2IlMkZzTGYyR2JWS2pHU0EzbSUyRnduZ2lEb2dEYzlMSzRRRkRVYmdMaWZFTmFJek5pYmlRSmRiSkRYNFY5cFV2UjR4ZXZNeEJiNXliSkRzY29qSzZQVEw4OUw0Q1Bab0RkVUVTejl1NHI3a3pQQ0t3OXZlNWF4UXNKU0JpRWlIWDdMZHd3bjN2N25SZCUyQjBvWExyd3BEQlVGJTJGM1k4bGo4QTBtanZ4UFhKcjd2TVJLenNOUVFlM3FLMFUyUmJZTGRzNEExN0ElMkJMYzRyZ0Z3QUZRNHNEMzljWGg3NEhLSVF5MEI5YzBpWjJ5ZFolMkZOdzZwJTJGSTRONE9zeWVrY1c3b2ZENGZHYm5pclZHOSUyQlFyZ3h2TDIlMkJCNnpHWDNBdmFKQlZGTG8wOVIlMkZLSiUyRklJWWJ0ZHlmWnRseURLYXF1YklsN1MwUnRxSW1UUFNteHVLVlNNWlNhcnM0U2pac2hsTDJ0SG5jaFFqSzhLaTc0Y2RZMVhseUpFcnYlMkJkbGQ5ZFlXQWZRJTJGSzVMdDlvam14eTBMSE14MiUyQjJZb0s1YWlJcGZEdldTQSUyQlNvc1RqR1dtSlppV2FhZmpkVXM1JTJGRkVnTVZFbjNXSnRqSCUyRjZDbVMzZkpFUk1MYXB5Y0lHT3B3QnEyY2ZJZiUyQkVlbDBqemp5Y2pVcW44YWh4S056cm11ZWRpWXJ4dnJFOENlWFk0RFM2REFzajlFR0diWFdNeDlZQktqcVhTSmFhNlpsQTRDSWV1b1lOeXpJJTJCS2xSdmtld0RabnZQSDVnZEJMcGcyR1BaTm1zbFdjTWpraTBWMU1RSUZVMEIxN3F1ZHZiZ1RObDZzV2sySWNNZE5wQ2xsc1JaSnRDSkcxRk51MTF5cnlaQkNqNFJPQ1pldmhBSmUydEh4SyUyQnZIanNMa1BkdlFadXYmWC1BbXotU2lnbmF0dXJlPTdlM2MwNjYyNmY5MDFjZWVjOWUxOWU5YTY0ZmQ5N2MzY2ZiNDJmODQ0ZTUxOTQ3NzhiM2E5YjZlYTI5MjlhMWMmWC1BbXotU2lnbmVkSGVhZGVycz1ob3N0JngtaWQ9R2V0T2JqZWN0",
+              "timings": {
+                "inference": 1.1378862038254738
+              }
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Limit": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Combine loop items",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Generate AI image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate AI image": {
+      "main": [
+        [
+          {
+            "node": "Upload image to server",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait for the error / rate limit to go away",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload image to server": {
+      "main": [
+        [
+          {
+            "node": "TTS switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get status of TTS generation": {
+      "main": [
+        [
+          {
+            "node": "TTS status switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TTS status switch": {
+      "main": [
+        [
+          {
+            "node": "Setup TTS file_id",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait until the TTS gets generated",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Start generating TTS (chatterbox)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start generating captioned TTS video": {
+      "main": [
+        [
+          {
+            "node": "Wait until the video gets generated",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get video generation status": {
+      "main": [
+        [
+          {
+            "node": "Video generation switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Video generation switch": {
+      "main": [
+        [
+          {
+            "node": "Setup media fields",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait until the video gets generated",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Setup media fields": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Combine loop items": {
+      "main": [
+        [
+          {
+            "node": "Start merging the videos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start merging the videos": {
+      "main": [
+        [
+          {
+            "node": "Wait until the videos gets merged together",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get status of the video merge": {
+      "main": [
+        [
+          {
+            "node": "Video merge status switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Video merge status switch": {
+      "main": [
+        [
+          {
+            "node": "Save video id to the db",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait until the videos gets merged together",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait for the error / rate limit to go away": {
+      "main": [
+        [
+          {
+            "node": "Generate AI image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait until the TTS gets generated": {
+      "main": [
+        [
+          {
+            "node": "Get status of TTS generation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start generating TTS (chatterbox)": {
+      "main": [
+        [
+          {
+            "node": "Wait until the TTS gets generated",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait until the video gets generated": {
+      "main": [
+        [
+          {
+            "node": "Get video generation status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait until the videos gets merged together": {
+      "main": [
+        [
+          {
+            "node": "Get status of the video merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Setup final video download URL": {
+      "main": [
+        [
+          {
+            "node": "Start Youtube upload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TTS switch": {
+      "main": [
+        [
+          {
+            "node": "Global TTS audio id",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Start generating TTS (chatterbox)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Setup TTS file_id": {
+      "main": [
+        [
+          {
+            "node": "Global TTS audio id",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cleanup text": {
+      "main": [
+        [
+          {
+            "node": "Create the script",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Create the motivational speech",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Create the script",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Global TTS audio id": {
+      "main": [
+        [
+          {
+            "node": "Start generating captioned TTS video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download the video": {
+      "main": [
+        [
+          {
+            "node": "Upload video to YouTube",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create the script": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create the motivational speech": {
+      "main": [
+        [
+          {
+            "node": "Cleanup text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start Youtube upload": {
+      "main": [
+        [
+          {
+            "node": "Download the video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload video to YouTube": {
+      "main": [
+        [
+          {
+            "node": "Set file ids to delete",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get stories from reddit": {
+      "main": [
+        [
+          {
+            "node": "For Each story",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "For Each story": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update reddit stories?": {
+      "main": [
+        [
+          {
+            "node": "Get stories from reddit",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get row for processing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Configure me": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "No more stories",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Create the motivational speech",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Update reddit stories?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Check if data exists",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Server isn't ready",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Combine": {
+      "main": [
+        [
+          {
+            "node": "Get row for processing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set file ids to delete": {
+      "main": [
+        [
+          {
+            "node": "For each file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "For each file": {
+      "main": [
+        [
+          {
+            "node": "Delete tmp files",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        []
+      ]
+    },
+    "Check if data exists": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save database row": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row for processing": {
+      "main": [
+        [
+          {
+            "node": "Limit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save video id to the db": {
+      "main": [
+        [
+          {
+            "node": "Setup final video download URL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download the video for Postiz": {
+      "main": [
+        [
+          {
+            "node": "Upload video to Postiz",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload video to Postiz": {
+      "main": [
+        [
+          {
+            "node": "Get Postiz integrations",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Postiz integrations": {
+      "main": [
+        [
+          {
+            "node": "Merge integrations",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge integrations": {
+      "main": [
+        [
+          {
+            "node": "Set integration id for YouTube",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set integration id for YouTube": {
+      "main": [
+        [
+          {
+            "node": "Schedule YouTube video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule YouTube video": {
+      "main": [
+        [
+          {
+            "node": "Set file ids to delete",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking 'Execute workflow'": {
+      "main": [
+        [
+          {
+            "node": "Configure me",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items1": {
+      "main": [
+        [
+          {
+            "node": "Combine",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Save database row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "5a1ed81b-c30f-4e6c-a548-a8ba90b91701",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "636db6b6ab21a21c6458e2137f340e33dc3e49f5a1c560c8d1e2372c227cf40e"
+  },
+  "id": "Ri9o9TZ2KwEBWHwY",
+  "tags": [
+    {
+      "createdAt": "2025-06-17T09:42:53.277Z",
+      "updatedAt": "2025-06-17T09:42:53.277Z",
+      "id": "o6Q6Vo48LMdFvbGd",
+      "name": "skool"
+    }
+  ]
+}

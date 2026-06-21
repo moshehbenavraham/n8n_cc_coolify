@@ -1,0 +1,822 @@
+{
+  "name": "Premium template: Youtube SEO improvements",
+  "nodes": [
+    {
+      "parameters": {
+        "fieldToSplitOut": "items",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        1328,
+        128
+      ],
+      "id": "d0f6f49b-5e59-46f9-925f-2c0941950c36",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "formTitle": "Start a new Youtube SEO research",
+        "formDescription": "Which video length are you interested in?",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Keyword",
+              "placeholder": "what keyword shall we research?",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Video length",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "short"
+                  },
+                  {
+                    "option": "medium"
+                  },
+                  {
+                    "option": "long"
+                  }
+                ]
+              },
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "From when?",
+              "fieldType": "date",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Until when?",
+              "fieldType": "date",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Minimum views",
+              "fieldType": "number",
+              "placeholder": "default: 1000; the minimum number of views on the videos you are interested in"
+            },
+            {
+              "fieldLabel": "Number of pages to scrape (pagination)",
+              "fieldType": "number",
+              "placeholder": "default: 1"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [
+        336,
+        128
+      ],
+      "id": "0de55e23-7a91-4599-a2cc-88ab0ec3b535",
+      "name": "On form submission",
+      "webhookId": "ba885e6c-0c2f-4e8f-99aa-a32c9ddfbb3b"
+    },
+    {
+      "parameters": {
+        "url": "https://www.googleapis.com/youtube/v3/search",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpQueryAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "publishedAfter",
+              "value": "={{ DateTime.fromISO($('On form submission').item.json['From when?']) }}"
+            },
+            {
+              "name": "q",
+              "value": "={{ $('On form submission').item.json.Keyword }}"
+            },
+            {
+              "name": "regionCode",
+              "value": "us"
+            },
+            {
+              "name": "type",
+              "value": "video"
+            },
+            {
+              "name": "maxResults",
+              "value": "50"
+            },
+            {
+              "name": "order",
+              "value": "viewCount"
+            },
+            {
+              "name": "part",
+              "value": "snippet"
+            },
+            {
+              "name": "publishedBefore",
+              "value": "={{ DateTime.fromISO($('On form submission').item.json['Until when?']) }}"
+            },
+            {
+              "name": "relevanceLanguage",
+              "value": "en"
+            },
+            {
+              "name": "videoDuration",
+              "value": "={{ $('On form submission').item.json['Video length'] }}"
+            }
+          ]
+        },
+        "options": {
+          "pagination": {
+            "pagination": {
+              "parameters": {
+                "parameters": [
+                  {
+                    "name": "pageToken",
+                    "value": "={{ $response.body.nextPageToken }}"
+                  }
+                ]
+              },
+              "paginationCompleteWhen": "other",
+              "completeExpression": "={{ !$response.body.items?.length }}",
+              "limitPagesFetched": true,
+              "maxRequests": "={{ $json.pages }}",
+              "requestInterval": 500
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        704,
+        128
+      ],
+      "id": "db503292-1e16-457d-bb7c-9c4067d1a826",
+      "name": "Get YouTube videos",
+      "executeOnce": false,
+      "retryOnFail": true,
+      "credentials": {
+        "httpQueryAuth": {
+          "id": "3baXrUTXSZdYheY5",
+          "name": "Google API key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "76c307cf-9e52-4429-9659-9a2bbed71e5e",
+              "name": "id",
+              "value": "={{ $('Split Out').item.json.id.videoId }}",
+              "type": "string"
+            },
+            {
+              "id": "61529969-3176-4670-89af-efcebbe4d813",
+              "name": "channelId",
+              "value": "={{ $('Split Out').item.json.snippet.channelId }}",
+              "type": "string"
+            },
+            {
+              "id": "850a2394-86a9-4126-8c16-ccd08da9f115",
+              "name": "title",
+              "value": "={{ $('Split Out').item.json.snippet.title }}",
+              "type": "string"
+            },
+            {
+              "id": "1e0b986b-ceaf-40af-9664-6f40abd074be",
+              "name": "description",
+              "value": "={{ $('Split Out').item.json.snippet.description }}",
+              "type": "string"
+            },
+            {
+              "id": "e9f8b380-e542-4fe9-bcd5-b0826e724c68",
+              "name": "channelTitle",
+              "value": "={{ $('Split Out').item.json.snippet.channelTitle }}",
+              "type": "string"
+            },
+            {
+              "id": "6b65592b-3d6c-42fe-885f-60beb460ab49",
+              "name": "publishedAt",
+              "value": "={{ $('Split Out').item.json.snippet.publishTime }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1488,
+        128
+      ],
+      "id": "8cd9e792-dda5-4530-abd6-2ada7273aa00",
+      "name": "Extract fields we need"
+    },
+    {
+      "parameters": {
+        "jsCode": "const channelStatMap = {};\nconst videoStatMap = {};\n\n$('Get video stats for the batch').all().forEach(batchStat => {\n  batchStat.json.items.forEach(statItem => {\n    videoStatMap[statItem.id] = {\n      viewCount: parseInt(statItem.statistics.viewCount),\n      likeCount: parseInt(statItem.statistics.likeCount),\n      commentCount: parseInt(statItem.statistics.commentCount)\n    };\n  });\n})\n  \n$('Get channel stats for the batch').all().forEach(batchStat => {\n  batchStat.json.items.forEach(statItem => {\n    channelStatMap[statItem.id] = {\n      viewCount: parseInt(statItem.statistics.viewCount),\n      videoCount: parseInt(statItem.statistics.videoCount),\n      subscriberCount: parseInt(statItem.statistics.subscriberCount)\n    };\n  })\n})  \n\nconst videos = $('All videos').first().json.videos.map(video => {\n  const videoData = {\n    ...video\n  }\n  if (videoStatMap[video.id]) {\n    videoData.videoStatistics = videoStatMap[video.id];\n  }\n  if (channelStatMap[video.channelId]) {\n    videoData.channelStatistics = channelStatMap[video.channelId]\n  }\n  return videoData;\n})\n  .filter(video => video.videoStatistics?.viewCount > $('Setup defaults').first().json.min_views)\n  .map(video => ({\n    [\"Video view/channel subscribers count ratio\"]: video.videoStatistics.viewCount / video.channelStatistics.subscriberCount,\n    [\"Estimated #searches\"]: video.videoStatistics.viewCount - video.channelStatistics.subscriberCount * 0.3,\n    [\"Video title\"]: video.title,\n    [\"Video link\"]: `https://www.youtube.com/watch?v=${video.id}`,\n    [\"Video view count\"]: video.videoStatistics.viewCount,\n    [\"Video like count\"]: video.videoStatistics.likeCount,\n    [\"Video comment count\"]: video.videoStatistics.commentCount,\n    [\"Video like/view ratio %\"]: video.videoStatistics.likeCount / video.videoStatistics.viewCount,\n    [\"Video like/comment ratio %\"]: video.videoStatistics.commentCount / video.videoStatistics.viewCount,\n    [\"Channel title\"]: video.channelTitle,\n    [\"Channel view count\"]: video.channelStatistics.viewCount,\n    [\"Channel number of videos\"]: video.channelStatistics.videoCount,\n    [\"Channel number of subscribers\"]: video.channelStatistics.subscriberCount,\n    [\"Published\"]: video.publishedAt\n  }))\n  .sort((a, b) => {\n    if (a[\"Video view/channel subscribers count ratio\"] > b[\"Video view/channel subscribers count ratio\"]) {\n      return -1;\n    } else if (a[\"Video view/channel subscribers count ratio\"] < b[\"Video view/channel subscribers count ratio\"]) {\n      return 1;\n    }\n    return 0;\n  })\n\nreturn [{ json: {\n  videos\n} }]"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2480,
+        128
+      ],
+      "id": "709eb59c-938d-4c45-a269-bd2e2fcc51b4",
+      "name": "Augment the videos with the statistics"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "8b92146a-83d7-48a4-b877-e4433c024a1b",
+              "leftValue": "={{ $json.items }}",
+              "rightValue": "",
+              "operator": {
+                "type": "array",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1040,
+        128
+      ],
+      "id": "ab61e8c0-45c2-4486-a8a0-c6ab4476255a",
+      "name": "Not empty?"
+    },
+    {
+      "parameters": {
+        "errorMessage": "There are no results for the phrase"
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1312,
+        464
+      ],
+      "id": "451458ac-9d5d-42ff-9918-d9fd89b586de",
+      "name": "Stop and Error"
+    },
+    {
+      "parameters": {
+        "content": "# 2. Get channel and video statistics",
+        "height": 380,
+        "width": 1636
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1984,
+        -16
+      ],
+      "id": "75925fc1-7bf1-49e6-9480-dece80f8e116",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "# Get videos",
+        "height": 380,
+        "width": 944
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        288,
+        -16
+      ],
+      "id": "49419e29-be2d-41ec-abc7-d321ca7b1df8",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "items"
+            }
+          ]
+        },
+        "options": {
+          "mergeLists": true
+        }
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        896,
+        128
+      ],
+      "id": "c72acfe5-8c16-4664-84b8-003e2e674561",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "content": "# Map data",
+        "height": 380,
+        "width": 688
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1264,
+        -16
+      ],
+      "id": "9d7cd88f-fc6f-49be-bbc2-a7b826a96867",
+      "name": "Sticky Note6"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "destinationFieldName": "videos",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        1664,
+        128
+      ],
+      "id": "117454d1-db6e-4300-8395-d30b0e97f986",
+      "name": "All videos"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Loop over input items and add a new field called 'myNewField' to the JSON of each one\nconst batches = [];\nlet batch = [];\nconst batchSize = 50;\nfor (const item of $input.all()) {\n  item.json.videos.forEach(video => {\n    if (batch.length >= batchSize) {\n      batches.push([...batch]);\n      batch = [];\n    }\n  \n    batch.push(video)\n  })\n}\n\nif (batch.length > 0) {\n  batches.push(batch);\n} \n\nreturn batches.map(item => ({\n  json: {\n    videoIds: item.map(video => video.id).join(','),\n    channelIds: item.map(video => video.channelId).join(',')\n  }\n}))"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1824,
+        128
+      ],
+      "id": "d792da69-a513-4c72-9707-2b6cea5596bf",
+      "name": "Map videoIds, channelIds"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "28e63c56-dc92-4fa9-afc4-d69048a7b11b",
+              "name": "min_views",
+              "value": "={{ $json['Minimum views'] || 1000 }}",
+              "type": "number"
+            },
+            {
+              "id": "3b6cd49a-f52e-4a09-a9e0-9f50213dd56c",
+              "name": "pages",
+              "value": "={{ $json['Number of pages to scrape (pagination)'] || 1 }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        512,
+        128
+      ],
+      "id": "859a7373-01b5-4c32-8458-b85057a12a7a",
+      "name": "Setup defaults"
+    },
+    {
+      "parameters": {
+        "url": "=https://www.googleapis.com/youtube/v3/channels",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpQueryAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "maxResults",
+              "value": "50"
+            },
+            {
+              "name": "part",
+              "value": "statistics"
+            },
+            {
+              "name": "id",
+              "value": "={{ $json.channelIds }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2064,
+        128
+      ],
+      "id": "3fd54cef-1247-4243-9fd3-d3674423f4c7",
+      "name": "Get channel stats for the batch",
+      "credentials": {
+        "httpQueryAuth": {
+          "id": "3baXrUTXSZdYheY5",
+          "name": "Google API key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://www.googleapis.com/youtube/v3/videos",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpQueryAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "maxResults",
+              "value": "50"
+            },
+            {
+              "name": "part",
+              "value": "statistics"
+            },
+            {
+              "name": "id",
+              "value": "={{ $('Map videoIds, channelIds').item.json.videoIds }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2272,
+        128
+      ],
+      "id": "afacbbd7-1e63-420c-867d-a8dd62abd191",
+      "name": "Get video stats for the batch",
+      "credentials": {
+        "httpQueryAuth": {
+          "id": "3baXrUTXSZdYheY5",
+          "name": "Google API key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://sheets.googleapis.com/v4/spreadsheets/{{ $json.spreadsheetId }}:batchUpdate",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleSheetsOAuth2Api",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"requests\":\n    {{ JSON.stringify([\n      {\n        \"repeatCell\": {\n          \"range\": {\n            \"sheetId\": $json.sheets[0].properties.sheetId,\n            \"startRowIndex\": 0,\n            \"endRowIndex\": 1\n          },\n          \"cell\": {\n            \"userEnteredFormat\": {\n              \"textFormat\": {\n                \"bold\": true\n              }\n            }\n          },\n          \"fields\": \"userEnteredFormat.textFormat.bold\"\n        }\n      },\n      {\n      \"appendCells\": {\n        \"sheetId\": $json.sheets[0].properties.sheetId,\n        \"rows\": [\n          {\n            \"values\": [\n              Object.keys($('Augment the videos with the statistics').item.json.videos[0]).map(key => ({\n                \"userEnteredValue\": { \"stringValue\": key }\n              }))\n            ]\n          },\n          ...$('Augment the videos with the statistics').item.json.videos.map(item => ({\n            \"values\": Object.values(item).map(value => ({\n              \"userEnteredValue\": { [typeof value === \"string\" ? \"stringValue\" : \"numberValue\"]: value }\n            }))\n          }))\n        ],\n        \"fields\": \"userEnteredValue\"\n      }\n    }\n    ], null, 2) }}\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3104,
+        128
+      ],
+      "id": "7d15b0d3-665b-404e-995f-dffde259c257",
+      "name": "Bulk insert",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "w6GVpJrJgVZNngG2",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "completion",
+        "completionTitle": "Your report is ready",
+        "completionMessage": "={{ $json.sheet_url }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.form",
+      "typeVersion": 1,
+      "position": [
+        3456,
+        128
+      ],
+      "id": "34697a07-8c9d-4e6b-96aa-7b3fd23b4868",
+      "name": "Form",
+      "webhookId": "864e80fd-3415-4f54-9ea4-55e36469f217"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "eb54613c-fdfa-4be7-a2b1-451bbada70dc",
+              "name": "sheet_url",
+              "value": "=https://docs.google.com/spreadsheets/d/{{ $('Create spreadsheet').first().json.spreadsheetId }}/edit?usp=sharing",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        3280,
+        128
+      ],
+      "id": "f0a2e145-af63-4e5a-a6ac-a35ca7b64d96",
+      "name": "Set sheets url"
+    },
+    {
+      "parameters": {
+        "resource": "spreadsheet",
+        "title": "=Best videos for \"{{ $('On form submission').first().json.Keyword }}\" keyword",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        2944,
+        128
+      ],
+      "id": "715b1fff-ee47-44e7-abf3-ec02bd5a6032",
+      "name": "Create spreadsheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "y3SQnJ2q0kAJw5OI",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "errorMessage": "No videos found with the given parameters"
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        2944,
+        448
+      ],
+      "id": "def0833f-386a-4754-a230-18bb9decf7b4",
+      "name": "Stop and Error1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "7fd65bce-6ac6-4ff4-aded-da6ee6393ad3",
+              "leftValue": "={{ $json.videos }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "array",
+                "operation": "lengthGt",
+                "rightType": "number"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2688,
+        144
+      ],
+      "id": "c6c081de-5c77-4613-9bd6-6bf9e1ca08d6",
+      "name": "Videos found?"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Extract fields we need",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Setup defaults",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get YouTube videos": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract fields we need": {
+      "main": [
+        [
+          {
+            "node": "All videos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Augment the videos with the statistics": {
+      "main": [
+        [
+          {
+            "node": "Videos found?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Not empty?": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Stop and Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Not empty?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "All videos": {
+      "main": [
+        [
+          {
+            "node": "Map videoIds, channelIds",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Map videoIds, channelIds": {
+      "main": [
+        [
+          {
+            "node": "Get channel stats for the batch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Setup defaults": {
+      "main": [
+        [
+          {
+            "node": "Get YouTube videos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get channel stats for the batch": {
+      "main": [
+        [
+          {
+            "node": "Get video stats for the batch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get video stats for the batch": {
+      "main": [
+        [
+          {
+            "node": "Augment the videos with the statistics",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Bulk insert": {
+      "main": [
+        [
+          {
+            "node": "Set sheets url",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set sheets url": {
+      "main": [
+        [
+          {
+            "node": "Form",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create spreadsheet": {
+      "main": [
+        [
+          {
+            "node": "Bulk insert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Videos found?": {
+      "main": [
+        [
+          {
+            "node": "Create spreadsheet",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Stop and Error1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "58b0f780-4caf-4e00-85e7-a6e8bca4a88a",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "636db6b6ab21a21c6458e2137f340e33dc3e49f5a1c560c8d1e2372c227cf40e"
+  },
+  "id": "3w4o1Eol3Mld1Hpp",
+  "tags": []
+}

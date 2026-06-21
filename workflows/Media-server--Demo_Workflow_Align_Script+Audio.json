@@ -1,0 +1,346 @@
+{
+  "name": "server demo: text alignment",
+  "nodes": [
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7bbb518a-c4f1-49a5-9e72-3e9d939b131b",
+              "name": "AI_AGENTS_NO_CODE_TOOLS_URL",
+              "value": "<< paste your server URL here >>",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1536,
+        0
+      ],
+      "id": "ab36dc1c-31da-4a73-a8da-bca6781d0477",
+      "name": "Configure me"
+    },
+    {
+      "parameters": {
+        "content": "# Configure me ?\n",
+        "height": 576,
+        "width": 204,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1584,
+        -240
+      ],
+      "id": "a176d221-a394-4c26-a8f1-78332692836b",
+      "name": "Sticky Note12"
+    },
+    {
+      "parameters": {
+        "errorMessage": "The server is not running or isn't configured"
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        -1088,
+        144
+      ],
+      "id": "b1b948a6-2988-43ea-94e4-035465fc4d26",
+      "name": "Server isn't ready"
+    },
+    {
+      "parameters": {
+        "content": "# Test connection \ndon't delete/touch this",
+        "height": 576,
+        "width": 420,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1328,
+        -240
+      ],
+      "id": "52ae46fe-a820-44b7-a3b5-a471c37c430e",
+      "name": "Sticky Note15"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7d55d6da-a78c-4a28-9343-0ea9035a0aa3",
+              "name": "AI_AGENTS_NO_CODE_TOOLS_URL",
+              "value": "={{   ((u) => {   let s = u.trim();   if (!/^https?:\\/\\//i.test(s)) s = 'https://' + s;   const parts = s.split('/');   return parts[0] + '//' + parts[2]; })($json.AI_AGENTS_NO_CODE_TOOLS_URL)  }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1296,
+        0
+      ],
+      "id": "b0e11b7a-c448-4164-9849-900b40e116d7",
+      "name": "Setup defaults"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.AI_AGENTS_NO_CODE_TOOLS_URL }}/health",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1088,
+        -80
+      ],
+      "id": "0596b4da-dc49-4f47-abce-ffbc241002fc",
+      "name": "HTTP Request1",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "formTitle": "Speech alignment demo",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Speech",
+              "fieldType": "file",
+              "acceptFileTypes": ".mp3,.wav",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Script",
+              "fieldType": "textarea",
+              "placeholder": "the script we want to align/time",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Output mode",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "word"
+                  },
+                  {
+                    "option": "sentence"
+                  },
+                  {
+                    "option": "sentence_punc"
+                  },
+                  {
+                    "option": "fixed_words"
+                  },
+                  {
+                    "option": "max_chars"
+                  }
+                ]
+              },
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Limit",
+              "fieldType": "number",
+              "placeholder": "For 'fixed_words': max words. For 'max_chars': max characters"
+            },
+            {
+              "fieldLabel": "Language code (ISO-639-3)",
+              "placeholder": "ISO-639-3"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.3,
+      "position": [
+        -1824,
+        0
+      ],
+      "id": "fbe35f64-d7f5-4bc6-9104-b4e23501f9c0",
+      "name": "On form submission",
+      "webhookId": "8435394f-9b3e-4577-89a0-fa3132e0f6e5"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Setup defaults').first().json.AI_AGENTS_NO_CODE_TOOLS_URL }}/api/v1/media/storage",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "file",
+              "inputDataFieldName": "=Speech"
+            },
+            {
+              "name": "media_type",
+              "value": "audio"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -528,
+        -96
+      ],
+      "id": "e1cbb4de-c6e8-418a-81cc-afcff584a527",
+      "name": "Upload voice sample to the server"
+    },
+    {
+      "parameters": {
+        "jsCode": "return $('On form submission').first()"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -736,
+        -96
+      ],
+      "id": "1160511b-9f80-4861-a56e-94c9f88f4cac",
+      "name": "Relay speech"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://7e5ebf426942a89ed2f4813067231269-sajid-ali-6511.aiagentsaz.com/api/v1/media/audio-tools/align-script",
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "audio_id",
+              "value": "={{ $json.file_id }}"
+            },
+            {
+              "name": "script",
+              "value": "={{ $('On form submission').item.json.Script }}"
+            },
+            {
+              "name": "mode",
+              "value": "={{ $('On form submission').item.json['Output mode'] }}"
+            },
+            {
+              "name": "limit",
+              "value": "={{ $('On form submission').item.json.Limit || undefined }}"
+            }
+          ]
+        },
+        "options": {
+          "redirect": {
+            "redirect": {}
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -320,
+        -96
+      ],
+      "id": "847e7dda-4f57-4dbf-b3f3-9b4a55850760",
+      "name": "HTTP Request"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Configure me": {
+      "main": [
+        [
+          {
+            "node": "Setup defaults",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Setup defaults": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "Relay speech",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Server isn't ready",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Configure me",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload voice sample to the server": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Relay speech": {
+      "main": [
+        [
+          {
+            "node": "Upload voice sample to the server",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "639bd3e5-6d8a-4234-8520-22eeaa194e53",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "636db6b6ab21a21c6458e2137f340e33dc3e49f5a1c560c8d1e2372c227cf40e"
+  },
+  "id": "VUf16uqDRsyoes4L",
+  "tags": []
+}

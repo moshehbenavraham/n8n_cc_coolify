@@ -1,0 +1,949 @@
+{
+  "name": "Premium: Sleep music video creator copy",
+  "nodes": [
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7bbb518a-c4f1-49a5-9e72-3e9d939b131b",
+              "name": "AI_AGENTS_NO_CODE_TOOLS_URL",
+              "value": "<< paste your server URL here >>",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        480,
+        32
+      ],
+      "id": "c5ccbe9f-6b02-4ea9-bc82-8043a5f4aac5",
+      "name": "Configure me"
+    },
+    {
+      "parameters": {
+        "content": "# Configure me ?\n",
+        "height": 560,
+        "width": 300,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        384,
+        -208
+      ],
+      "id": "f9a85256-86cc-4421-b1e6-7a9116d64967",
+      "name": "Sticky Note12"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.AI_AGENTS_NO_CODE_TOOLS_URL }}/health",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        960,
+        -48
+      ],
+      "id": "74bc395d-2e05-438b-848d-bf7d327c0afb",
+      "name": "HTTP Request",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "errorMessage": "The server is not running or isn't configured"
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        960,
+        176
+      ],
+      "id": "7752e10f-4ae1-4ee0-8a06-3a93203fd067",
+      "name": "Server isn't ready"
+    },
+    {
+      "parameters": {
+        "content": "# Test connection",
+        "height": 560,
+        "width": 420,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        720,
+        -208
+      ],
+      "id": "14c1c922-be88-41d2-82d3-a51049d80d5a",
+      "name": "Sticky Note15"
+    },
+    {
+      "parameters": {
+        "jsCode": "return $('On form submission').first()"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1232,
+        -128
+      ],
+      "id": "95e1f4ea-3fd8-413c-a032-7795b8d262d6",
+      "name": "Relay background music"
+    },
+    {
+      "parameters": {
+        "jsCode": "return $('On form submission').first()"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1232,
+        176
+      ],
+      "id": "b79a327c-ffcc-4697-9d7e-6c67df611ee8",
+      "name": "Relay sample audio"
+    },
+    {
+      "parameters": {
+        "content": "# Upload background music",
+        "height": 256,
+        "width": 592,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1168,
+        -208
+      ],
+      "id": "938d03ff-5264-48b6-ab59-50eb3fedc1c0",
+      "name": "Sticky Note17"
+    },
+    {
+      "parameters": {
+        "content": "# Upload voice sample",
+        "height": 272,
+        "width": 592,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1168,
+        80
+      ],
+      "id": "8b6de336-bcc5-4676-b896-2a2c319c1d97",
+      "name": "Sticky Note18"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Setup defaults').first().json.AI_AGENTS_NO_CODE_TOOLS_URL }}/api/v1/media/storage",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "file",
+              "inputDataFieldName": "=Music"
+            },
+            {
+              "name": "media_type",
+              "value": "audio"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1440,
+        -128
+      ],
+      "id": "c90682d3-7e97-4553-8cf7-cb466d1844b2",
+      "name": "Upload background music to the server"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7d55d6da-a78c-4a28-9343-0ea9035a0aa3",
+              "name": "AI_AGENTS_NO_CODE_TOOLS_URL",
+              "value": "={{   ((u) => {   let s = u.trim();   if (!/^https?:\\/\\//i.test(s)) s = 'https://' + s;   const parts = s.split('/');   return parts[0] + '//' + parts[2]; })($json.AI_AGENTS_NO_CODE_TOOLS_URL)  }}",
+              "type": "string"
+            },
+            {
+              "id": "00cd26bb-43df-4b7f-9173-b55a7af28fd9",
+              "name": "video_length",
+              "value": "={{ $('On form submission').item.json['Duration in minutes'] || 10 }}",
+              "type": "string"
+            },
+            {
+              "id": "363941be-7bf4-4cff-96c5-75f233be9dd3",
+              "name": "ambient_sounds",
+              "value": "={{ $('On form submission').item.json['Add ambient sound'].length ? $('On form submission').item.json['Add ambient sound'].map(item => `${item.toLowerCase().replace(/ /g, '_')}:${$('Close the form').item.json[item]}`).join(',') : '' }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        752,
+        32
+      ],
+      "id": "2e895066-27b4-48b6-9469-74fd8be9f1db",
+      "name": "Setup defaults"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1840,
+        16
+      ],
+      "id": "6eff65a5-12a6-422c-aa55-f807601fe1fa",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Setup defaults').first().json.AI_AGENTS_NO_CODE_TOOLS_URL }}/api/v1/media/storage/{{ $('Start creating the sleep video').item.json.file_id }}/status",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2464,
+        16
+      ],
+      "id": "a8ff0aae-480e-4167-8672-896287561e39",
+      "name": "Get video generation status",
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "ready",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "91402596-3978-4dfc-91b7-9ffe3521b862"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "ready"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "0c29765e-4213-434c-9bf3-c5e854dd6ee8",
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "processing",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "processing"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "4a6cfd86-e690-417e-aa6d-ae497e1177ae",
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "not_found",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "failed"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        2656,
+        16
+      ],
+      "id": "685709d5-08ab-4879-aa8b-1ab4742335fa",
+      "name": "Video generation switch"
+    },
+    {
+      "parameters": {
+        "amount": 10
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        2272,
+        16
+      ],
+      "id": "5ac18e18-a5d8-4706-8326-8397b0ee8a0d",
+      "name": "Wait until the video gets generated",
+      "webhookId": "3fe3e0ee-1aa6-43d8-afaa-b75174f48ebf"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Setup defaults').first().json.AI_AGENTS_NO_CODE_TOOLS_URL }}/api/v1/media/storage",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "file",
+              "inputDataFieldName": "=Looping_background_video"
+            },
+            {
+              "name": "media_type",
+              "value": "video"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1440,
+        176
+      ],
+      "id": "042d045f-9eea-4013-a597-d18ed8191776",
+      "name": "Upload looping video"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "9f09f191-8e3d-4bfe-8942-fcf7ea66b4cb",
+              "name": "video_id",
+              "value": "={{ $json.file_id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1600,
+        176
+      ],
+      "id": "38d25cfb-7215-45b7-9a90-9b7d6ba354ff",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "09899c0c-4e96-40f6-9038-718fb42d4ed4",
+              "name": "music_id",
+              "value": "={{ $json.file_id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1600,
+        -128
+      ],
+      "id": "3d48b71f-91ec-4299-a5ca-e3dd9a3e8688",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Setup defaults').first().json.AI_AGENTS_NO_CODE_TOOLS_URL }}/api/v1/media/video-tools/long-form-ambient",
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "video_id",
+              "value": "={{ $json.video_id }}"
+            },
+            {
+              "name": "audio_id",
+              "value": "={{ $json.music_id }}"
+            },
+            {
+              "name": "duration_minutes",
+              "value": "={{ $('Setup defaults').item.json.video_length }}"
+            },
+            {
+              "name": "ambient_sounds",
+              "value": "={{ $('Setup defaults').item.json.ambient_sounds }}"
+            }
+          ]
+        },
+        "options": {
+          "redirect": {
+            "redirect": {}
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2080,
+        16
+      ],
+      "id": "12e1f034-b968-495f-967e-c376f2e32431",
+      "name": "Start creating the sleep video"
+    },
+    {
+      "parameters": {
+        "errorMessage": "Something happened while generating the video - contact Miri!"
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        2864,
+        160
+      ],
+      "id": "e633eed5-17a0-4e3f-8154-0b4569c480b9",
+      "name": "Stop and Error"
+    },
+    {
+      "parameters": {
+        "content": "# Generate the video",
+        "height": 560,
+        "width": 1216,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1792,
+        -208
+      ],
+      "id": "0f1436c7-ecba-460b-b9fd-53ee6d9632a7",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "# Done",
+        "height": 560,
+        "width": 208,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        3040,
+        -208
+      ],
+      "id": "d8b4fe1d-29c4-42e2-ad37-b6a180457999",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "4b2c83eb-43a2-4fe7-aefc-f544505b50ae",
+              "leftValue": "={{ $json['Add ambient sound'] }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "array",
+                "operation": "lengthGt",
+                "rightType": "number"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -160,
+        16
+      ],
+      "id": "5e1ab899-43e9-44e4-9c80-827e7a2234bd",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "defineForm": "json",
+        "jsonOutput": "={{ \n  JSON.stringify(\n    $json['Add ambient sound'].map(item => ({\n      \"fieldLabel\":item,\n      \"placeholder\": \"volume (0-1)\",\n      \"requiredField\":true\n   }))\n  );\n}}",
+        "options": {
+          "formTitle": "Set the volume of the ambient sound(s)"
+        }
+      },
+      "type": "n8n-nodes-base.form",
+      "typeVersion": 1,
+      "position": [
+        0,
+        -128
+      ],
+      "id": "6e505132-009c-480d-a4e2-5c7b9f111dcb",
+      "name": "Form",
+      "webhookId": "7bf7135b-1c6a-4e63-aaef-a33aa53ca65d"
+    },
+    {
+      "parameters": {
+        "content": "# Starting the workflow",
+        "height": 560,
+        "width": 708,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -368,
+        -208
+      ],
+      "id": "c4ce0451-b600-4a80-b72f-c87dab720f50",
+      "name": "Sticky Note16"
+    },
+    {
+      "parameters": {
+        "operation": "completion",
+        "completionTitle": "In progress",
+        "completionMessage": "Wait until the generation completes",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.form",
+      "typeVersion": 1,
+      "position": [
+        160,
+        32
+      ],
+      "id": "428c583b-77bc-4d6e-8433-a31929fb23d5",
+      "name": "Close the form",
+      "webhookId": "b17d6ce6-a27b-4014-be27-0d903f5b2ebd"
+    },
+    {
+      "parameters": {
+        "formTitle": "Create a sleep music video",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Looping background video",
+              "fieldType": "file",
+              "multipleFiles": false,
+              "acceptFileTypes": ".mp4",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Music",
+              "fieldType": "file",
+              "multipleFiles": false,
+              "acceptFileTypes": ".mp3",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Duration in minutes",
+              "fieldType": "number",
+              "placeholder": "default: 10"
+            },
+            {
+              "fieldLabel": "Add ambient sound",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "City streets"
+                  },
+                  {
+                    "option": "Distant thunder"
+                  },
+                  {
+                    "option": "Fireplace"
+                  },
+                  {
+                    "option": "Rain heavy"
+                  },
+                  {
+                    "option": "Rain medium"
+                  },
+                  {
+                    "option": "Rain window"
+                  },
+                  {
+                    "option": "Stream"
+                  },
+                  {
+                    "option": "Thunderstorm"
+                  },
+                  {
+                    "option": "Wall clock"
+                  },
+                  {
+                    "option": "Waves seagulls"
+                  },
+                  {
+                    "option": "Vinyl effect"
+                  },
+                  {
+                    "option": "Small waves on the sand"
+                  },
+                  {
+                    "option": "Sandy beach"
+                  },
+                  {
+                    "option": "Lofi noize"
+                  }
+                ]
+              },
+              "multiselect": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [
+        -336,
+        16
+      ],
+      "id": "88c0254a-81dd-4a87-972f-52ce4c6aefe8",
+      "name": "On form submission",
+      "webhookId": "1f31a453-d3a8-4aa8-9f5a-a0a90b77c79c"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c1fa11a5-8e00-4c40-b605-759388178dd4",
+              "name": "video_url",
+              "value": "={{ $('Setup defaults').first().json.AI_AGENTS_NO_CODE_TOOLS_URL }}/api/v1/media/storage/{{ $('Start creating the sleep video').item.json.file_id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        3104,
+        0
+      ],
+      "id": "8529edf7-fbd2-4d04-af26-8c6b4b6b0fcc",
+      "name": "Download URL"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Configure me": {
+      "main": [
+        [
+          {
+            "node": "Setup defaults",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Relay background music",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Relay sample audio",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Server isn't ready",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Relay background music": {
+      "main": [
+        [
+          {
+            "node": "Upload background music to the server",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Relay sample audio": {
+      "main": [
+        [
+          {
+            "node": "Upload looping video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload background music to the server": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Setup defaults": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get video generation status": {
+      "main": [
+        [
+          {
+            "node": "Video generation switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Video generation switch": {
+      "main": [
+        [
+          {
+            "node": "Download URL",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait until the video gets generated",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Stop and Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait until the video gets generated": {
+      "main": [
+        [
+          {
+            "node": "Get video generation status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Start creating the sleep video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload looping video": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Start creating the sleep video": {
+      "main": [
+        [
+          {
+            "node": "Wait until the video gets generated",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Form",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Close the form",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Form": {
+      "main": [
+        [
+          {
+            "node": "Close the form",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Close the form": {
+      "main": [
+        [
+          {
+            "node": "Configure me",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "b5e30585-d205-43d7-82de-9c33c9133acc",
+  "meta": {
+    "instanceId": "636db6b6ab21a21c6458e2137f340e33dc3e49f5a1c560c8d1e2372c227cf40e"
+  },
+  "id": "egxC18uXPShgZHoN",
+  "tags": []
+}

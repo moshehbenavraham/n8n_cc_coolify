@@ -1,0 +1,866 @@
+{
+  "name": "Youtube niche finder",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Research viral video channels on YouTube",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Search term",
+              "placeholder": "search term to find viral channels through viral videos, like \"sleep\"",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Max age in days",
+              "fieldType": "number",
+              "placeholder": "optional, default: 100"
+            },
+            {
+              "fieldLabel": "Maximum number of videos",
+              "fieldType": "number",
+              "placeholder": "optional, default: 30"
+            },
+            {
+              "fieldLabel": "Maximum pages to process",
+              "fieldType": "number",
+              "placeholder": "(optional) How many pages we should scrape on YT? Default: 10"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [
+        -448,
+        1520
+      ],
+      "id": "f6b75547-128d-439f-8ae6-7e72ab120009",
+      "name": "On form submission",
+      "webhookId": "d4a506eb-70b9-4e81-b40d-5a74b1464f32"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "3313890a-9aea-4484-bdca-a354bf3ddfe6",
+              "leftValue": "={{ $json.page }}",
+              "rightValue": "={{ $('Loop variables').first().json.maxPages }}",
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            },
+            {
+              "id": "8aac1f8c-07e7-43fd-bdda-13990ad40cf0",
+              "leftValue": "={{ $json.pageToken }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notExists",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "bb686e3e-eb55-4b92-978e-cacc893702d6",
+              "leftValue": "={{ $json.data }}",
+              "rightValue": "={{ $('Loop variables').first().json.maxVideos }}",
+              "operator": {
+                "type": "array",
+                "operation": "lengthGte",
+                "rightType": "number"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        768,
+        1584
+      ],
+      "id": "cc6253c2-7e81-4f9f-9601-ad18bbfbb190",
+      "name": "Done?"
+    },
+    {
+      "parameters": {
+        "amount": 2
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        960,
+        1712
+      ],
+      "id": "73dc7c02-c8c0-4f77-bf3f-bda6d06f01ba",
+      "name": "Wait",
+      "webhookId": "40d3b1c9-1401-4f6a-af4c-62761781c540"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "99c8aabf-cf20-48f6-a8ad-a1887e82add5",
+              "name": "page",
+              "value": "={{ $json.page || 0 }}",
+              "type": "number"
+            },
+            {
+              "id": "0ac4ba5e-bcad-4dc7-b990-fcf92d23aee3",
+              "name": "pageToken",
+              "value": "={{ $json.pageToken || '' }}",
+              "type": "string"
+            },
+            {
+              "id": "f3d91bb5-5e82-420e-b6a7-b3c8e06a5101",
+              "name": "maxAgeInDays",
+              "value": "={{ parseInt($('On form submission').first().json['Max age in days']) || 100 }}",
+              "type": "number"
+            },
+            {
+              "id": "e69a27f8-ef12-48df-942b-b164f075b7fa",
+              "name": "maxVideos",
+              "value": "={{ $('On form submission').first().json['Maximum number of videos'] || 30 }}",
+              "type": "number"
+            },
+            {
+              "id": "f157035e-8c08-4a34-b4a2-f1ea185d9b9f",
+              "name": "maxPages",
+              "value": "={{ $('On form submission').first().json['Maximum pages to process'] || 10 }}",
+              "type": "number"
+            },
+            {
+              "id": "bb57133c-5338-49cf-8237-8cf4c988ddc6",
+              "name": "data",
+              "value": "={{ $json.data || [] }}",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -112,
+        1520
+      ],
+      "id": "b4effd3c-b361-4b8c-8cb9-466bab7909f7",
+      "name": "Loop variables"
+    },
+    {
+      "parameters": {
+        "url": "https://www.googleapis.com/youtube/v3/search",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpQueryAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "publishedAfter",
+              "value": "={{ $now.minus(\"2\", \"week\").toUTC().toString() }}"
+            },
+            {
+              "name": "q",
+              "value": "={{ $('On form submission').first().json['Search term'] }}"
+            },
+            {
+              "name": "regionCode",
+              "value": "us"
+            },
+            {
+              "name": "type",
+              "value": "video"
+            },
+            {
+              "name": "maxResults",
+              "value": "50"
+            },
+            {
+              "name": "order",
+              "value": "viewCount"
+            },
+            {
+              "name": "part",
+              "value": "snippet"
+            },
+            {
+              "name": "relevanceLanguage",
+              "value": "en"
+            },
+            {
+              "name": "videoDuration",
+              "value": "=long"
+            },
+            {
+              "name": "pageToken",
+              "value": "={{ $('Loop variables').last().json.pageToken || '' }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        64,
+        1520
+      ],
+      "id": "68562a89-0247-4484-99fb-fba23350ce2e",
+      "name": "Query YouTube",
+      "alwaysOutputData": false,
+      "retryOnFail": true,
+      "credentials": {
+        "httpQueryAuth": {
+          "id": "3baXrUTXSZdYheY5",
+          "name": "Google API key"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "url": "=https://www.googleapis.com/youtube/v3/channels?maxResults=50&id={{ $json.items.map(item => item.snippet.channelId).join(',') }}&part=statistics&part=snippet",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpQueryAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        432,
+        1584
+      ],
+      "id": "46328dd1-80e9-4dfd-959a-863e7398cb69",
+      "name": "Get data for channels",
+      "credentials": {
+        "httpQueryAuth": {
+          "id": "3baXrUTXSZdYheY5",
+          "name": "Google API key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://sheets.googleapis.com/v4/spreadsheets/{{ $json.spreadsheetId }}:batchUpdate",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleSheetsOAuth2Api",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"requests\":\n    {{ JSON.stringify([\n      {\n        \"repeatCell\": {\n          \"range\": {\n            \"sheetId\": $json.sheets[0].properties.sheetId,\n            \"startRowIndex\": 0,\n            \"endRowIndex\": 1\n          },\n          \"cell\": {\n            \"userEnteredFormat\": {\n              \"textFormat\": {\n                \"bold\": true\n              }\n            }\n          },\n          \"fields\": \"userEnteredFormat.textFormat.bold\"\n        }\n      },\n      {\n      \"appendCells\": {\n        \"sheetId\": $json.sheets[0].properties.sheetId,\n        \"rows\": [\n          {\n            \"values\": [\n              Object.keys($('Final data').first().json.data[0]).map(key => ({\n                \"userEnteredValue\": { \"stringValue\": key }\n              }))\n            ]\n          },\n          ...$('Final data').first().json.data.map(item => ({\n            \"values\": Object.values(item).map(value => ({\n              \"userEnteredValue\": { [typeof value === \"string\" ? \"stringValue\" : \"numberValue\"]: value }\n            }))\n          }))\n        ],\n        \"fields\": \"userEnteredValue\"\n      }\n    }\n    ], null, 2) }}\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2048,
+        1712
+      ],
+      "id": "25791b4e-6b04-40e7-92eb-9c9243cdcdc2",
+      "name": "Bulk insert",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "w6GVpJrJgVZNngG2",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "compare": "selectedFields",
+        "fieldsToCompare": "Channel ID",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.removeDuplicates",
+      "typeVersion": 2,
+      "position": [
+        1392,
+        1712
+      ],
+      "id": "b1d65cea-9fce-447a-a1e1-fb2be71f87b3",
+      "name": "Remove Duplicate channels",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "content": "# How to use this automation?\n\n### 1. Setup the two Spreadsheet nodes - connect your account\n### 2. Enable the Youtube Data API v3 on your Google API Console and create an API key\n### 3. Setup the `Query Youtube` node, set your Google API key as a query key (key: key, value: your API key)\n\n# Enjoy! ?",
+        "height": 288,
+        "width": 912
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -560,
+        1056
+      ],
+      "id": "02a13cc7-64bc-4911-b43a-568c8e687981",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "options": {
+          "formDescription": "=Your report is ready: {{ $json.sheet_url }}",
+          "buttonLabel": "Close"
+        }
+      },
+      "type": "n8n-nodes-base.form",
+      "typeVersion": 1,
+      "position": [
+        2480,
+        1712
+      ],
+      "id": "2c424611-38cf-42c6-a890-020bbc985bee",
+      "name": "Form",
+      "webhookId": "864e80fd-3415-4f54-9ea4-55e36469f217"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "eb54613c-fdfa-4be7-a2b1-451bbada70dc",
+              "name": "sheet_url",
+              "value": "=https://docs.google.com/spreadsheets/d/{{ $('Create spreadsheet').first().json.spreadsheetId }}/edit?usp=sharing",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2160,
+        1712
+      ],
+      "id": "9a2c3629-3cf3-4800-8d3f-23d9a0625c4c",
+      "name": "Set sheets url"
+    },
+    {
+      "parameters": {
+        "content": "# Main loop",
+        "height": 512,
+        "width": 1264,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -160,
+        1376
+      ],
+      "id": "d977db87-4f6a-4449-8897-581c552df591",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "errorMessage": "No trending channels were found with your search term"
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1968,
+        1456
+      ],
+      "id": "daeaea6d-95ad-4748-9567-c69613914070",
+      "name": "No channels found"
+    },
+    {
+      "parameters": {
+        "content": "# Post process",
+        "height": 512,
+        "width": 1248,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1136,
+        1376
+      ],
+      "id": "e5b7d24e-9eb8-43be-89ea-97e7f6861d04",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "# Done",
+        "height": 512,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2416,
+        1376
+      ],
+      "id": "4894eb55-3bb4-4a0a-94e4-70b103b8c6dd",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "# Start",
+        "height": 512,
+        "width": 368,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -560,
+        1376
+      ],
+      "id": "b96f17e8-2d98-41bd-95ad-45e6aee39fb9",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "errorMessage": "Problem with Youtube Data API"
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        240,
+        1712
+      ],
+      "id": "b68a42ee-09fc-4de2-926f-525831d0aa3e",
+      "name": "Stop and Error"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "d09d4845-07dc-40af-af1f-856083460af7",
+              "leftValue": "={{ !$json.keys().includes('items') || $json.items.length === 0 }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        272,
+        1440
+      ],
+      "id": "1cac643a-5d25-48d7-a2e5-5e2a7ffbdcd0",
+      "name": "No items"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "213dbe8f-fd66-4e75-ae12-08682e0c3288",
+              "name": "data",
+              "value": "={{ $('Loop variables').last().json.data }}",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        800,
+        1424
+      ],
+      "id": "3256c2d5-67cd-4d34-93dc-5ca1b4ef1bf0",
+      "name": "Set return data"
+    },
+    {
+      "parameters": {
+        "jsCode": "const videoResults = $('Query YouTube').last().json;\nconst data = $('Loop variables').last().json.data;\nconst page = $('Loop variables').last().json.page + 1;\nconst pageToken = videoResults.nextPageToken;\n\nfor (const item of $input.all()) {\n  for (const channel of item.json.items) {\n    const video = videoResults.items.find(video => channel.id === video.snippet.channelId);\n\n    const date = DateTime.fromISO(channel.snippet.publishedAt);\n    const diffDays = Math.abs(date.diff($now, ['days']).toObject()['days']);\n    \n    if (\n      diffDays < $('Loop variables').first().json.maxAgeInDays\n    ) {\n      data.push({\n        ['Channel ID']: channel.id,\n        ['Channel title']: channel.snippet.title,\n        ['Channel description']: channel.snippet.description,\n        ['Channel created at']: channel.snippet.publishedAt,\n        ['Channel URL']: `https://www.youtube.com/${channel.snippet.customUrl}`,\n        ['Channel total viewcount']: channel.statistics.viewCount,\n        ['Channel number of videos']: channel.statistics.videoCount,\n        ['Video title']: video?.snippet.title,\n        ['Video URL']: video ? `https://www.youtube.com/watch?v=${video.id.videoId}` : undefined\n      })\n    }\n  }\n}\n\nreturn [{\n  json: {\n    page,\n    pageToken,\n    data\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        592,
+        1584
+      ],
+      "id": "4a8dc478-a873-4b9a-9186-711d4335461b",
+      "name": "Map data"
+    },
+    {
+      "parameters": {
+        "resource": "spreadsheet",
+        "title": "=Viral channels for \"{{ $('On form submission').first().json['Search term'] }}\" related videos",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        1904,
+        1712
+      ],
+      "id": "e49ec67a-b282-4d37-b55a-041528ad46e2",
+      "name": "Create spreadsheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "y3SQnJ2q0kAJw5OI",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        1552,
+        1712
+      ],
+      "id": "fe0c4b7c-04b5-465a-a9a9-8020eb8f64bc",
+      "name": "Final data"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "7ec17dc5-7e69-4b9d-9329-5a50d7efbbdc",
+              "leftValue": "={{ $json.data.length === 0 || $json.data[0].keys().length === 0 }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1728,
+        1648
+      ],
+      "id": "217f39b6-8bcf-43e1-b6ef-b85fa6631018",
+      "name": "No final data?"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "7ec17dc5-7e69-4b9d-9329-5a50d7efbbdc",
+              "leftValue": "={{ $json.data }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "array",
+                "operation": "lengthEquals",
+                "rightType": "number"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        960,
+        1424
+      ],
+      "id": "c8f8e14f-5707-4ca9-b6ff-52f569ebc9f9",
+      "name": "No data?"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "data",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        1248,
+        1712
+      ],
+      "id": "15fce554-bd59-47ad-a9d1-22fc59b110dc",
+      "name": "For each item",
+      "alwaysOutputData": false
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Loop variables",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Done?": {
+      "main": [
+        [
+          {
+            "node": "No data?",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Loop variables",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop variables": {
+      "main": [
+        [
+          {
+            "node": "Query YouTube",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Query YouTube": {
+      "main": [
+        [
+          {
+            "node": "No items",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Stop and Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get data for channels": {
+      "main": [
+        [
+          {
+            "node": "Map data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Bulk insert": {
+      "main": [
+        [
+          {
+            "node": "Set sheets url",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Remove Duplicate channels": {
+      "main": [
+        [
+          {
+            "node": "Final data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set sheets url": {
+      "main": [
+        [
+          {
+            "node": "Form",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "No items": {
+      "main": [
+        [
+          {
+            "node": "Set return data",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get data for channels",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set return data": {
+      "main": [
+        [
+          {
+            "node": "No data?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Map data": {
+      "main": [
+        [
+          {
+            "node": "Done?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create spreadsheet": {
+      "main": [
+        [
+          {
+            "node": "Bulk insert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Final data": {
+      "main": [
+        [
+          {
+            "node": "No final data?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "No final data?": {
+      "main": [
+        [
+          {
+            "node": "No channels found",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Create spreadsheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "No data?": {
+      "main": [
+        [
+          {
+            "node": "No channels found",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "For each item",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "For each item": {
+      "main": [
+        [
+          {
+            "node": "Remove Duplicate channels",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "02de4c83-1b69-45ea-b4b4-425d8a9e33f1",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "636db6b6ab21a21c6458e2137f340e33dc3e49f5a1c560c8d1e2372c227cf40e"
+  },
+  "id": "q6h5yfYI1klBc5uR",
+  "tags": []
+}

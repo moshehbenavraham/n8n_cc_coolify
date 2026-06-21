@@ -1,0 +1,552 @@
+{
+  "name": "Looping video maker",
+  "nodes": [
+    {
+      "parameters": {
+        "errorMessage": "Error occoured while generating the TTS"
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        3872,
+        672
+      ],
+      "id": "dc7be993-ede2-4369-a36d-084340f9a075",
+      "name": "Stop and Error"
+    },
+    {
+      "parameters": {
+        "content": "# Generate looping video",
+        "height": 556,
+        "width": 856,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2816,
+        256
+      ],
+      "id": "012518a3-c57b-4c4c-8e07-4c4fb7aa84da",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7bbb518a-c4f1-49a5-9e72-3e9d939b131b",
+              "name": "AI_AGENTS_NO_CODE_TOOLS_URL",
+              "value": "<< add your server url here >>",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1648,
+        496
+      ],
+      "id": "716bb98a-5ffd-4c34-adb5-19560e56e242",
+      "name": "Configure me"
+    },
+    {
+      "parameters": {
+        "content": "# Configure me ?\n",
+        "height": 560,
+        "width": 300,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1536,
+        256
+      ],
+      "id": "cd82cfdf-b31f-4bcc-8d7d-b6fbec393690",
+      "name": "Sticky Note12"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.AI_AGENTS_NO_CODE_TOOLS_URL }}/health",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2128,
+        416
+      ],
+      "id": "125136eb-a620-4b6d-abf4-66e209765d0c",
+      "name": "HTTP Request",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "errorMessage": "The server is not running or isn't configured"
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        2128,
+        640
+      ],
+      "id": "aa3588b0-84b7-4f20-ad35-905c9235c333",
+      "name": "Server isn't ready"
+    },
+    {
+      "parameters": {
+        "content": "# Test connection",
+        "height": 560,
+        "width": 420,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1888,
+        256
+      ],
+      "id": "a3d6721f-49c9-433d-9b50-f9b5e1c2d869",
+      "name": "Sticky Note15"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7d55d6da-a78c-4a28-9343-0ea9035a0aa3",
+              "name": "AI_AGENTS_NO_CODE_TOOLS_URL",
+              "value": "={{   ((u) => {   let s = u.trim();   if (!/^https?:\\/\\//i.test(s)) s = 'https://' + s;   const parts = s.split('/');   return parts[0] + '//' + parts[2]; })($json.AI_AGENTS_NO_CODE_TOOLS_URL)  }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1920,
+        496
+      ],
+      "id": "69d23077-8271-4108-a36b-a34f6aa065c7",
+      "name": "Setup defaults"
+    },
+    {
+      "parameters": {
+        "formTitle": "Looping video maker",
+        "formDescription": "Upload a video file (<=20s) that you want to loop",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Video",
+              "fieldType": "file",
+              "multipleFiles": false,
+              "acceptFileTypes": ".mp4",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {
+          "buttonLabel": "Get started"
+        }
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.3,
+      "position": [
+        1344,
+        496
+      ],
+      "id": "cb9bfec4-540e-433b-9703-268b2aa8224d",
+      "name": "On form submission",
+      "webhookId": "d6417fce-3e37-4887-82a5-d49680598e4d"
+    },
+    {
+      "parameters": {
+        "content": "# Setup",
+        "height": 560,
+        "width": 420,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2352,
+        256
+      ],
+      "id": "39a409ba-def7-4327-a16b-c5c949ae3e1f",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "# Done",
+        "height": 304,
+        "width": 420,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        3712,
+        256
+      ],
+      "id": "f44c5205-57ef-4fc3-9857-9fff03b63939",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "jsCode": "return $('On form submission').first()"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2432,
+        528
+      ],
+      "id": "457b2b04-b574-4c32-8a96-83602246deb0",
+      "name": "Relay video"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Setup defaults').item.json.AI_AGENTS_NO_CODE_TOOLS_URL }}/api/v1/media/storage",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "file",
+              "inputDataFieldName": "Video"
+            },
+            {
+              "name": "media_type",
+              "value": "video"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2592,
+        528
+      ],
+      "id": "b1b778cf-29e8-49a2-9187-e5882d7824e3",
+      "name": "Upload video to the server"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Setup defaults').item.json.AI_AGENTS_NO_CODE_TOOLS_URL }}/api/v1/media/video-tools/create-looping-video",
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "video_id",
+              "value": "={{ $json.file_id }}"
+            }
+          ]
+        },
+        "options": {
+          "redirect": {
+            "redirect": {}
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2896,
+        528
+      ],
+      "id": "58f9962b-00d5-4ca4-bb5b-b9213fdf1252",
+      "name": "Start creating looping video"
+    },
+    {
+      "parameters": {
+        "amount": 1
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        3104,
+        528
+      ],
+      "id": "a0fc0da1-e57d-4007-ba20-67d6ab2f2a26",
+      "name": "Wait until the looping video gets generated",
+      "webhookId": "0d9fb7ca-1cd3-4d05-989e-6a18c858bdae"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Setup defaults').item.json.AI_AGENTS_NO_CODE_TOOLS_URL }}/api/v1/media/storage/{{ $('Start creating looping video').last().json.file_id }}/status",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3312,
+        528
+      ],
+      "id": "3e4927f9-6473-49d6-82e2-319780cda800",
+      "name": "Get status of looping video",
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "ready",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "91402596-3978-4dfc-91b7-9ffe3521b862"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "ready"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "0c29765e-4213-434c-9bf3-c5e854dd6ee8",
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "processing",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "processing"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "4a6cfd86-e690-417e-aa6d-ae497e1177ae",
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "not_found",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "failed"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        3520,
+        512
+      ],
+      "id": "a386ed2c-9410-4f8e-bf4d-bba862820e6b",
+      "name": "Looping video status switch"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Setup defaults').item.json.AI_AGENTS_NO_CODE_TOOLS_URL }}/api/v1/media/storage/{{ $('Start creating looping video').last().json.file_id }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3856,
+        384
+      ],
+      "id": "75955545-aa5d-4de2-8f3b-e5e12fa36f7a",
+      "name": "Donwload looping video"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Configure me": {
+      "main": [
+        [
+          {
+            "node": "Setup defaults",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Relay video",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Server isn't ready",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Setup defaults": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Configure me",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Relay video": {
+      "main": [
+        [
+          {
+            "node": "Upload video to the server",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload video to the server": {
+      "main": [
+        [
+          {
+            "node": "Start creating looping video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start creating looping video": {
+      "main": [
+        [
+          {
+            "node": "Wait until the looping video gets generated",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait until the looping video gets generated": {
+      "main": [
+        [
+          {
+            "node": "Get status of looping video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get status of looping video": {
+      "main": [
+        [
+          {
+            "node": "Looping video status switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Looping video status switch": {
+      "main": [
+        [
+          {
+            "node": "Donwload looping video",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait until the looping video gets generated",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Stop and Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "27f8af96-0c8b-4cf2-9d78-bb547bdf47a1",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "636db6b6ab21a21c6458e2137f340e33dc3e49f5a1c560c8d1e2372c227cf40e"
+  },
+  "id": "3sTpZAFHGy9sCV9l",
+  "tags": []
+}

@@ -1,0 +1,578 @@
+{
+  "name": "Sleepless historian workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7d55d6da-a78c-4a28-9343-0ea9035a0aa3",
+              "name": "AI_AGENTS_NO_CODE_TOOLS_URL",
+              "value": "={{   ((u) => {   let s = u.trim();   if (!/^https?:\\/\\//i.test(s)) s = 'https://' + s;   const parts = s.split('/');   return parts[0] + '//' + parts[2]; })($json.AI_AGENTS_NO_CODE_TOOLS_URL)  }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        384,
+        240
+      ],
+      "id": "4181b815-8b65-40f2-bddc-315a99c87081",
+      "name": "Setup defaults"
+    },
+    {
+      "parameters": {
+        "content": "# Test connection",
+        "height": 464,
+        "width": 420,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        352,
+        64
+      ],
+      "id": "b9917538-89e5-4b27-ab1f-8c99133cd271",
+      "name": "Sticky Note15"
+    },
+    {
+      "parameters": {
+        "errorMessage": "The server is not running or isn't configured"
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        592,
+        384
+      ],
+      "id": "7b4c82d0-79eb-4a9f-ba12-cb0c83562047",
+      "name": "Server isn't ready"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.AI_AGENTS_NO_CODE_TOOLS_URL }}/health",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        592,
+        160
+      ],
+      "id": "baa8ac49-f5b4-4d15-84d4-95c7c9a8e7a5",
+      "name": "HTTP Request",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "content": "# Configure me ?\n",
+        "height": 464,
+        "width": 204,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        96,
+        64
+      ],
+      "id": "9eb996c2-141f-4f16-a26e-c7460d0e012f",
+      "name": "Sticky Note12"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7bbb518a-c4f1-49a5-9e72-3e9d939b131b",
+              "name": "AI_AGENTS_NO_CODE_TOOLS_URL",
+              "value": "<<insert your url>>",
+              "type": "string"
+            },
+            {
+              "id": "4c81b3f9-79b4-4bbb-8818-6d235cfb07e7",
+              "name": "history_videos_db",
+              "value": "CqoI9dv8AXBQR8L5",
+              "type": "string"
+            },
+            {
+              "id": "a58b9da8-dd34-437f-9782-1036edcc50dd",
+              "name": "history_video_chunks_db",
+              "value": "GNLYPz8c3h3x07Es",
+              "type": "string"
+            },
+            {
+              "id": "0b3dbbb2-a68f-4cc6-a065-1ac39c6d5539",
+              "name": "sleepless_historian_subworkflow_id",
+              "value": "1gsvHDmKeJGDJ4n8",
+              "type": "string"
+            },
+            {
+              "id": "6a103812-bd16-4e35-aaaa-0cf839074753",
+              "name": "sleepless_historian_create_story_subworkflow_id",
+              "value": "1Tv7lsvK5xyVFm8p",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        144,
+        240
+      ],
+      "id": "15ff1095-84b8-4ad7-ab68-ca6880c78756",
+      "name": "Configure me"
+    },
+    {
+      "parameters": {
+        "formTitle": "Create a boring history video",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Idea",
+              "placeholder": "The idea / topic for the video",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Art style",
+              "placeholder": "The art style for the image generation",
+              "defaultValue": "medieval oil painting",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Intro",
+              "placeholder": "Intro of the video",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Desired length (minutes)",
+              "fieldType": "number",
+              "placeholder": "How long the final video should be",
+              "defaultValue": "5",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Image length (seconds)",
+              "placeholder": "for how long each image will be visible",
+              "defaultValue": "23",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.3,
+      "position": [
+        -80,
+        240
+      ],
+      "id": "2f7f6948-2ddf-4311-ba2c-8f2214452498",
+      "name": "On form submission",
+      "webhookId": "99b97807-88d4-47ef-b6fd-4e1c3a17b4ec"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $('Configure me').item.json.sleepless_historian_create_story_subworkflow_id }}",
+          "cachedResultName": "={{ $('Configure me').item.json.sleepless_historian_create_story_subworkflow_id }}"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "topic": "={{ $('On form submission').item.json.Idea }}",
+            "desired_length_minutes": "={{ $('On form submission').item.json['Desired length (minutes)'] }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "topic",
+              "displayName": "topic",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "desired_length_minutes",
+              "displayName": "desired_length_minutes",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "number"
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        880,
+        256
+      ],
+      "id": "149f4cb5-3462-4dbf-ac39-2e3f98ead2e3",
+      "name": "Create story"
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "value": "={{ $('Configure me').item.json.history_videos_db }}",
+          "mode": "id"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "idea": "={{ $('On form submission').item.json.Idea }}",
+            "intro": "={{ $json.intro }}",
+            "art_style": "={{ $('On form submission').item.json['Art style'] }}",
+            "image_length_seconds": "={{ $('On form submission').item.json['Image length (seconds)'] }}",
+            "story": "={{ $('Create story').item.json.story }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "idea",
+              "displayName": "idea",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "intro",
+              "displayName": "intro",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "image_length_seconds",
+              "displayName": "image_length_seconds",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "voice_sample_id",
+              "displayName": "voice_sample_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "story",
+              "displayName": "story",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "art_style",
+              "displayName": "art_style",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "generated_video_id",
+              "displayName": "generated_video_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        1552,
+        256
+      ],
+      "id": "82062677-0c0b-4140-9efb-5a1d2c9ee501",
+      "name": "Save to db"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $('Configure me').item.json.sleepless_historian_subworkflow_id }}",
+          "cachedResultName": "={{ $('Configure me').item.json.sleepless_historian_subworkflow_id }}"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "video_id": "={{ $json.id }}",
+            "server_url": "={{ $('Setup defaults').item.json.AI_AGENTS_NO_CODE_TOOLS_URL }}",
+            "history_videos_db": "={{ $('Configure me').item.json.history_videos_db }}",
+            "history_video_chunks_db": "={{ $('Configure me').item.json.history_video_chunks_db }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "video_id",
+              "displayName": "video_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "number"
+            },
+            {
+              "id": "history_videos_db",
+              "displayName": "history_videos_db",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "history_video_chunks_db",
+              "displayName": "history_video_chunks_db",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "server_url",
+              "displayName": "server_url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        1728,
+        256
+      ],
+      "id": "a294a919-b5ae-43d5-9fb8-5cae2bf026a8",
+      "name": "Call 'Sleepless historian subworkflow'"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-5-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-5-MINI"
+        },
+        "responses": {
+          "values": [
+            {
+              "content": "=<instructions>\nHelp me to write a short intro using the story below, and include (integrate) the intro that was written by me. \n\nRequirements\n- Make sure to keep the 8th grade reading level.\n- Integrate the intro I've written, not as it is, but make it part of the intro\n- Start with something like \"tonight, we'll be talking about ...\" and then the summary of the topic\n- End the intro with something like \"Let's start the journey\" or similar\n</instructions>\n\n<story>\n{{ $json.story }}\n</story>\n\n<intro>\n{{ $('On form submission').item.json.Intro }}\n</intro>"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {
+          "textFormat": {
+            "textOptions": {
+              "type": "json_schema",
+              "name": "intro_schema",
+              "schema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"intro\": {\n      \"type\": \"string\",\n      \"description\": \"A brief introductory message.\"\n    }\n  },\n  \"required\": [\n    \"intro\"\n  ],\n  \"additionalProperties\": false\n}",
+              "strict": true
+            }
+          }
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.1,
+      "position": [
+        1072,
+        256
+      ],
+      "id": "8f9dcdab-771f-4d2f-ba7e-a763eba6853d",
+      "name": "Create intro",
+      "credentials": {
+        "openAiApi": {
+          "id": "tGvJRP2th9CbI2oq",
+          "name": "OpenAi account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "0679e253-689e-481f-9ad6-0a1897768bb2",
+              "name": "intro",
+              "value": "={{ $json.output[0].content[0].text.intro.replace(/\\n/g, ' ').replace(/--/g, ', ').replace(/\\./, '. ').replace(/  /g, ' ') }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1376,
+        256
+      ],
+      "id": "6cc42100-e317-46aa-bb45-870ef6df6e74",
+      "name": "Clean intro"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Setup defaults": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Create story",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Server isn't ready",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Configure me": {
+      "main": [
+        [
+          {
+            "node": "Setup defaults",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Configure me",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create story": {
+      "main": [
+        [
+          {
+            "node": "Create intro",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save to db": {
+      "main": [
+        [
+          {
+            "node": "Call 'Sleepless historian subworkflow'",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create intro": {
+      "main": [
+        [
+          {
+            "node": "Clean intro",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Clean intro": {
+      "main": [
+        [
+          {
+            "node": "Save to db",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "8b7c8557-a7f9-48b8-b409-5c32e6b09836",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "636db6b6ab21a21c6458e2137f340e33dc3e49f5a1c560c8d1e2372c227cf40e"
+  },
+  "id": "B9w05B1sK8K6xQL3",
+  "tags": []
+}

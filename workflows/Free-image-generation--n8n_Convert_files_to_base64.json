@@ -1,0 +1,55 @@
+{
+  "name": "Subworkflow: convert files to base64",
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -704,
+        32
+      ],
+      "id": "c4ea3d87-66dc-42cf-a689-f9d16e0641b0",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "jsCode": "const results = [];\n\nfor (const file in $input.first().binary) {\n  try {\n    const bin = $input.first().binary[file];\n    const binBuffer = await this.helpers.getBinaryDataBuffer(0, file);\n\n    const path = bin.directory\n      ? `${bin.directory}/${bin.fileName}`\n      : bin.fileName;\n\n    results.push(`data:${bin.mimeType};base64,` + Buffer.from(binBuffer).toString('base64'));\n  } catch (error) {\n    console.error(`Error processing file \"${file}\": ${error.message}`);\n  }\n}\n\nreturn [{\n  json: {\n    files: results,\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -496,
+        32
+      ],
+      "id": "5cab3fb0-cefd-40fa-aa8e-4357e514067e",
+      "name": "Convert images to base64"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Convert images to base64",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "6e74b725-7343-4921-bda5-448e7460285d",
+  "meta": {
+    "instanceId": "636db6b6ab21a21c6458e2137f340e33dc3e49f5a1c560c8d1e2372c227cf40e"
+  },
+  "id": "ZXHmqf94gHAABBaf",
+  "tags": []
+}

@@ -1,0 +1,283 @@
+{
+  "name": "Subworkflow: Qwen image edit plus",
+  "nodes": [
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "065181ef-404a-4860-9019-976e6e8391e0",
+              "name": "seed",
+              "value": "={{ Math.floor(Math.random() * 100000000) }}",
+              "type": "number"
+            },
+            {
+              "id": "95df4de2-196a-4f64-a2ed-3959ede14154",
+              "name": "url",
+              "value": "={{   ((u) => {   let s = u.trim();   if (!/^https?:\\/\\//i.test(s)) s = 'https://' + s;   const parts = s.split('/');   return parts[0] + '//' + parts[2]; })($json.MODAL_URL)  }}/edit-images",
+              "type": "string"
+            },
+            {
+              "id": "f621fcd7-fc60-4a3b-99ec-0f356f996689",
+              "name": "prompt",
+              "value": "={{ $('When Executed by Another Workflow').item.json.REQUIRED_prompt }}",
+              "type": "string"
+            },
+            {
+              "id": "ea5c9ac8-ada9-4e77-9eb2-73db13f31a14",
+              "name": "images",
+              "value": "={{ $('When Executed by Another Workflow').item.json.REQUIRED_images }}",
+              "type": "array"
+            },
+            {
+              "id": "666b31ed-983c-4db5-870f-f8f4e8677a5c",
+              "name": "width",
+              "value": "={{ $('When Executed by Another Workflow').item.json.width || 1024 }}",
+              "type": "number"
+            },
+            {
+              "id": "43af36aa-c09f-4261-b9c4-d1086c17839b",
+              "name": "height",
+              "value": "={{ $('When Executed by Another Workflow').item.json.height || 1024 }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        288,
+        240
+      ],
+      "id": "b461cda4-2bf4-4f80-8505-812b6b5568ae",
+      "name": "Setup workflow"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "2df0bb38-9912-4978-ad56-3236c5d54126",
+              "name": "MODAL_URL",
+              "value": "https://gyoridavid--nunchaku-qwen-image-fastapi-fastapi-app-dev.modal.run/",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        48,
+        240
+      ],
+      "id": "bc33466c-3305-44be-b7e1-23624f640e96",
+      "name": "Configure me"
+    },
+    {
+      "parameters": {
+        "content": "# Configure\n\nStart the modal app, and add serverless modal URL here",
+        "height": 448,
+        "width": 192,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "0664879a-1afc-48a1-a6fb-319ebf84bd5e",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Setup workflow').item.json.url }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({\n  prompt: $json.prompt,\n  images: $json.images,\n  seed: $json.seed,\n  width: $json.width,\n  height: $json.height\n}, null, 2) }}",
+        "options": {
+          "redirect": {
+            "redirect": {}
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        480,
+        240
+      ],
+      "id": "b0b2a715-c925-4d4f-b1ca-762ec1550cfb",
+      "name": "Edit image",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "vLZnCmQuaqpFY5LK",
+          "name": "Postiz auth"
+        },
+        "httpBearerAuth": {
+          "id": "87OZHS8yldgJ2skd",
+          "name": "Modal"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "REQUIRED_prompt"
+            },
+            {
+              "name": "REQUIRED_images",
+              "type": "array"
+            },
+            {
+              "name": "width",
+              "type": "number"
+            },
+            {
+              "name": "height",
+              "type": "number"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -528,
+        208
+      ],
+      "id": "b8c4b7a6-6210-469a-849e-dc924a22fb24",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "b3bb164a-7a8d-4b2e-baf3-46a6da46fea0",
+              "leftValue": "={{ $json.REQUIRED_prompt }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "empty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "7a35d284-0a42-4103-a6d8-221572742056",
+              "leftValue": "={{ $json.REQUIRED_images }}",
+              "rightValue": "",
+              "operator": {
+                "type": "array",
+                "operation": "empty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -304,
+        208
+      ],
+      "id": "db9ce223-21f6-412c-88ae-67e0642fd97a",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "errorMessage": "The prompt and at least one image is required"
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        0,
+        -160
+      ],
+      "id": "16c21373-1e11-4fe4-973d-a2b26f55d8a1",
+      "name": "Stop and Error"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Setup workflow": {
+      "main": [
+        [
+          {
+            "node": "Edit image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Configure me": {
+      "main": [
+        [
+          {
+            "node": "Setup workflow",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Stop and Error",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Configure me",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "3f0a1f91-e604-46b6-a49e-69495198c496",
+  "meta": {
+    "instanceId": "636db6b6ab21a21c6458e2137f340e33dc3e49f5a1c560c8d1e2372c227cf40e"
+  },
+  "id": "MaqNVRcFUVNEWXxC",
+  "tags": []
+}

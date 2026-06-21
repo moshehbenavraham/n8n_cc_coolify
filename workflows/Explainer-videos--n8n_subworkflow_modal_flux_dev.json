@@ -1,0 +1,245 @@
+{
+  "name": "Modal: flux dev subworkflow",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "prompt"
+            },
+            {
+              "name": "width",
+              "type": "number"
+            },
+            {
+              "name": "height",
+              "type": "number"
+            },
+            {
+              "name": "steps",
+              "type": "number"
+            },
+            {
+              "name": "guidance_scale",
+              "type": "number"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -1168,
+        0
+      ],
+      "id": "a8b8c8b0-b73d-4039-aca4-c1d386c081d1",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3f7d5020-0710-4f3c-858f-0485a2bd2963",
+              "name": "width",
+              "value": "={{ $('When Executed by Another Workflow').item.json.width || 1024 }}",
+              "type": "number"
+            },
+            {
+              "id": "39b906fa-3e0b-45b9-9c1b-95cbc51e195d",
+              "name": "prompt",
+              "value": "={{ $('When Executed by Another Workflow').item.json.prompt }}",
+              "type": "string"
+            },
+            {
+              "id": "3f8593d2-cfb3-437a-a9fc-4430995cb78f",
+              "name": "height",
+              "value": "={{ $('When Executed by Another Workflow').item.json.height || 1024 }}",
+              "type": "number"
+            },
+            {
+              "id": "065181ef-404a-4860-9019-976e6e8391e0",
+              "name": "seed",
+              "value": "={{ Math.floor(Math.random() * 100000000) }}",
+              "type": "number"
+            },
+            {
+              "id": "2c131da3-e708-4468-bb09-d400e7e5f28c",
+              "name": "steps",
+              "value": "={{ $('When Executed by Another Workflow').item.json.steps || 40 }}",
+              "type": "number"
+            },
+            {
+              "id": "95df4de2-196a-4f64-a2ed-3959ede14154",
+              "name": "url",
+              "value": "={{   ((u) => {   let s = u.trim();   if (!/^https?:\\/\\//i.test(s)) s = 'https://' + s;   const parts = s.split('/');   return parts[0] + '//' + parts[2]; })($json.MODAL_URL)  }}/generate",
+              "type": "string"
+            },
+            {
+              "id": "aa3da4e4-9c9e-4cf4-b8bf-f7f08717ec02",
+              "name": "guidance_scale",
+              "value": "={{ $('When Executed by Another Workflow').item.json.guidance_scale || 3.5 }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -640,
+        0
+      ],
+      "id": "3e4fadf2-1a32-44eb-8c81-b393a717e224",
+      "name": "Setup workflow"
+    },
+    {
+      "parameters": {
+        "content": "# Configure me\n\nStart the modal server, and and add the server URL to this node",
+        "height": 432,
+        "width": 256,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -960,
+        -240
+      ],
+      "typeVersion": 1,
+      "id": "157aaae1-9316-4eaa-80b9-d1b9946a570c",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Setup workflow').item.json.url }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "prompt",
+              "value": "={{ $('Setup workflow').item.json.prompt }}"
+            },
+            {
+              "name": "width",
+              "value": "={{ $('Setup workflow').item.json.width }}"
+            },
+            {
+              "name": "height",
+              "value": "={{ $('Setup workflow').item.json.height }}"
+            },
+            {
+              "name": "seed",
+              "value": "={{ $('Setup workflow').item.json.seed }}"
+            },
+            {
+              "name": "steps",
+              "value": "={{ $('Setup workflow').item.json.steps }}"
+            },
+            {
+              "name": "guidance_scale",
+              "value": "={{ $('Setup workflow').item.json.guidance_scale }}"
+            }
+          ]
+        },
+        "options": {
+          "redirect": {
+            "redirect": {}
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -448,
+        0
+      ],
+      "id": "0a6a94cd-6d62-4f77-b118-f6abf834f4f3",
+      "name": "Generate image",
+      "credentials": {
+        "httpBearerAuth": {
+          "id": "87OZHS8yldgJ2skd",
+          "name": "Modal"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "2df0bb38-9912-4978-ad56-3236c5d54126",
+              "name": "MODAL_URL",
+              "value": "<<your modal server URL>>",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -896,
+        0
+      ],
+      "id": "1732669f-0019-45d7-8c64-34fa2a16db7e",
+      "name": "Configure"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Configure",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Setup workflow": {
+      "main": [
+        [
+          {
+            "node": "Generate image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate image": {
+      "main": [
+        []
+      ]
+    },
+    "Configure": {
+      "main": [
+        [
+          {
+            "node": "Setup workflow",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "2b6f8386-906d-437f-be3b-967af5db4832",
+  "meta": {
+    "instanceId": "636db6b6ab21a21c6458e2137f340e33dc3e49f5a1c560c8d1e2372c227cf40e"
+  },
+  "id": "J4CdzHvSiRhLbRi4",
+  "tags": []
+}

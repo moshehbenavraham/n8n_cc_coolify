@@ -1,0 +1,3094 @@
+{
+  "name": "Subworkflow: sleepless historian - improved",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "video_id",
+              "type": "number"
+            },
+            {
+              "name": "history_videos_db"
+            },
+            {
+              "name": "history_video_chunks_db"
+            },
+            {
+              "name": "server_url"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -2128,
+        192
+      ],
+      "id": "4125a7be-7068-4ba7-9a6b-9708ece6338c",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "CqoI9dv8AXBQR8L5",
+          "mode": "id"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyValue": "={{ $('When Executed by Another Workflow').first().json.video_id }}"
+            }
+          ]
+        },
+        "limit": 1
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        -1936,
+        192
+      ],
+      "id": "1e2188ad-e1dd-485f-a4bc-b54f93d5c55c",
+      "name": "Get video",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "errorMessage": "The video id can't be found"
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        -1600,
+        32
+      ],
+      "id": "16ef25f4-6c9b-4b7a-9e17-b7bb20cb4fb3",
+      "name": "No video"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('When Executed by Another Workflow').first().json.server_url }}/api/v1/media/video-tools/merge",
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "video_ids",
+              "value": "={{ $json.video_ids }}"
+            }
+          ]
+        },
+        "options": {
+          "redirect": {
+            "redirect": {}
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -960,
+        2160
+      ],
+      "id": "835bcccb-8016-404c-b1f9-1975fd8f5ec6",
+      "name": "Start merging the videos"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('When Executed by Another Workflow').first().json.server_url }}/api/v1/media/storage/{{ $('Start merging the videos').item.json.file_id }}/status",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -544,
+        2160
+      ],
+      "id": "46105250-75c6-496a-b454-f19a4f92f785",
+      "name": "Get status of the video merge"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "4a6cfd86-e690-417e-aa6d-ae497e1177ae",
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "not_found",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "failed"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "0c29765e-4213-434c-9bf3-c5e854dd6ee8",
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "processing",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "processing"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "ready",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "91402596-3978-4dfc-91b7-9ffe3521b862"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "ready"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -352,
+        2176
+      ],
+      "id": "76b2667d-fd58-4099-aaaa-8609d9b3708a",
+      "name": "Video merge status switch"
+    },
+    {
+      "parameters": {
+        "amount": 1
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -752,
+        2160
+      ],
+      "id": "5c441b8d-46e6-409d-a93e-c49dc4f3bdcb",
+      "name": "Wait until the videos gets merged together",
+      "webhookId": "9bddef78-bb8b-4743-ba72-d3771dfd1295"
+    },
+    {
+      "parameters": {
+        "errorMessage": "Error while merging the final video"
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        -128,
+        2128
+      ],
+      "id": "05f2c0ad-05f3-421a-9667-37a1474d23b5",
+      "name": "Merge error"
+    },
+    {
+      "parameters": {
+        "content": "# Get the video",
+        "height": 432,
+        "width": 532,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1984,
+        -48
+      ],
+      "id": "f3a52a14-b6a6-4356-976c-7f53ba2d8da0",
+      "name": "Sticky Note16"
+    },
+    {
+      "parameters": {
+        "content": "# Merge videos",
+        "height": 336,
+        "width": 1428,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1408,
+        2064
+      ],
+      "id": "ed51d10e-3e4a-4514-9b56-f4a8591ec8b2",
+      "name": "Sticky Note22"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "ae08e7df-161d-4769-ada6-97a302bd7a94",
+              "leftValue": "={{ $json.keys() }}",
+              "rightValue": "",
+              "operator": {
+                "type": "array",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -1200,
+        224
+      ],
+      "id": "b469e6e2-bd26-4425-97fb-1ca4ea751389",
+      "name": "Has chunks?"
+    },
+    {
+      "parameters": {
+        "content": "# Generate image prompts",
+        "height": 352,
+        "width": 1124,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1408,
+        432
+      ],
+      "id": "5c8ac742-a946-4e28-a144-e104c5431d6f",
+      "name": "Sticky Note23"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "={{ $('When Executed by Another Workflow').first().json.history_video_chunks_db }}",
+          "mode": "id"
+        },
+        "matchType": "allConditions",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "video_id",
+              "keyValue": "={{ $('Set video object').first().json.video.id }}"
+            },
+            {
+              "keyName": "image_prompt",
+              "keyValue": "={{ null }}"
+            }
+          ]
+        },
+        "returnAll": true
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        -1360,
+        560
+      ],
+      "id": "5f33d3d5-44b2-4d6b-a581-4bdf66eb163a",
+      "name": "Get chunks for image prompt generation",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "content": "# Generate images",
+        "height": 368,
+        "width": 1124,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1408,
+        832
+      ],
+      "id": "0aa522e1-a3ea-4114-901d-08eb3c3d6fe7",
+      "name": "Sticky Note24"
+    },
+    {
+      "parameters": {
+        "content": "# Generate narration",
+        "height": 384,
+        "width": 1764,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1408,
+        1248
+      ],
+      "id": "517ffe53-cdd8-4ebf-ad99-4233342cc616",
+      "name": "Sticky Note25"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('When Executed by Another Workflow').first().json.server_url }}/api/v1/media/storage",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "url",
+              "value": "https://drive.google.com/file/d/1wkVwNGe782oRAzKHgGITmwt-cc46-bAr/view?usp=sharing"
+            },
+            {
+              "name": "media_type",
+              "value": "audio"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1360,
+        1376
+      ],
+      "id": "fa517bd3-5dc8-458e-889d-fd443789b0f0",
+      "name": "Upload sample voice"
+    },
+    {
+      "parameters": {
+        "content": "# Generate video",
+        "height": 336,
+        "width": 1588,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1408,
+        1680
+      ],
+      "id": "1abb1595-84d5-458d-a4b5-bc41a476a88c",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('When Executed by Another Workflow').first().json.server_url }}/api/v1/media/storage",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "url",
+              "value": "https://drive.google.com/file/d/1fF0rfjQ57ppfhJ3TgnaFFNXA5LSHK4dl/view?usp=sharing"
+            },
+            {
+              "name": "media_type",
+              "value": "video"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1360,
+        2560
+      ],
+      "id": "2d717f2b-d7e7-4dcd-b23c-2117eaea674c",
+      "name": "Upload overlay to the server"
+    },
+    {
+      "parameters": {
+        "amount": 1
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -944,
+        2560
+      ],
+      "id": "422814f5-1d3c-4396-85cc-a516138cf76f",
+      "name": "Wait until the videos gets merged together1",
+      "webhookId": "b5215aac-8756-4331-92af-f6370cdbe3a3"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('When Executed by Another Workflow').first().json.server_url }}/api/v1/media/video-tools/add-overlay",
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "video_id",
+              "value": "={{ $('Start merging the videos').last().json.file_id }}"
+            },
+            {
+              "name": "overlay_id",
+              "value": "={{ $('Upload overlay to the server').first().json.file_id }}"
+            },
+            {
+              "name": "opacity",
+              "value": "0.2"
+            }
+          ]
+        },
+        "options": {
+          "redirect": {
+            "redirect": {}
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1152,
+        2560
+      ],
+      "id": "58951dc7-4043-4e10-86e4-0619ce393a2a",
+      "name": "Start adding overlay to thevideo"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('When Executed by Another Workflow').first().json.server_url }}/api/v1/media/storage/{{ $('Start adding overlay to thevideo').last().json.file_id }}/status",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -720,
+        2560
+      ],
+      "id": "830f6596-7cba-4ec1-bdde-401b729fc78d",
+      "name": "Get status of the overlay"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "4a6cfd86-e690-417e-aa6d-ae497e1177ae",
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "not_found",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "failed"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "ready",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "91402596-3978-4dfc-91b7-9ffe3521b862"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "ready"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "0c29765e-4213-434c-9bf3-c5e854dd6ee8",
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "processing",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "processing"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -512,
+        2592
+      ],
+      "id": "5b642274-a974-4b19-bc12-09dc26b18845",
+      "name": "Overlay status"
+    },
+    {
+      "parameters": {
+        "content": "# Add overlay",
+        "height": 360,
+        "width": 1208,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1408,
+        2464
+      ],
+      "id": "92789b7a-e1d8-4a61-9d31-952c4cbdf18b",
+      "name": "Sticky Note10"
+    },
+    {
+      "parameters": {
+        "errorMessage": "Adding the overlay failed"
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        -336,
+        2512
+      ],
+      "id": "03ecd24b-cbea-4c9c-bf94-7ebd51073a1e",
+      "name": "Stop and Error"
+    },
+    {
+      "parameters": {
+        "content": "# Create chunks",
+        "height": 432,
+        "width": 980,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1408,
+        -48
+      ],
+      "id": "989bb6ff-e9fd-483f-832f-2aad4e3a5da7",
+      "name": "Sticky Note17"
+    },
+    {
+      "parameters": {
+        "content": "# Done",
+        "height": 360,
+        "width": 232,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -144,
+        2464
+      ],
+      "id": "3c67a3c8-888f-4390-a161-6b2ef69ae8f8",
+      "name": "Sticky Note11"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "eb1afb09-f874-4fef-8a68-a69a5d956d4c",
+              "leftValue": "={{ $json.keys() }}",
+              "rightValue": "",
+              "operator": {
+                "type": "array",
+                "operation": "empty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -1760,
+        192
+      ],
+      "id": "4aa6f81c-cb82-463d-812e-c962b4209dc9",
+      "name": "No video?"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "cd167691-a914-4341-a410-12f0a4c034f9",
+              "name": "video",
+              "value": "={{ $json }}",
+              "type": "object"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1600,
+        208
+      ],
+      "id": "cbe7ea7b-3737-4d7c-85d9-92dc221f3f0c",
+      "name": "Set video object"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "={{ $('When Executed by Another Workflow').item.json.history_video_chunks_db }}",
+          "mode": "id"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "video_id",
+              "keyValue": "={{ $('When Executed by Another Workflow').item.json.video_id }}"
+            }
+          ]
+        },
+        "limit": 1
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        -1360,
+        208
+      ],
+      "id": "56ad114b-600e-4d8b-b4ce-c2eabf0f8f6d",
+      "name": "Get chunks",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const chunk_length_seconds = $('Set video object').first().json.video.image_length_seconds;\nconst chars_per_minute = 1000;\nconst chunk_character_length = Math.ceil(chars_per_minute * (chunk_length_seconds / 60));\n\nfunction splitTextToChunks(text, characterLimit) {\n  if (text.length <= characterLimit) {\n    \n    return [text];\n  }\n  const tmpChunks = [[]];\n  for (const sentence of text.split('.')) {\n    if (\n      tmpChunks[tmpChunks.length - 1].join('').length >= characterLimit \n    ) {\n      tmpChunks.push([]);\n    }\n    tmpChunks[tmpChunks.length - 1].push(sentence);\n  }\n  return tmpChunks.map(item => item.join('. ')).filter(Boolean);\n}\n\n// Loop over input items and add a new field called 'myNewField' to the JSON of each one\nfor (const item of $input.all()) {\n  item.json.chunk_character_length = chunk_character_length;\n  item.json.chunks = [\n    ...splitTextToChunks($('Set video object').first().json.video.intro, chunk_character_length),\n    ...splitTextToChunks($('Set video object').first().json.video.story, chunk_character_length)\n  ];\n}\n\nreturn $input.all();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1008,
+        208
+      ],
+      "id": "19aa3268-0ff0-4535-aab2-c8be4e70e44c",
+      "name": "Create chunks"
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "value": "={{ $('When Executed by Another Workflow').first().json.history_video_chunks_db }}",
+          "mode": "id"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "video_id": "={{ $('When Executed by Another Workflow').item.json.video_id }}",
+            "text": "={{ $json.chunks }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "video_id",
+              "displayName": "video_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "text",
+              "displayName": "text",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "image_prompt",
+              "displayName": "image_prompt",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "generated_image_id",
+              "displayName": "generated_image_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "generated_audio_id",
+              "displayName": "generated_audio_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "generated_video_id",
+              "displayName": "generated_video_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        -720,
+        208
+      ],
+      "id": "de4cad9b-0026-4641-930f-f5f2c9062943",
+      "name": "Save chunk"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "chunks",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -864,
+        208
+      ],
+      "id": "fdd9a0a8-7357-4077-b377-987348789106",
+      "name": "For each chunks"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        -576,
+        208
+      ],
+      "id": "8a078ca6-27b8-4b75-ae99-7c1e8b2de00d",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "alIK6ZBE2mNNLolF",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/alIK6ZBE2mNNLolF",
+          "cachedResultName": "Subworkflow: Fal.ai z-image"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "prompt": "={{ $json.image_prompt }}",
+            "image_size": "landscape_16_9"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "prompt",
+              "displayName": "prompt",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "image_size",
+              "displayName": "image_size",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        -800,
+        864
+      ],
+      "id": "22e860e9-4081-4b49-834c-15a0e16c0c8a",
+      "name": "Generate image"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('When Executed by Another Workflow').first().json.server_url }}/api/v1/media/storage",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "file",
+              "inputDataFieldName": "=data"
+            },
+            {
+              "name": "media_type",
+              "value": "image"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -592,
+        944
+      ],
+      "id": "ab79dbd8-a8e4-4d46-b706-fddf0c195476",
+      "name": "Upload image to the server"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "dataTableId": {
+          "__rl": true,
+          "value": "={{ $('When Executed by Another Workflow').first().json.history_video_chunks_db }}",
+          "mode": "id"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyValue": "={{ $('Get chunks for image generation').item.json.id }}"
+            }
+          ]
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "generated_image_id": "={{ $json.file_id }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "video_id",
+              "displayName": "video_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "text",
+              "displayName": "text",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "image_prompt",
+              "displayName": "image_prompt",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "generated_image_id",
+              "displayName": "generated_image_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "generated_audio_id",
+              "displayName": "generated_audio_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "generated_video_id",
+              "displayName": "generated_video_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        -432,
+        1024
+      ],
+      "id": "eb1d867b-e5bf-4f80-954b-802f7db12422",
+      "name": "Save image"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "dataTableId": {
+          "__rl": true,
+          "value": "={{ $('When Executed by Another Workflow').first().json.history_video_chunks_db }}",
+          "mode": "id"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyValue": "={{ $('Get chunks for image prompt generation').item.json.id }}"
+            }
+          ]
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "image_prompt": "={{ $json.output.image_prompt }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "video_id",
+              "displayName": "video_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "text",
+              "displayName": "text",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "image_prompt",
+              "displayName": "image_prompt",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "generated_image_id",
+              "displayName": "generated_image_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "generated_audio_id",
+              "displayName": "generated_audio_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "generated_video_id",
+              "displayName": "generated_video_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        -432,
+        608
+      ],
+      "id": "f03b990c-d5c6-40ae-bf78-16f839e7fdd9",
+      "name": "Save image prompt"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('When Executed by Another Workflow').first().json.server_url }}/api/v1/media/audio-tools/tts/chatterbox",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "text",
+              "value": "={{ $('Get chunks for narration').item.json.text }}"
+            },
+            {
+              "name": "sample_audio_id",
+              "value": "={{ $('Upload sample voice').item.json.file_id }}"
+            },
+            {
+              "name": "exaggeration",
+              "value": "0.2"
+            },
+            {
+              "name": "cfg_weight",
+              "value": "0.2"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -592,
+        1312
+      ],
+      "id": "cfe0eb23-9583-4330-b5e2-46e019218351",
+      "name": "Start generating TTS"
+    },
+    {
+      "parameters": {
+        "amount": 1
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -336,
+        1408
+      ],
+      "id": "e8af0cd8-aadc-4071-8fd0-df961e6e8beb",
+      "name": "Wait until the TTS gets generated",
+      "webhookId": "2514de72-3647-43da-b9b3-a42643e20fad"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('When Executed by Another Workflow').first().json.server_url }}/api/v1/media/storage/{{ $('Start generating TTS').item.json.file_id }}/status",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -160,
+        1408
+      ],
+      "id": "36729a53-2abe-4f28-b37e-d8c5f317f0f6",
+      "name": "Get status of TTS generation",
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "4a6cfd86-e690-417e-aa6d-ae497e1177ae",
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "not_found",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "failed"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "ready",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "91402596-3978-4dfc-91b7-9ffe3521b862"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "ready"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "0c29765e-4213-434c-9bf3-c5e854dd6ee8",
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "processing",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "processing"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        0,
+        1408
+      ],
+      "id": "c6dff743-8c5f-4eb9-a031-913e8e059851",
+      "name": "TTS status switch"
+    },
+    {
+      "parameters": {
+        "errorMessage": "Error during the TTS generation"
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        208,
+        1312
+      ],
+      "id": "025ecf2d-a30a-4d67-8ef3-776ec002fccf",
+      "name": "TTS error"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "dataTableId": {
+          "__rl": true,
+          "value": "={{ $('When Executed by Another Workflow').first().json.history_video_chunks_db }}",
+          "mode": "id"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyValue": "={{ $('Get chunks for narration').item.json.id }}"
+            }
+          ]
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "generated_audio_id": "={{ $('Start generating TTS').item.json.file_id }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "video_id",
+              "displayName": "video_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "text",
+              "displayName": "text",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "image_prompt",
+              "displayName": "image_prompt",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "generated_image_id",
+              "displayName": "generated_image_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "generated_audio_id",
+              "displayName": "generated_audio_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "generated_video_id",
+              "displayName": "generated_video_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        208,
+        1456
+      ],
+      "id": "51ea511c-eb63-45cf-b566-3c521ac068a5",
+      "name": "Save speech"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "={{ $('When Executed by Another Workflow').first().json.history_video_chunks_db }}",
+          "mode": "id"
+        },
+        "matchType": "allConditions",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "video_id",
+              "keyValue": "={{ $('Set video object').first().json.video.id }}"
+            },
+            {
+              "keyName": "generated_image_id",
+              "keyValue": "={{ null }}"
+            }
+          ]
+        },
+        "returnAll": true
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        -1360,
+        960
+      ],
+      "id": "908002ee-3eda-4ee5-81f9-caa8072f8b32",
+      "name": "Get chunks for image generation",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "={{ $('When Executed by Another Workflow').first().json.history_video_chunks_db }}",
+          "mode": "id"
+        },
+        "matchType": "allConditions",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "video_id",
+              "keyValue": "={{ $('Set video object').first().json.video.id }}"
+            },
+            {
+              "keyName": "generated_audio_id",
+              "keyValue": "={{ null }}"
+            }
+          ]
+        },
+        "returnAll": true
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        -1168,
+        1376
+      ],
+      "id": "43e3b260-e740-496c-8937-3d0818fc75bf",
+      "name": "Get chunks for narration",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "={{ $('When Executed by Another Workflow').first().json.history_video_chunks_db }}",
+          "mode": "id"
+        },
+        "matchType": "allConditions",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "video_id",
+              "keyValue": "={{ $('Set video object').first().json.video.id }}"
+            },
+            {
+              "keyName": "generated_video_id",
+              "keyValue": "={{ null }}"
+            }
+          ]
+        },
+        "returnAll": true
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        -1360,
+        1824
+      ],
+      "id": "5110d04b-0ba5-4f07-ab57-6d90b5cdc3e1",
+      "name": "Get chunk for video generation",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('When Executed by Another Workflow').first().json.server_url }}/api/v1/media/video-tools/generate/tts-captioned-video",
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "specifyBody": "string",
+        "body": "={{ \n\n  Object.entries({\n    background_id: $json.generated_image_id,\n    audio_id: $json.generated_audio_id,\n    caption_on: false,\n    image_effect: 'still',\n    width: 1920,\n    height: 1080\n  }).reduce((c, a) => { return [ ...c, `${a[0]}=${a[1]}` ] }, []).join('&')\n\n}}",
+        "options": {
+          "redirect": {
+            "redirect": {}
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -784,
+        1696
+      ],
+      "id": "095c7e53-3fd8-4043-bb4b-cb9a09eb4d96",
+      "name": "Start generating video"
+    },
+    {
+      "parameters": {
+        "amount": 1
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -576,
+        1824
+      ],
+      "id": "ee4f0b4e-132b-4366-81b3-e0efb55fc5ef",
+      "name": "Wait until the video gets generated",
+      "webhookId": "0a15a64e-4548-44d6-8a6c-ac3a2290489d"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('When Executed by Another Workflow').first().json.server_url }}/api/v1/media/storage/{{ $('Start generating video').item.json.file_id }}/status",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -384,
+        1824
+      ],
+      "id": "76556da4-9d34-465f-8945-43118dc81def",
+      "name": "Get video generation status",
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "ready",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "91402596-3978-4dfc-91b7-9ffe3521b862"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "ready"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "0c29765e-4213-434c-9bf3-c5e854dd6ee8",
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "processing",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "processing"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "4a6cfd86-e690-417e-aa6d-ae497e1177ae",
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "not_found",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "failed"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -192,
+        1824
+      ],
+      "id": "340ca5de-9d5e-44c4-8794-debe27f85d35",
+      "name": "Video generation switch"
+    },
+    {
+      "parameters": {
+        "errorMessage": "Error while generating the video chunk"
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        32,
+        1696
+      ],
+      "id": "08b23828-8b43-4b22-b330-0bc19358dc3a",
+      "name": "Video error"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "dataTableId": {
+          "__rl": true,
+          "value": "={{ $('When Executed by Another Workflow').first().json.history_video_chunks_db }}",
+          "mode": "id"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyValue": "={{ $('Get chunk for video generation').item.json.id }}"
+            }
+          ]
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "generated_video_id": "={{ $('Start generating video').item.json.file_id }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "video_id",
+              "displayName": "video_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "text",
+              "displayName": "text",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "image_prompt",
+              "displayName": "image_prompt",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "generated_image_id",
+              "displayName": "generated_image_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "generated_audio_id",
+              "displayName": "generated_audio_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "generated_video_id",
+              "displayName": "generated_video_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        32,
+        1840
+      ],
+      "id": "0d2063f9-4c2a-4ce4-b8b7-1efe44ff16e5",
+      "name": "Save video"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "={{ $('When Executed by Another Workflow').first().json.history_video_chunks_db }}",
+          "mode": "id"
+        },
+        "matchType": "allConditions",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "video_id",
+              "keyValue": "={{ $('Set video object').first().json.video.id }}"
+            }
+          ]
+        },
+        "returnAll": true
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        -1360,
+        2160
+      ],
+      "id": "9c4132b8-996b-4d39-9221-43e25ffcbf09",
+      "name": "Get all the chunks",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const chunks = []\n// Loop over input items and add a new field called 'myNewField' to the JSON of each one\nfor (const item of $input.all()) {\n  chunks.push(item.json)\n}\n\nchunks.sort((a, b) => {\n  if (a.id > b.id) {\n    return 1;\n  } else if (b.id > a.id) {\n    return -1;\n  }\n  return 0;\n})\n\nreturn [{\n  json: {\n    video_ids: chunks.map(item => item.generated_video_id).join(\",\")\n  }\n}]"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1168,
+        2160
+      ],
+      "id": "9b75aded-c1a6-4fcd-8d43-330d6cd8cfea",
+      "name": "Get video ids (in order)"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "000e2900-cfad-483b-944e-9ec5a9629f0e",
+              "name": "video_download_url",
+              "value": "={{ $('When Executed by Another Workflow').first().json.server_url }}/api/v1/media/storage/{{ $('Start adding overlay to thevideo').last().json.file_id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -96,
+        2608
+      ],
+      "id": "daf0f364-4572-4c20-b656-289d814cb47f",
+      "name": "Set return data"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "15cb2dae-42d0-432a-9bd8-4840f7727d6e",
+              "leftValue": "={{ $json.keys() }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "array",
+                "operation": "lengthGt",
+                "rightType": "number"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -1168,
+        1824
+      ],
+      "id": "14336c14-94ad-4cfb-a19e-9e60a9cbfc6c",
+      "name": "Should generate video?"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "15cb2dae-42d0-432a-9bd8-4840f7727d6e",
+              "leftValue": "={{ $json.keys() }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "array",
+                "operation": "lengthGt",
+                "rightType": "number"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -992,
+        1440
+      ],
+      "id": "525e93d3-fc4e-4347-a71e-7316fb795fc3",
+      "name": "Should generate speech?"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "15cb2dae-42d0-432a-9bd8-4840f7727d6e",
+              "leftValue": "={{ $json.keys() }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "array",
+                "operation": "lengthGt",
+                "rightType": "number"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -1168,
+        1008
+      ],
+      "id": "21a60d33-d1a1-4530-beab-349caec1078f",
+      "name": "Should generate image?"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "15cb2dae-42d0-432a-9bd8-4840f7727d6e",
+              "leftValue": "={{ $json.keys() }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "array",
+                "operation": "lengthGt",
+                "rightType": "number"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -1168,
+        592
+      ],
+      "id": "c2cd7c51-1547-4f62-ab41-b3e8a124239d",
+      "name": "Should generate image prompt?"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=<Instructions>\nCreate an image prompt for the following chunk for my documentary video. The image is going to be a representation of the text, it should make it very easy to understand.\nMake sure to follow the art style. Don't mention the aspect ration or the image size in the prompt.\n</Instructions>\n\n<VideoTopic>\n{{ $('Get video').item.json.idea }}\n</VideoTopic>\n\n<Text>\n{{ $json.text }}\n</Text>\n\n<ArtStyle>\n{{ $('Get video').item.json.art_style }}\n</ArtStyle>",
+        "hasOutputParser": true,
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        -784,
+        464
+      ],
+      "id": "5e3de3fb-1862-4a32-a2c9-3727e6e74b5d",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"type\": \"object\",\n    \"properties\": {\n      \"image_prompt\": {\n        \"type\": \"string\",\n        \"description\": \"Text describing the prompt for image generation\",\n        \"minLength\": 1\n      }\n    },\n    \"required\": [\n      \"image_prompt\"\n    ],\n    \"additionalProperties\": false\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        -592,
+        624
+      ],
+      "id": "8c1c2d20-ef0e-4db0-986b-a05dcfaae0cb",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-5-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-5-mini"
+        },
+        "builtInTools": {},
+        "options": {
+          "reasoningEffort": "low",
+          "timeout": 120000
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        -1616,
+        560
+      ],
+      "id": "ad4460a4-b144-4039-91ad-43e74b0f4de0",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "tGvJRP2th9CbI2oq",
+          "name": "OpenAi account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -960,
+        992
+      ],
+      "id": "b6e310b9-bf07-4122-8377-24c1f29548fb",
+      "name": "For each image generation chunk"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -960,
+        576
+      ],
+      "id": "effb5254-04ad-42a4-93f7-38753c0e9f4d",
+      "name": "For each image prompt generation chunk"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -784,
+        1424
+      ],
+      "id": "6dd38746-a190-4c2f-a4e8-5a0fab169c7d",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -960,
+        1808
+      ],
+      "id": "0891f47c-902c-47ff-bafc-a187130c551a",
+      "name": "Loop Over Items1"
+    },
+    {
+      "parameters": {
+        "content": "# Pick your choice of LLM ?\n? Make sure to deactive/delete the rest of the LLMs after selecting one",
+        "height": 700,
+        "width": 700,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -2160,
+        432
+      ],
+      "id": "71434907-1c83-44ec-965d-95f047b6407f",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "model": "qwen3:32b",
+        "options": {
+          "numCtx": 16048
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        -2080,
+        560
+      ],
+      "id": "7baac2d6-b1ec-461f-93cd-96260bba2cc9",
+      "name": "Ollama Chat Model",
+      "credentials": {
+        "ollamaApi": {
+          "id": "cWXUsJ0LsqnzOEx0",
+          "name": "Ollama account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatDeepSeek",
+      "typeVersion": 1,
+      "position": [
+        -1760,
+        560
+      ],
+      "id": "cb07d693-d483-43f9-b680-3c4402be85b4",
+      "name": "DeepSeek Chat Model",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "model": "tngtech/deepseek-r1t-chimera:free",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        -1616,
+        912
+      ],
+      "id": "bb222223-10df-423f-8a69-86c1ba9a44fb",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "pKxg2Rhtt3cG3h19",
+          "name": "OpenRouter account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -2080,
+        912
+      ],
+      "id": "c1cd3d36-bee5-46c9-a9ca-2bb0a2307789",
+      "name": "Google Gemini Chat Model",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatAzureOpenAi",
+      "typeVersion": 1,
+      "position": [
+        -2080,
+        720
+      ],
+      "id": "07f4bb55-92d7-4e5a-94fd-c3d888f6141e",
+      "name": "Azure OpenAI Chat Model",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatXAiGrok",
+      "typeVersion": 1,
+      "position": [
+        -1920,
+        720
+      ],
+      "id": "a43399f9-55e2-4fe5-a899-bbf9a57886c2",
+      "name": "xAI Grok Chat Model",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "claude-sonnet-4-20250514",
+          "cachedResultName": "Claude 4 Sonnet"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "typeVersion": 1.3,
+      "position": [
+        -1760,
+        720
+      ],
+      "id": "6bd71832-759b-489f-aabc-b116205e986b",
+      "name": "Anthropic Chat Model",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatXAiGrok",
+      "typeVersion": 1,
+      "position": [
+        -1616,
+        720
+      ],
+      "id": "69db82cc-b967-4704-83f1-a52cc71e69b5",
+      "name": "xAI Grok Chat Model1",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        -1760,
+        912
+      ],
+      "id": "33c4faa2-d6fe-4f19-b7b7-e140f9e6d7f5",
+      "name": "Groq Chat Model",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatAwsBedrock",
+      "typeVersion": 1,
+      "position": [
+        -1920,
+        560
+      ],
+      "id": "d9055b46-03fe-47b9-bd53-f802f9192c15",
+      "name": "AWS Bedrock Chat Model",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatMistralCloud",
+      "typeVersion": 1,
+      "position": [
+        -1920,
+        912
+      ],
+      "id": "0a577676-4f2e-49ff-a726-f12bc9059a0f",
+      "name": "Mistral Cloud Chat Model",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        -784,
+        608
+      ],
+      "id": "1fdf953b-baed-416d-a7c1-4fbcc86de86e",
+      "name": "Aggregate image prompt chunks"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        -800,
+        1024
+      ],
+      "id": "0c50dede-e5d9-4e16-b3b7-897ca7fc8448",
+      "name": "Aggregate generation image chunks"
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {}
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        -592,
+        1456
+      ],
+      "id": "e0d70988-dfb2-4f24-bcb5-bab19bbef1c3",
+      "name": "Aggregate narration chunks"
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {}
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        -784,
+        1840
+      ],
+      "id": "ed118c8a-94db-4950-b8df-7d79baa617e5",
+      "name": "Aggregate video generation chunks"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Get video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get video": {
+      "main": [
+        [
+          {
+            "node": "No video?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start merging the videos": {
+      "main": [
+        [
+          {
+            "node": "Wait until the videos gets merged together",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get status of the video merge": {
+      "main": [
+        [
+          {
+            "node": "Video merge status switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Video merge status switch": {
+      "main": [
+        [
+          {
+            "node": "Merge error",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait until the videos gets merged together",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Upload overlay to the server",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait until the videos gets merged together": {
+      "main": [
+        [
+          {
+            "node": "Get status of the video merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has chunks?": {
+      "main": [
+        [
+          {
+            "node": "Get chunks for image prompt generation",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Create chunks",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get chunks for image prompt generation": {
+      "main": [
+        [
+          {
+            "node": "Should generate image prompt?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload sample voice": {
+      "main": [
+        [
+          {
+            "node": "Get chunks for narration",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload overlay to the server": {
+      "main": [
+        [
+          {
+            "node": "Start adding overlay to thevideo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait until the videos gets merged together1": {
+      "main": [
+        [
+          {
+            "node": "Get status of the overlay",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start adding overlay to thevideo": {
+      "main": [
+        [
+          {
+            "node": "Wait until the videos gets merged together1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get status of the overlay": {
+      "main": [
+        [
+          {
+            "node": "Overlay status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Overlay status": {
+      "main": [
+        [
+          {
+            "node": "Stop and Error",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Set return data",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait until the videos gets merged together1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "No video?": {
+      "main": [
+        [
+          {
+            "node": "No video",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Set video object",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set video object": {
+      "main": [
+        [
+          {
+            "node": "Get chunks",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get chunks": {
+      "main": [
+        [
+          {
+            "node": "Has chunks?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create chunks": {
+      "main": [
+        [
+          {
+            "node": "For each chunks",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save chunk": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "For each chunks": {
+      "main": [
+        [
+          {
+            "node": "Save chunk",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Get chunks for image prompt generation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate image": {
+      "main": [
+        [
+          {
+            "node": "Upload image to the server",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload image to the server": {
+      "main": [
+        [
+          {
+            "node": "Save image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save image": {
+      "main": [
+        [
+          {
+            "node": "For each image generation chunk",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save image prompt": {
+      "main": [
+        [
+          {
+            "node": "For each image prompt generation chunk",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start generating TTS": {
+      "main": [
+        [
+          {
+            "node": "Wait until the TTS gets generated",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait until the TTS gets generated": {
+      "main": [
+        [
+          {
+            "node": "Get status of TTS generation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get status of TTS generation": {
+      "main": [
+        [
+          {
+            "node": "TTS status switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TTS status switch": {
+      "main": [
+        [
+          {
+            "node": "TTS error",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Save speech",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait until the TTS gets generated",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save speech": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get chunks for image generation": {
+      "main": [
+        [
+          {
+            "node": "Should generate image?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get chunks for narration": {
+      "main": [
+        [
+          {
+            "node": "Should generate speech?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get chunk for video generation": {
+      "main": [
+        [
+          {
+            "node": "Should generate video?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start generating video": {
+      "main": [
+        [
+          {
+            "node": "Wait until the video gets generated",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait until the video gets generated": {
+      "main": [
+        [
+          {
+            "node": "Get video generation status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get video generation status": {
+      "main": [
+        [
+          {
+            "node": "Video generation switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Video generation switch": {
+      "main": [
+        [
+          {
+            "node": "Save video",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait until the video gets generated",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Video error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save video": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get all the chunks": {
+      "main": [
+        [
+          {
+            "node": "Get video ids (in order)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get video ids (in order)": {
+      "main": [
+        [
+          {
+            "node": "Start merging the videos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Should generate video?": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get all the chunks",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Should generate speech?": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get chunk for video generation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Should generate image?": {
+      "main": [
+        [
+          {
+            "node": "For each image generation chunk",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Upload sample voice",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Should generate image prompt?": {
+      "main": [
+        [
+          {
+            "node": "For each image prompt generation chunk",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get chunks for image generation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Save image prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "For each image generation chunk": {
+      "main": [
+        [
+          {
+            "node": "Aggregate generation image chunks",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Generate image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "For each image prompt generation chunk": {
+      "main": [
+        [
+          {
+            "node": "Aggregate image prompt chunks",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Aggregate narration chunks",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Start generating TTS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items1": {
+      "main": [
+        [
+          {
+            "node": "Aggregate video generation chunks",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Start generating video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate image prompt chunks": {
+      "main": [
+        [
+          {
+            "node": "Get chunks for image prompt generation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate generation image chunks": {
+      "main": [
+        [
+          {
+            "node": "Get chunks for image generation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate narration chunks": {
+      "main": [
+        [
+          {
+            "node": "Get chunks for narration",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate video generation chunks": {
+      "main": [
+        [
+          {
+            "node": "Get chunk for video generation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "d8016401-ca18-4657-959c-bdba1820ba38",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "636db6b6ab21a21c6458e2137f340e33dc3e49f5a1c560c8d1e2372c227cf40e"
+  },
+  "id": "1gsvHDmKeJGDJ4n8",
+  "tags": []
+}

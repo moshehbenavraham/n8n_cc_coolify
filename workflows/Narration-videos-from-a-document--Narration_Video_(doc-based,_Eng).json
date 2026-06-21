@@ -1,0 +1,1476 @@
+{
+  "name": "Premium: Narration video (based on a document)",
+  "nodes": [
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7bbb518a-c4f1-49a5-9e72-3e9d939b131b",
+              "name": "AI_AGENTS_NO_CODE_TOOLS_URL",
+              "value": "<< paste your server URL here >>",
+              "type": "string"
+            },
+            {
+              "id": "a936d8da-e72b-4984-832b-49f1c036d028",
+              "name": "NARRATION_PROMPT",
+              "value": "=Create a long podcast story from the given science document (pdf). Make it exciting and interesting, for a science audience. The text will be used with TTS to create audio, so only output the story. The story should be at least 1000 words long. Make sure to explain all the details in the document, in a way that's easy to understand. Explain the charts.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -3328,
+        32
+      ],
+      "id": "55c08d4c-9c98-4157-b310-0084cc70e526",
+      "name": "Configure me"
+    },
+    {
+      "parameters": {
+        "content": "# Configure me ?\n",
+        "height": 560,
+        "width": 300,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -3424,
+        -208
+      ],
+      "id": "56cc575c-ac89-460e-9529-b9507ff01fd6",
+      "name": "Sticky Note12"
+    },
+    {
+      "parameters": {
+        "errorMessage": "The server is not running or isn't configured"
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        -2848,
+        176
+      ],
+      "id": "82f9ba88-008d-4255-95d1-1157dcfee435",
+      "name": "Server isn't ready"
+    },
+    {
+      "parameters": {
+        "content": "# Test connection",
+        "height": 560,
+        "width": 420,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -3088,
+        -208
+      ],
+      "id": "d94e3026-fcaa-4f1b-b884-26b99e78cbe5",
+      "name": "Sticky Note15"
+    },
+    {
+      "parameters": {
+        "content": "# Upload background music",
+        "height": 256,
+        "width": 464,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1920,
+        80
+      ],
+      "id": "631df25f-0ae3-4215-9b3e-ea02d74a582d",
+      "name": "Sticky Note17"
+    },
+    {
+      "parameters": {
+        "content": "# Upload looping video",
+        "height": 272,
+        "width": 464,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1920,
+        368
+      ],
+      "id": "e2ed98af-96af-47cc-ba72-e01ddfcf5b03",
+      "name": "Sticky Note18"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Setup defaults').first().json.AI_AGENTS_NO_CODE_TOOLS_URL }}/api/v1/media/storage",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "file",
+              "inputDataFieldName": "=Music"
+            },
+            {
+              "name": "media_type",
+              "value": "audio"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1824,
+        160
+      ],
+      "id": "452709d8-7a48-4ffd-8b2a-9247da5e91f6",
+      "name": "Upload background music to the server"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7d55d6da-a78c-4a28-9343-0ea9035a0aa3",
+              "name": "AI_AGENTS_NO_CODE_TOOLS_URL",
+              "value": "={{   ((u) => {   let s = u.trim();   if (!/^https?:\\/\\//i.test(s)) s = 'https://' + s;   const parts = s.split('/');   return parts[0] + '//' + parts[2]; })($json.AI_AGENTS_NO_CODE_TOOLS_URL)  }}",
+              "type": "string"
+            },
+            {
+              "id": "00cd26bb-43df-4b7f-9173-b55a7af28fd9",
+              "name": "video_length",
+              "value": "={{ $('On form submission').item.json['Duration in minutes'] || 10 }}",
+              "type": "string"
+            },
+            {
+              "id": "363941be-7bf4-4cff-96c5-75f233be9dd3",
+              "name": "ambient_sounds",
+              "value": "={{ $('On form submission').item.json['Add ambient sound'].length ? $('On form submission').item.json['Add ambient sound'].map(item => `${item.toLowerCase().replace(/ /g, '_')}:${$('Setup volume of the ambient sounds').item.json[item]}`).join(',') : '' }}",
+              "type": "string"
+            },
+            {
+              "id": "d916db23-736f-4ef6-8fd4-8e9112e1282b",
+              "name": "music_volume",
+              "value": "={{ $('On form submission').item.json['Music volume'] ? parseFloat($('On form submission').item.json['Music volume']) : 0.1 }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -3056,
+        32
+      ],
+      "id": "4cc2bbbc-ddcd-412e-a29e-d76192780b99",
+      "name": "Setup defaults"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "numberInputs": 3,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -1328,
+        -96
+      ],
+      "id": "55fcc255-1eed-4815-b362-dcf2b0887240",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Setup defaults').first().json.AI_AGENTS_NO_CODE_TOOLS_URL }}/api/v1/media/storage/{{ $('Start creating the sleep video').item.json.file_id }}/status",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        592,
+        0
+      ],
+      "id": "a37f8f5a-eca7-4338-abbc-6ba952bacb84",
+      "name": "Get video generation status",
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "ready",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "91402596-3978-4dfc-91b7-9ffe3521b862"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "ready"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "0c29765e-4213-434c-9bf3-c5e854dd6ee8",
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "processing",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "processing"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "4a6cfd86-e690-417e-aa6d-ae497e1177ae",
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "not_found",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "failed"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        784,
+        0
+      ],
+      "id": "1935970f-ee6f-446c-9ac2-6fa0e91add28",
+      "name": "Video generation switch"
+    },
+    {
+      "parameters": {
+        "amount": 10
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        400,
+        0
+      ],
+      "id": "9d47360d-be31-42cb-971f-8890c6a16abb",
+      "name": "Wait until the video gets generated",
+      "webhookId": "3e06a97b-4dde-4421-b33e-31824e4ae3d3"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Setup defaults').first().json.AI_AGENTS_NO_CODE_TOOLS_URL }}/api/v1/media/storage",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "file",
+              "inputDataFieldName": "=Looping_background_video"
+            },
+            {
+              "name": "media_type",
+              "value": "video"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1824,
+        464
+      ],
+      "id": "541e802a-11cd-4fd4-8486-5dc4ce9746da",
+      "name": "Upload looping video"
+    },
+    {
+      "parameters": {
+        "errorMessage": "Something happened while generating the video - contact Miri!"
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        992,
+        144
+      ],
+      "id": "7d03acf8-3afd-413f-bfea-e541f504a19a",
+      "name": "Stop and Error"
+    },
+    {
+      "parameters": {
+        "content": "# Generate the video",
+        "height": 576,
+        "width": 1216,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -80,
+        -224
+      ],
+      "id": "108722bb-54c4-46aa-a919-e1aadd5230fc",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "# Done",
+        "height": 576,
+        "width": 208,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1168,
+        -224
+      ],
+      "id": "7be204a8-5488-4bd5-bc07-0985f01c1680",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "# Starting the workflow",
+        "height": 560,
+        "width": 628,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -4080,
+        -208
+      ],
+      "id": "9ebe6073-5f2d-45b3-bb1f-9eb213bf42ae",
+      "name": "Sticky Note16"
+    },
+    {
+      "parameters": {
+        "formTitle": "Narration videos (based on a document)",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Document",
+              "fieldType": "file",
+              "multipleFiles": false,
+              "acceptFileTypes": ".pdf,.doc,.docx,.md",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Looping background video",
+              "fieldType": "file",
+              "multipleFiles": false,
+              "acceptFileTypes": ".mp4",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Music",
+              "fieldType": "file",
+              "multipleFiles": false,
+              "acceptFileTypes": ".mp3",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Add ambient sound",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "City streets"
+                  },
+                  {
+                    "option": "Distant thunder"
+                  },
+                  {
+                    "option": "Fireplace"
+                  },
+                  {
+                    "option": "Rain heavy"
+                  },
+                  {
+                    "option": "Rain medium"
+                  },
+                  {
+                    "option": "Rain window"
+                  },
+                  {
+                    "option": "Stream"
+                  },
+                  {
+                    "option": "Thunderstorm"
+                  },
+                  {
+                    "option": "Wall clock"
+                  },
+                  {
+                    "option": "Waves seagulls"
+                  }
+                ]
+              },
+              "multiselect": true
+            },
+            {
+              "fieldLabel": "Music volume",
+              "placeholder": "default: 0.1"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [
+        -4032,
+        16
+      ],
+      "id": "0fefb6a5-9ff9-4bd0-9f78-22578110ffb8",
+      "name": "On form submission",
+      "webhookId": "52138ce2-3fdc-4cdc-9cc7-cb60c54331a2"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c1fa11a5-8e00-4c40-b605-759388178dd4",
+              "name": "video_url",
+              "value": "={{ $('Setup defaults').first().json.AI_AGENTS_NO_CODE_TOOLS_URL }}/api/v1/media/storage/{{ $('Start creating the sleep video').item.json.file_id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1232,
+        -16
+      ],
+      "id": "3fff4502-f96e-4fd1-85df-9d0d0e5f0fe0",
+      "name": "Download URL"
+    },
+    {
+      "parameters": {
+        "jsCode": "for (const item of $input.all()) {\n  const output = item.json.output.find(item => item.type === 'message');\n  if (output.status !== 'completed') {\n    throw new Error('OpenAI call failed');\n  }\n  const textContent = output?.content?.[0].text;\n  if (!textContent) {\n    throw new Error('No content received from OpenAI');\n  }\n\n  \n  item.json = {\n    output: JSON.parse(textContent)\n  }\n}\n\nreturn $input.all();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1648,
+        -160
+      ],
+      "id": "634da37d-96b2-44e6-a680-43a9737c70d0",
+      "name": "Parse dialogue"
+    },
+    {
+      "parameters": {
+        "jsCode": "return $('On form submission').first()"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2144,
+        0
+      ],
+      "id": "1d83c956-f8af-4e04-ae1a-4493af0edd6e",
+      "name": "Relay files"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "09899c0c-4e96-40f6-9038-718fb42d4ed4",
+              "name": "music_id",
+              "value": "={{ $json.file_id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1648,
+        160
+      ],
+      "id": "4f79e36c-aa72-40bc-abf2-a325d77b3e53",
+      "name": "Set music id"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "9f09f191-8e3d-4bfe-8942-fcf7ea66b4cb",
+              "name": "video_id",
+              "value": "={{ $json.file_id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1648,
+        464
+      ],
+      "id": "610ed791-5063-4671-8080-a83d36dcba71",
+      "name": "Set video id"
+    },
+    {
+      "parameters": {
+        "errorMessage": "Error while creating speech from text"
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        -448,
+        160
+      ],
+      "id": "73f44102-28a4-4ca7-852f-576dda6932e3",
+      "name": "Stop and Error1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Setup defaults').first().json.AI_AGENTS_NO_CODE_TOOLS_URL }}/api/v1/media/video-tools/long-form-ambient\n",
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "video_id",
+              "value": "={{ $('Merge').item.json.video_id }}"
+            },
+            {
+              "name": "ambient_sounds",
+              "value": "={{ $('Setup defaults').item.json.ambient_sounds }}"
+            },
+            {
+              "name": "music_id",
+              "value": "={{ $('Merge').item.json.music_id }}"
+            },
+            {
+              "name": "dialogue_ids",
+              "value": "={{ $json.tts_audio_id }}"
+            },
+            {
+              "name": "music_volume",
+              "value": "={{ $('Setup defaults').item.json.music_volume }}"
+            }
+          ]
+        },
+        "options": {
+          "redirect": {
+            "redirect": {}
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        80,
+        0
+      ],
+      "id": "87d93f8f-8906-4e44-a7cd-f284c4f5dfef",
+      "name": "Start creating the sleep video"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d41f1ef6-7591-41b7-805d-94b58caba5c4",
+              "name": "tts_audio_id",
+              "value": "={{ $('Start generating TTS (kokoro)').item.json.file_id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -384,
+        -96
+      ],
+      "id": "279b8e20-9888-4b0f-b1de-c4725c225748",
+      "name": "download url"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Setup defaults').first().json.AI_AGENTS_NO_CODE_TOOLS_URL }}/api/v1/media/audio-tools/tts/kokoro",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "text",
+              "value": "={{ $json.output.text_for_tts }}"
+            },
+            {
+              "name": "voice",
+              "value": "={{ $('Configure TTS').item.json.kokoro_voice }}"
+            },
+            {
+              "name": "speed",
+              "value": "={{ $('Configure TTS').item.json.kokoro_speed }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1136,
+        -80
+      ],
+      "id": "b4367c89-fcc4-4d48-ac47-06bf45922cb5",
+      "name": "Start generating TTS (kokoro)"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Setup defaults').first().json.AI_AGENTS_NO_CODE_TOOLS_URL }}/api/v1/media/storage/{{ $('Start generating TTS (kokoro)').item.json.file_id }}/status",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -768,
+        -80
+      ],
+      "id": "7208e94b-cc58-412f-ac19-510ab15a6271",
+      "name": "Get status of TTS generation1",
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "ready",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "91402596-3978-4dfc-91b7-9ffe3521b862"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "ready"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "0c29765e-4213-434c-9bf3-c5e854dd6ee8",
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "processing",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "processing"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "4a6cfd86-e690-417e-aa6d-ae497e1177ae",
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "not_found",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "failed"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -608,
+        -80
+      ],
+      "id": "febdc6a1-2bf6-4ce4-a7a0-3858781cd7d7",
+      "name": "TTS status switch1"
+    },
+    {
+      "parameters": {
+        "amount": 1
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -960,
+        -80
+      ],
+      "id": "d6322a02-c5ab-40da-ab95-b71b0bc63c6f",
+      "name": "Wait until the TTS gets generated1",
+      "webhookId": "6d2b79ce-2195-4a5e-b298-c88325874732"
+    },
+    {
+      "parameters": {
+        "content": "# Create script",
+        "height": 544,
+        "width": 464,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1920,
+        -496
+      ],
+      "id": "75da1705-858b-40f2-97ae-70da4f380532",
+      "name": "Sticky Note20"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "09899c0c-4e96-40f6-9038-718fb42d4ed4",
+              "name": "document_url",
+              "value": "={{ $('Setup defaults').item.json.AI_AGENTS_NO_CODE_TOOLS_URL }}/api/v1/media/storage/{{ $json.file_id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1648,
+        -384
+      ],
+      "id": "870de135-e3eb-4f2d-bde1-1a10d6cd3ee0",
+      "name": "Set document url"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/responses",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "openAiApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n   \"model\":\"gpt-5-mini\",\n   \"input\": [{\n      \"role\": \"user\",\n      \"content\": [\n        {\n          \"type\": \"input_text\",\n          \"text\": {{ JSON.stringify($('Configure me').item.json.NARRATION_PROMPT) }}\n        },\n        {\n          \"type\": \"input_file\",\n          \"file_url\": \"{{ $json.document_url }}\"\n        }\n      ]\n   }],\n   \"reasoning\":{\n      \"effort\":\"minimal\",\n      \"summary\":\"auto\"\n   },\n   \"text\":{\n      \"format\": {\n        \"type\": \"json_schema\",\n        \"name\": \"video_concept\",\n        \"schema\": {\n           \"type\": \"object\",\n            \"properties\": {\n                \"text_for_tts\": {\n                    \"type\": \"string\",\n                    \"description\": \"The text content that will be turned into speech\"\n                }\n            },\n            \"required\": [\n                \"text_for_tts\"\n            ],\n           \"additionalProperties\": false\n        }\n      },\n      \"verbosity\":\"high\"\n   },\n   \"stream\":false,\n   \"store\":false\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1824,
+        -160
+      ],
+      "id": "daa94185-f752-4a16-b911-8d63c1d456f8",
+      "name": "? Create dialogue",
+      "credentials": {
+        "openAiApi": {
+          "id": "tGvJRP2th9CbI2oq",
+          "name": "OpenAi account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "# Create speech from text",
+        "height": 576,
+        "width": 1280,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1408,
+        -224
+      ],
+      "id": "792332b1-9a09-46f5-b36e-3b2b7b4debcf",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Setup defaults').item.json.AI_AGENTS_NO_CODE_TOOLS_URL }}/api/v1/media/audio-tools/tts/kokoro/voices",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -2560,
+        -96
+      ],
+      "id": "71667d22-c853-49d5-b19a-dbef972093e7",
+      "name": "Get supported kokoro voices"
+    },
+    {
+      "parameters": {
+        "defineForm": "json",
+        "jsonOutput": "=[\n   {\n      \"fieldLabel\": \"Voice\",\n      \"requiredField\": true,\n      \"fieldType\": \"dropdown\",\n      \"fieldOptions\": {\n        \"values\": {{ $json.voices.filter(item => item.startsWith('a') || item.startsWith('b')).map(item => { return {option: `${item}`} }) }}\n      }\n   },\n   {\n      \"fieldLabel\": \"Speed\",\n      \"fieldType\": \"number\",\n      \"placeholder\": \"The default is 1\",\n      \"requiredField\": true\n   }\n]",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.form",
+      "typeVersion": 1,
+      "position": [
+        -2384,
+        -96
+      ],
+      "id": "84452cf5-e758-49bd-8a51-0efa3de6e1d0",
+      "name": "Setup kokoro",
+      "webhookId": "63f2431c-8cf1-42a6-80cf-fa36ed4dcc92"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "351324cf-a658-48f5-9150-0c8a9304fb41",
+              "name": "kokoro_voice",
+              "value": "={{ $json.Voice }}",
+              "type": "string"
+            },
+            {
+              "id": "f094be8b-c33a-44ba-8fc9-cb08d9cce918",
+              "name": "kokoro_speed",
+              "value": "={{ $json.Speed }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2576,
+        144
+      ],
+      "id": "ca1b892f-3718-4cc9-9796-ce5294d50c0d",
+      "name": "Configure TTS"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Setup defaults').first().json.AI_AGENTS_NO_CODE_TOOLS_URL }}/api/v1/media/storage",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "file",
+              "inputDataFieldName": "=Document"
+            },
+            {
+              "name": "media_type",
+              "value": "tmp"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1824,
+        -384
+      ],
+      "id": "6f8c1ea6-036a-4771-9ad3-b59741c04ac3",
+      "name": "Upload the document to the server"
+    },
+    {
+      "parameters": {
+        "operation": "completion",
+        "completionTitle": "Sit tight!",
+        "completionMessage": "The video is generating. You can close this form.",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.form",
+      "typeVersion": 2.3,
+      "position": [
+        -2384,
+        144
+      ],
+      "id": "c51b772f-eeae-4e0f-8840-3f3b8bde7e90",
+      "name": "Close form",
+      "webhookId": "396e5722-af4a-4444-98f2-bba754d5db40"
+    },
+    {
+      "parameters": {
+        "content": "# Setup TTS",
+        "height": 560,
+        "width": 388,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -2624,
+        -208
+      ],
+      "id": "5a086de6-a013-4a7c-ab5b-8fa15a519e26",
+      "name": "Sticky Note19"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "4b2c83eb-43a2-4fe7-aefc-f544505b50ae",
+              "leftValue": "={{ $json['Add ambient sound'] }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "array",
+                "operation": "lengthGt",
+                "rightType": "number"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -3840,
+        16
+      ],
+      "id": "0283d116-d2b8-46de-9b42-52af592472ff",
+      "name": "Has ambient sound?"
+    },
+    {
+      "parameters": {
+        "defineForm": "json",
+        "jsonOutput": "={{ \n  JSON.stringify(\n    $json['Add ambient sound'].map(item => ({\n      \"fieldLabel\":item,\n      \"placeholder\": \"volume (0-1)\",\n      \"requiredField\":true\n   }))\n  );\n}}",
+        "options": {
+          "formTitle": "Set the volume of the ambient sound(s)"
+        }
+      },
+      "type": "n8n-nodes-base.form",
+      "typeVersion": 1,
+      "position": [
+        -3632,
+        -112
+      ],
+      "id": "743c1bde-5330-4472-8056-15429fe83368",
+      "name": "Setup volume of the ambient sounds",
+      "webhookId": "a0da8334-506b-41fa-8d00-0551bd165b51"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.AI_AGENTS_NO_CODE_TOOLS_URL }}/health",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -2848,
+        -48
+      ],
+      "id": "f6dbad7f-b3db-486a-b84c-b365f3044bbc",
+      "name": "HTTP Request (healthcheck)",
+      "onError": "continueErrorOutput"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Configure me": {
+      "main": [
+        [
+          {
+            "node": "Setup defaults",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload background music to the server": {
+      "main": [
+        [
+          {
+            "node": "Set music id",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Setup defaults": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request (healthcheck)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get video generation status": {
+      "main": [
+        [
+          {
+            "node": "Video generation switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Video generation switch": {
+      "main": [
+        [
+          {
+            "node": "Download URL",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait until the video gets generated",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Stop and Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait until the video gets generated": {
+      "main": [
+        [
+          {
+            "node": "Get video generation status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Start generating TTS (kokoro)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload looping video": {
+      "main": [
+        [
+          {
+            "node": "Set video id",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Has ambient sound?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Relay files": {
+      "main": [
+        [
+          {
+            "node": "Upload the document to the server",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Upload background music to the server",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Upload looping video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set music id": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Set video id": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Parse dialogue": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start creating the sleep video": {
+      "main": [
+        [
+          {
+            "node": "Wait until the video gets generated",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start generating TTS (kokoro)": {
+      "main": [
+        [
+          {
+            "node": "Wait until the TTS gets generated1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get status of TTS generation1": {
+      "main": [
+        [
+          {
+            "node": "TTS status switch1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TTS status switch1": {
+      "main": [
+        [
+          {
+            "node": "download url",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait until the TTS gets generated1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Stop and Error1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait until the TTS gets generated1": {
+      "main": [
+        [
+          {
+            "node": "Get status of TTS generation1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "download url": {
+      "main": [
+        [
+          {
+            "node": "Start creating the sleep video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set document url": {
+      "main": [
+        [
+          {
+            "node": "? Create dialogue",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "? Create dialogue": {
+      "main": [
+        [
+          {
+            "node": "Parse dialogue",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get supported kokoro voices": {
+      "main": [
+        [
+          {
+            "node": "Setup kokoro",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Setup kokoro": {
+      "main": [
+        [
+          {
+            "node": "Configure TTS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Configure TTS": {
+      "main": [
+        [
+          {
+            "node": "Close form",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload the document to the server": {
+      "main": [
+        [
+          {
+            "node": "Set document url",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Close form": {
+      "main": [
+        [
+          {
+            "node": "Relay files",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has ambient sound?": {
+      "main": [
+        [
+          {
+            "node": "Setup volume of the ambient sounds",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Configure me",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Setup volume of the ambient sounds": {
+      "main": [
+        [
+          {
+            "node": "Configure me",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request (healthcheck)": {
+      "main": [
+        [
+          {
+            "node": "Get supported kokoro voices",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Server isn't ready",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "f131468b-9c1e-4d9b-970c-b8b8f2e69cf8",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "636db6b6ab21a21c6458e2137f340e33dc3e49f5a1c560c8d1e2372c227cf40e"
+  },
+  "id": "LSRWbUi7PKWnuF4w",
+  "tags": []
+}

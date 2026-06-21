@@ -28,6 +28,8 @@ WSL2 Ubuntu | Docker Compose | ngrok
 | 6 | [Network Topology](06-network-topology.md) | Infrastructure diagram |
 | 7 | [Docker Networks](07-docker-networks.md) | Container network reference |
 | 8 | [Important Notes](08-important-notes.md) | Critical operational warnings |
+| 10 | [TLS Incident and Domain Audit - 2026-03-16](10-tls-incident-and-domain-audit-2026-03-16.md) | Root cause, fix, and broader Traefik certificate/domain audit from the 2026-03-16 operations session |
+| 11 | [Systems Involved in Public Routing and TLS](11-systems-involved-in-public-routing-and-tls.md) | Structured reference for Cloudflare, Coolify, Traefik, n8n, ACME state, and routing/TLS diagnostics |
 
 ---
 
@@ -36,7 +38,7 @@ WSL2 Ubuntu | Docker Compose | ngrok
 ```
 Internet
     |
-[ngrok tunnel] ──── $N8N_URL
+[ngrok tunnel] ---- $N8N_URL
     |
 [WSL2 Ubuntu]
     |

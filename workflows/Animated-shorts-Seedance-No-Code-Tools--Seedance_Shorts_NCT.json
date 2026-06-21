@@ -1,0 +1,2144 @@
+{
+  "name": "My workflow 50",
+  "nodes": [
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -3900,
+        2620
+      ],
+      "id": "be293c92-9e7e-4048-b11a-3f30ab9ffb39",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "tGvJRP2th9CbI2oq",
+          "name": "OpenAi account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        -4360,
+        2280
+      ],
+      "id": "e4d05636-b62d-431b-9392-662b6f3f66e7",
+      "name": "Ollama Chat Model",
+      "credentials": {
+        "ollamaApi": {
+          "id": "cWXUsJ0LsqnzOEx0",
+          "name": "Ollama account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatDeepSeek",
+      "typeVersion": 1,
+      "position": [
+        -4040,
+        2280
+      ],
+      "id": "ca8b6e8d-89fc-40fa-a9f9-e02bc77f2b5d",
+      "name": "DeepSeek Chat Model",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        -3900,
+        2280
+      ],
+      "id": "aaf5bde4-3c44-423f-8d73-d59bf57b57d3",
+      "name": "OpenRouter Chat Model",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -4360,
+        2620
+      ],
+      "id": "e140e4b6-9379-4fb7-8bbf-a075655242b4",
+      "name": "Google Gemini Chat Model",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatAzureOpenAi",
+      "typeVersion": 1,
+      "position": [
+        -4360,
+        2440
+      ],
+      "id": "5204c627-bc5f-4df0-ad24-1793d46d80ef",
+      "name": "Azure OpenAI Chat Model",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatXAiGrok",
+      "typeVersion": 1,
+      "position": [
+        -4200,
+        2440
+      ],
+      "id": "2dcbc04f-e8fe-4027-bd7a-31661785a2c1",
+      "name": "xAI Grok Chat Model",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "claude-sonnet-4-20250514",
+          "cachedResultName": "Claude 4 Sonnet"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "typeVersion": 1.3,
+      "position": [
+        -4040,
+        2440
+      ],
+      "id": "f86a9174-ea84-48b7-9f39-34b9df371356",
+      "name": "Anthropic Chat Model",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatXAiGrok",
+      "typeVersion": 1,
+      "position": [
+        -3900,
+        2440
+      ],
+      "id": "d14dde5c-47ae-4a3f-909b-42f9e85ae684",
+      "name": "xAI Grok Chat Model1",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        -4040,
+        2620
+      ],
+      "id": "2626122a-a5d3-4e3e-bcfb-ededdc285745",
+      "name": "Groq Chat Model",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatAwsBedrock",
+      "typeVersion": 1,
+      "position": [
+        -4200,
+        2280
+      ],
+      "id": "41f6360d-5a5e-4e18-9ceb-d223a2d7ee92",
+      "name": "AWS Bedrock Chat Model",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatMistralCloud",
+      "typeVersion": 1,
+      "position": [
+        -4200,
+        2620
+      ],
+      "id": "db499178-b41d-43ba-a678-5b9fada1096d",
+      "name": "Mistral Cloud Chat Model",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "content": "# Pick your choice of LLM\n\nSelect one LLM and make sure to deactivate the rest",
+        "height": 700,
+        "width": 660,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -4420,
+        2120
+      ],
+      "id": "e7f44703-2469-4fd5-ac5f-b76b7e450b8c",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "content": "# How to set up this automation?\n\n## 1. Select your choice of LLM and deactive (or delete) the rest\n## 2. Setup the fal.ai authentication in the HTTP Request nodes in boxes 2, 3, 4",
+        "height": 480,
+        "width": 900,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "b5af9ad1-3ced-42bc-970f-dc7bc7f0330e",
+      "name": "Sticky Note14"
+    },
+    {
+      "parameters": {
+        "content": "# ? [Join our Skool community for support, premium content and more!](https://www.skool.com/ai-agents-az/about?w9)\n\n## Be part of a growing community and help us create more content like this",
+        "height": 260,
+        "width": 700,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -760,
+        20
+      ],
+      "id": "dcf39f48-fe88-4dc2-9400-4cb1919bd5dc",
+      "name": "Sticky Note16"
+    },
+    {
+      "parameters": {
+        "formTitle": "Create an AI video with Seedance (from Bytedance)",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Story",
+              "fieldType": "textarea",
+              "placeholder": "The story of the video",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Number of scenes",
+              "fieldType": "number",
+              "placeholder": "default: 5"
+            },
+            {
+              "fieldLabel": "Aspect ratio",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "16:9"
+                  },
+                  {
+                    "option": "9:16"
+                  },
+                  {
+                    "option": "1:1"
+                  },
+                  {
+                    "option": "4:3"
+                  },
+                  {
+                    "option": "3:4"
+                  },
+                  {
+                    "option": "21:9"
+                  }
+                ]
+              },
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Resolution",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "480p"
+                  },
+                  {
+                    "option": "1080p"
+                  }
+                ]
+              },
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Duration",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "5"
+                  },
+                  {
+                    "option": "10"
+                  }
+                ]
+              },
+              "requiredField": true
+            },
+            {
+              "fieldType": "html",
+              "html": "<p>(background music is optional)</p>"
+            },
+            {
+              "fieldLabel": "Background music",
+              "fieldType": "file",
+              "multipleFiles": false,
+              "acceptFileTypes": ".mp3"
+            },
+            {
+              "fieldLabel": "Background music volume",
+              "fieldType": "number",
+              "placeholder": "default: 0.2"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [
+        -4120,
+        1100
+      ],
+      "id": "684fd060-4cbe-498a-85a2-4ab10857e8b4",
+      "name": "On form submission",
+      "webhookId": "1b24d810-a844-4c10-81f9-edcee9a4d0ec"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "88f1922e-9c90-4d5f-a501-2cd0fdb2ff54",
+              "name": "number_of_scenes",
+              "value": "={{ $('On form submission').item.json['Number of scenes'] || 5 }}",
+              "type": "number"
+            },
+            {
+              "id": "7d55d6da-a78c-4a28-9343-0ea9035a0aa3",
+              "name": "AI_AGENTS_NO_CODE_TOOLS_URL",
+              "value": "={{   ((u) => {   let s = u.trim();   if (!/^https?:\\/\\//i.test(s)) s = 'https://' + s;   const parts = s.split('/');   return parts[0] + '//' + parts[2]; })($json.AI_AGENTS_NO_CODE_TOOLS_URL)  }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -3680,
+        1100
+      ],
+      "id": "2a39773a-ff90-475d-a5fc-bfef0fa0369b",
+      "name": "Setup defaults"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d39f2f42-bae0-4a27-93a2-ab73382935cb",
+              "name": "AI_AGENTS_NO_CODE_TOOLS_URL",
+              "value": "https://no-code-tools.aiagentsaz.com",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -3900,
+        1100
+      ],
+      "id": "cc146bed-aaec-4aa0-ab11-ae85c2a85f9d",
+      "name": "Configure me"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Setup defaults').item.json.AI_AGENTS_NO_CODE_TOOLS_URL }}/api/v1/media/storage",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "file",
+              "inputDataFieldName": "=data"
+            },
+            {
+              "name": "media_type",
+              "value": "video"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -3500,
+        2920
+      ],
+      "id": "b2dc6b29-b505-4c55-9ebc-bb150aec9e45",
+      "name": "Upload videos to the server"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        -3340,
+        2920
+      ],
+      "id": "235c4f20-26ca-4786-a873-41dbe40056da",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Setup defaults').item.json.AI_AGENTS_NO_CODE_TOOLS_URL }}/api/v1/media/video-tools/merge",
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "video_ids",
+              "value": "={{ $json.data.map(item => item.file_id).join(',') }}"
+            },
+            {
+              "name": "background_music_id",
+              "value": "={{ $('Background music results').item.json.background_music_id }}"
+            },
+            {
+              "name": "background_music_volume",
+              "value": "={{ $('Background music results').item.json.background_music_volume }}"
+            }
+          ]
+        },
+        "options": {
+          "redirect": {
+            "redirect": {}
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -3140,
+        2920
+      ],
+      "id": "1340542a-2d05-44d8-b79f-50419a9eae24",
+      "name": "Start merging the videos"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Setup defaults').item.json.AI_AGENTS_NO_CODE_TOOLS_URL }}/api/v1/media/storage/{{ $('Start merging the videos').item.json.file_id }}/status",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -2720,
+        2920
+      ],
+      "id": "87bb5602-62a5-42b6-9a3f-a10041c2fc54",
+      "name": "Get status of the video merge"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "ready",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "91402596-3978-4dfc-91b7-9ffe3521b862"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "ready"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "0c29765e-4213-434c-9bf3-c5e854dd6ee8",
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "processing",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "processing"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "4a6cfd86-e690-417e-aa6d-ae497e1177ae",
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "not_found",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "failed"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -2540,
+        2920
+      ],
+      "id": "9f1252e2-d048-4328-b8dd-70f2b2942099",
+      "name": "Video merge status switch"
+    },
+    {
+      "parameters": {
+        "amount": 1
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -2920,
+        2920
+      ],
+      "id": "122f8842-3b0b-4e29-b712-3d2020f6a47c",
+      "name": "Wait until the videos gets merged together",
+      "webhookId": "553f59bc-efa7-46ac-b91d-ae287c54294f"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "13b0dde8-b067-41d2-b7c2-fa5addf56a25",
+              "name": "video_url",
+              "value": "={{ $('Setup defaults').item.json.AI_AGENTS_NO_CODE_TOOLS_URL }}/api/v1/media/storage/{{ $('Start merging the videos').item.json.file_id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1120,
+        2840
+      ],
+      "id": "50c45e4d-5560-4f98-a840-e0decfa4e421",
+      "name": "Setup final video download URL"
+    },
+    {
+      "parameters": {
+        "errorMessage": "Error while merging the videos"
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        -2200,
+        3020
+      ],
+      "id": "3935ce64-739d-459e-a1ae-bf5b7b46115c",
+      "name": "Stop and Error"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Configure me').item.json.AI_AGENTS_NO_CODE_TOOLS_URL }}/health",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -3480,
+        1040
+      ],
+      "id": "673eda51-e3cb-41d5-b62a-7a5a393be517",
+      "name": "HTTP Request",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "errorMessage": "The server is not running or isn't configured"
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        -3480,
+        1260
+      ],
+      "id": "862b94b7-22d3-43cb-bb17-1854d4848359",
+      "name": "Server isn't ready"
+    },
+    {
+      "parameters": {
+        "content": "# Test connection",
+        "height": 520,
+        "width": 420,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -3720,
+        880
+      ],
+      "id": "940797c1-3aef-4958-8b67-23f704877e4f",
+      "name": "Sticky Note15"
+    },
+    {
+      "parameters": {
+        "content": "# Set the no-code server url",
+        "height": 520,
+        "width": 180,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -3940,
+        880
+      ],
+      "id": "5f342112-81cd-4c6c-aead-a4df0da19761",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "0cde6e03-a8da-4f1a-91c7-4adee90614c9",
+              "leftValue": "={{ $('On form submission').item.json['Background music'] }}",
+              "rightValue": "yes",
+              "operator": {
+                "type": "object",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -3200,
+        1160
+      ],
+      "id": "f0cbd4d6-7e7d-4c51-b0c6-80f27f226c59",
+      "name": "Background music?"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Setup defaults').item.json.AI_AGENTS_NO_CODE_TOOLS_URL }}/api/v1/media/storage",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "file",
+              "inputDataFieldName": "=Background_music"
+            },
+            {
+              "name": "media_type",
+              "value": "audio"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -2760,
+        980
+      ],
+      "id": "581ecc92-1bcd-46ff-9be0-66c8a2647e1c",
+      "name": "Upload background music to the server"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f5316cd3-b774-4688-808a-69385b647380",
+              "name": "background_music_id",
+              "value": "={{ $json.background_music_id }}",
+              "type": "string"
+            },
+            {
+              "id": "0dcb72fa-a800-498a-a89a-66cfbff62d9b",
+              "name": "background_music_volume",
+              "value": "={{ $('On form submission').item.json['Background music volume'] || 0.2 }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2360,
+        1220
+      ],
+      "id": "f8417d7e-2ddd-4ec6-8d7a-dde92c094582",
+      "name": "Background music results"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "329c828e-bddf-45a1-b9dd-62e8d0080e0e",
+              "name": "background_music_id",
+              "value": "={{ $json.file_id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2560,
+        980
+      ],
+      "id": "72d3d820-833b-43be-b6c1-ca6bcec1133e",
+      "name": "Set background music output"
+    },
+    {
+      "parameters": {
+        "jsCode": "return $('On form submission').last()"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2980,
+        980
+      ],
+      "id": "3212fcd1-87e7-4031-806a-6e49612ed016",
+      "name": "Relay background music"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.video.url }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -3680,
+        2920
+      ],
+      "id": "c7d3657c-52f2-4f79-ba6d-8dcc27164138",
+      "name": "Download the video"
+    },
+    {
+      "parameters": {
+        "content": "# Upload music",
+        "height": 520,
+        "width": 1080,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -3260,
+        880
+      ],
+      "id": "389bac8c-cfa3-48b6-ae3c-54267ae6571e",
+      "name": "Sticky Note17"
+    },
+    {
+      "parameters": {
+        "content": "# fal.ai API key should be added in the following format:\n\n1. Select the `Header Authentication` node\n2. Use the following key: `Authorization`\n3. Value should be: `Key $YOUR_API_KEY`",
+        "height": 300,
+        "width": 660,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -4420,
+        1440
+      ],
+      "id": "aa7f2349-dfa9-47f1-9195-a8be47b953b7",
+      "name": "Sticky Note7"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=<Instructions>\n\nBreak down the following story into a script (for short video) with exacly {{ $('Setup defaults').item.json.number_of_scenes }} scenes.\n\n</Instructions>\n\n<Story>\n{{ $json.output.story }}\n</Story>",
+        "hasOutputParser": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        -3340,
+        1560
+      ],
+      "id": "08ad6b3c-2ccf-4003-ab8a-c4fb86e7c7d4",
+      "name": "Generate scenes"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Start adding audio to the video').item.json.status_url }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -3040,
+        2480
+      ],
+      "id": "2cd28f1c-9f9e-4f75-84b2-0862bd8cc472",
+      "name": "Get audio status",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "BUYuOe8V0hqLtA02",
+          "name": "fal.ai"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Start adding audio to the video').item.json.response_url }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -2660,
+        2500
+      ],
+      "id": "eb111970-9982-4220-8882-a74045bc5b62",
+      "name": "Get video with audio",
+      "alwaysOutputData": false,
+      "retryOnFail": true,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "BUYuOe8V0hqLtA02",
+          "name": "fal.ai"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "output.scenes",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -2820,
+        1580
+      ],
+      "id": "1b1d315e-68d6-4b94-bf00-0e53c3694861",
+      "name": "Split out the scenes"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://queue.fal.run/fal-ai/mmaudio-v2",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "video_url",
+              "value": "={{ $json.video.url }}"
+            },
+            {
+              "name": "prompt",
+              "value": "={{ $('Create scene').item.json.output.sound_effects }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -3680,
+        2460
+      ],
+      "id": "f0139db7-def9-4aa7-845e-e4166fdbf683",
+      "name": "Start adding audio to the video",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "BUYuOe8V0hqLtA02",
+          "name": "fal.ai"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 1
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -3240,
+        2480
+      ],
+      "id": "3830a232-0879-474d-9993-e025369cefe4",
+      "name": "Wait for adding the audio",
+      "webhookId": "e8d6e2f8-2c00-4b80-a18c-3693765b6976"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "COMPLETED",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "6fc5bea4-1567-474b-bfca-5394eb303217"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "COMPLETED"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "0882f634-2472-4d24-a1c3-a39f0cd94855",
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "IN_PROGRESS",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "IN_PROGRESS"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "e6c8b207-13ac-4537-8c5c-677039bc2fef",
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "IN_QUEUE",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "IN_QUEUE"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -2880,
+        2480
+      ],
+      "id": "4c170516-4047-437c-8e9d-fe2707a5fd21",
+      "name": "Audio status"
+    },
+    {
+      "parameters": {
+        "content": "# 1. Create a story\n1. Setup the LLM nodes `Create story` and `Generate scenes`",
+        "height": 320,
+        "width": 1080
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -3720,
+        1440
+      ],
+      "id": "cfbc9e29-c547-42d2-8174-f4a3b95762c1",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "# 2. Generate a video with seedance\n1. Setup the fal.ai authentication in the `Start video generation` `Get video generation status` and the `Get the generated video` nodes\n1. Setup the LLM node `Create scene`\n",
+        "height": 460,
+        "width": 1700
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -3720,
+        1800
+      ],
+      "id": "36cc75cd-3b47-43a8-a35b-58ec81893f93",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "# 3. Create sound effects using mmaudio-v2\n\nSetup the fal.ai authentication in the `Start adding audio to the video` `Get audio status` and the `Get video with audio` nodes",
+        "height": 380,
+        "width": 1240
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -3720,
+        2300
+      ],
+      "id": "6a83ef57-741e-4e46-9a9e-258bdb506e3d",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -2800,
+        2060
+      ],
+      "id": "88f78f9b-ab3b-4af2-88a7-a995e2f26ecb",
+      "name": "Wait for the video",
+      "webhookId": "e8d6e2f8-2c00-4b80-a18c-3693765b6976"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Loop Over Items').item.json.status_url }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -2620,
+        2060
+      ],
+      "id": "22c78e6d-2160-4a00-bf5c-1c822fd92bdb",
+      "name": "Get the video status",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "BUYuOe8V0hqLtA02",
+          "name": "fal.ai"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "COMPLETED",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "6fc5bea4-1567-474b-bfca-5394eb303217"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "COMPLETED"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "0882f634-2472-4d24-a1c3-a39f0cd94855",
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "IN_PROGRESS",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "IN_PROGRESS"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "e6c8b207-13ac-4537-8c5c-677039bc2fef",
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "IN_QUEUE",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "IN_QUEUE"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -2440,
+        2060
+      ],
+      "id": "804095f1-02a1-48f7-ba2e-c2e416116037",
+      "name": "Video status"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Loop Over Items').item.json.response_url }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -2200,
+        2080
+      ],
+      "id": "e841ef69-6ba8-4d26-9179-287fa9e96aa8",
+      "name": "Get the  video",
+      "alwaysOutputData": false,
+      "retryOnFail": true,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "BUYuOe8V0hqLtA02",
+          "name": "fal.ai"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=<Instructions>\n\nCreate an engaging, very detailed story for a short video, based on the idea/story below.\nMake sure to provide detailed description for the characters and the surroundings.\n\n</Instructions>\n\n<Idea>\n{{ $('On form submission').item.json.Story }}\n</Idea>",
+        "hasOutputParser": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        -3680,
+        1560
+      ],
+      "id": "6c3d71b7-db3f-4127-b559-ace8095eaea5",
+      "name": "Create story"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=<Instructions>\n\n# Create a detailed scene for the scene below, that consists of\n- A list of characters in the scene, with their detailed description\n- A detailed description of the scene: what's behind the characters\n- Camera movement (if any) in the scene\n- The movement of the objects on the screen in this 5s long clip\n- The description of the sound effects on the screen\n\nUse the full story for reference.\n\n</Instructions>\n\n<Scene>\n{{ $json['output.scenes'] }}\n</Scene>\n\n<FullStory>\n{{ $('Create story').item.json.output.story }}\n</FullStory>\n",
+        "hasOutputParser": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        -3680,
+        1960
+      ],
+      "id": "43ddd859-4912-4304-9b84-a437b624cf8c",
+      "name": "Create scene"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "999a81ed-d897-43cf-babe-c05c0d9f2314",
+              "leftValue": "={{ $json.output.scenes }}",
+              "rightValue": "={{ $('Setup defaults').item.json.number_of_scenes }}",
+              "operator": {
+                "type": "array",
+                "operation": "lengthEquals",
+                "rightType": "number"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -3040,
+        1560
+      ],
+      "id": "5ae8dde6-73a7-442a-afa8-9c3b90314c14",
+      "name": "Correct length?"
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n    \"type\": \"object\",\n    \"properties\": {\n        \"scenes\": {\n            \"type\": \"array\",\n            \"description\": \"the scenes\",\n            \"items\": {\n                \"type\": \"string\"\n            }\n        }\n    },\n    \"required\": [\n        \"scenes\"\n    ]\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        -3980,
+        1900
+      ],
+      "id": "1d8aa151-bc23-44f0-87f0-b8d57829302b",
+      "name": "Generate scenes output parser"
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n    \"type\": \"object\",\n    \"properties\": {\n        \"story\": {\n            \"type\": \"string\",\n            \"description\": \"the detailed story\"\n        }\n    },\n    \"required\": [\n        \"story\"\n    ]\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        -4360,
+        1900
+      ],
+      "id": "f939543b-d912-4fac-865e-5747df83c16b",
+      "name": "Create story output parser"
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n    \"type\": \"object\",\n    \"properties\": {\n        \"characters\": {\n            \"type\": \"array\",\n            \"description\": \"the list of characters in the scene\",\n            \"items\": {\n                \"type\": \"object\",\n                \"properties\": {\n                    \"name\": {\n                        \"type\": \"string\",\n                        \"description\": \"the name of the character\"\n                    },\n                    \"description\": {\n                        \"type\": \"string\",\n                        \"description\": \"the detailed description of the character (visual outlook)\"\n                    }\n                },\n                \"required\": [\n                    \"name\",\n                    \"description\"\n                ]\n            }\n        },\n        \"scene_description\": {\n            \"type\": \"string\",\n            \"description\": \"the detailed description of the scene\"\n        },\n        \"camera_movement\": {\n            \"type\": \"string\",\n            \"description\": \"the description of the camera movement (if any)\"\n        },\n        \"object_movements\": {\n            \"type\": \"string\",\n            \"description\": \"the detailed description of the movement of the objects on the screen\"\n        },\n        \"sound_effects\": {\n            \"type\": \"string\",\n            \"description\": \"the sound effects the viewer can hear during the scene\"\n        }\n    },\n    \"required\": [\n        \"characters\",\n        \"scene_description\",\n        \"camera_movement\",\n        \"object_movements\",\n        \"sound_effects\"\n    ]\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        -4180,
+        1900
+      ],
+      "id": "920fbdd6-7108-4973-b50a-5d8a2d07e39a",
+      "name": "Create scene output parser"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -3080,
+        2100
+      ],
+      "id": "b9e7d617-e181-49a5-bfc9-7fbbff391c45",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -3460,
+        2520
+      ],
+      "id": "ad1fd892-0c43-48d6-ab5e-71750f00517c",
+      "name": "Loop Over Items1"
+    },
+    {
+      "parameters": {
+        "content": "# Structured output parsers",
+        "height": 300,
+        "width": 660,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -4420,
+        1780
+      ],
+      "id": "9eed0e28-0174-4b06-945b-ae6921c2e5f1",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://queue.fal.run/fal-ai/bytedance/seedance/v1/pro/text-to-video",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "prompt",
+              "value": "=<Characters>\n{{ $json.output.characters.map(character => `<Character>\n  <Name>${character.name}</Name>\n  <Description>${character.description}</Description>\n</Character>`).join('\\n') }}\n</Characters>\n\n<SceneDescription>\n{{ $json.output.scene_description }}\n</SceneDescription>\n\n<CameraMovements>\n{{ $json.output.camera_movement }}\n</CameraMovements>\n\n<ObjectMovements>\n{{ $json.output.object_movements }}\n</ObjectMovements>"
+            },
+            {
+              "name": "aspect_ratio",
+              "value": "={{ $('On form submission').item.json['Aspect ratio'] }}"
+            },
+            {
+              "name": "resolution",
+              "value": "={{ $('On form submission').item.json.Resolution }}"
+            },
+            {
+              "name": "duration",
+              "value": "={{ parseInt($('On form submission').item.json.Duration, 10) }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -3300,
+        1960
+      ],
+      "id": "64800692-97cb-492a-8899-42f68b9fae11",
+      "name": "Start generating the video",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "BUYuOe8V0hqLtA02",
+          "name": "fal.ai"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "# 4. Merge the video using the AI Agents No-Code Tools server",
+        "height": 480,
+        "width": 1760
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -3720,
+        2720
+      ],
+      "id": "6fffb0d7-4e9c-48ae-a835-0620c4d3fb56",
+      "name": "Sticky Note6"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "27bcaf96-fcaa-41cb-8a51-436870ce2110",
+              "name": "file_ids",
+              "value": "={{ $('Aggregate').item.json.data.map(video => video.file_id) }}",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1880,
+        2840
+      ],
+      "id": "1a8c3aad-a97e-476d-98f1-5e79d99bbb59",
+      "name": "Set file ids to delete"
+    },
+    {
+      "parameters": {
+        "method": "DELETE",
+        "url": "={{ $('Setup defaults').item.json.AI_AGENTS_NO_CODE_TOOLS_URL }}/api/v1/media/storage/{{ $json.file_ids }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1560,
+        2840
+      ],
+      "id": "811c9ede-859b-4341-b767-2a56848b3e2a",
+      "name": "Delete tmp files"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "file_ids",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -1720,
+        2840
+      ],
+      "id": "140cd929-3bf0-466a-852b-5140182e4267",
+      "name": "For each file"
+    },
+    {
+      "parameters": {
+        "content": "# cleanup (removing tmp files)\nif you want to delete the generated video too, add it's id to the array",
+        "height": 360,
+        "width": 540
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1920,
+        2720
+      ],
+      "id": "2bbd68c4-3729-4be7-91fc-fead429b2ad0",
+      "name": "Sticky Note8"
+    },
+    {
+      "parameters": {
+        "content": "# Setup data to return",
+        "height": 360,
+        "width": 360,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1340,
+        2720
+      ],
+      "id": "3de410a4-6891-41b6-a6ca-4ee7d365a047",
+      "name": "Sticky Note9"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        -1280,
+        2840
+      ],
+      "id": "a5c81f6a-2b93-464d-bd41-47497795deed",
+      "name": "Merge to one lane"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Create story",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Generate scenes",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Create scene",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Configure me",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Setup defaults": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Configure me": {
+      "main": [
+        [
+          {
+            "node": "Setup defaults",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload videos to the server": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Start merging the videos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start merging the videos": {
+      "main": [
+        [
+          {
+            "node": "Wait until the videos gets merged together",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get status of the video merge": {
+      "main": [
+        [
+          {
+            "node": "Video merge status switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Video merge status switch": {
+      "main": [
+        [
+          {
+            "node": "Set file ids to delete",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait until the videos gets merged together",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Stop and Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait until the videos gets merged together": {
+      "main": [
+        [
+          {
+            "node": "Get status of the video merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Background music?",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Server isn't ready",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Background music?": {
+      "main": [
+        [
+          {
+            "node": "Relay background music",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Background music results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload background music to the server": {
+      "main": [
+        [
+          {
+            "node": "Set background music output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set background music output": {
+      "main": [
+        [
+          {
+            "node": "Background music results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Background music results": {
+      "main": [
+        [
+          {
+            "node": "Create story",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Relay background music": {
+      "main": [
+        [
+          {
+            "node": "Upload background music to the server",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download the video": {
+      "main": [
+        [
+          {
+            "node": "Upload videos to the server",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate scenes": {
+      "main": [
+        [
+          {
+            "node": "Correct length?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get audio status": {
+      "main": [
+        [
+          {
+            "node": "Audio status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get video with audio": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split out the scenes": {
+      "main": [
+        [
+          {
+            "node": "Create scene",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start adding audio to the video": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait for adding the audio": {
+      "main": [
+        [
+          {
+            "node": "Get audio status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Audio status": {
+      "main": [
+        [
+          {
+            "node": "Get video with audio",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait for adding the audio",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait for adding the audio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait for the video": {
+      "main": [
+        [
+          {
+            "node": "Get the video status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get the video status": {
+      "main": [
+        [
+          {
+            "node": "Video status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Video status": {
+      "main": [
+        [
+          {
+            "node": "Get the  video",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait for the video",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait for the video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get the  video": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create story": {
+      "main": [
+        [
+          {
+            "node": "Generate scenes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create scene": {
+      "main": [
+        [
+          {
+            "node": "Start generating the video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Correct length?": {
+      "main": [
+        [
+          {
+            "node": "Split out the scenes",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Generate scenes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate scenes output parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Generate scenes",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create story output parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Create story",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create scene output parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Create scene",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Start adding audio to the video",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait for the video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items1": {
+      "main": [
+        [
+          {
+            "node": "Download the video",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait for adding the audio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start generating the video": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set file ids to delete": {
+      "main": [
+        [
+          {
+            "node": "For each file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "For each file": {
+      "main": [
+        [
+          {
+            "node": "Delete tmp files",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete tmp files": {
+      "main": [
+        [
+          {
+            "node": "Merge to one lane",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge to one lane": {
+      "main": [
+        [
+          {
+            "node": "Setup final video download URL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "5f15ea8e-5f91-425d-b2d1-96e321f127d4",
+  "meta": {
+    "instanceId": "636db6b6ab21a21c6458e2137f340e33dc3e49f5a1c560c8d1e2372c227cf40e"
+  },
+  "id": "brPRDnGE1XxFMkRm",
+  "tags": [
+    {
+      "createdAt": "2025-06-17T09:42:53.277Z",
+      "updatedAt": "2025-06-17T09:42:53.277Z",
+      "id": "o6Q6Vo48LMdFvbGd",
+      "name": "skool"
+    }
+  ]
+}

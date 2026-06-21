@@ -1,6 +1,6 @@
 # n8n Infrastructure Documentation
 
-**Version:** 1.4.1
+**Version:** 1.4.2
 
 Build, edit, debug, back up, and maintain n8n workflows and the n8n installation with OpenAI Codex CLI.
 

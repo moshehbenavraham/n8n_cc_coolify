@@ -1,0 +1,967 @@
+{
+	"info": {
+		"_postman_id": "7c3f19ed-94a3-4f72-8382-5d0cbf03ba8f",
+		"name": "AI Agents No-Code Tools",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "2227644"
+	},
+	"item": [
+		{
+			"name": "Utils",
+			"item": [
+				{
+					"name": "api/v1/utils/convert/pcm/wav",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "pcm_id",
+									"value": "audio_out.pcm",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{SERVER_URL}}/api/v1/utils/convert/pcm/wav",
+							"host": [
+								"{{SERVER_URL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"utils",
+								"convert",
+								"pcm",
+								"wav"
+							],
+							"query": [
+								{
+									"key": "",
+									"value": null,
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "api/v1/utils/stitch-images",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "asfd",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "image_urls",
+									"value": "https://cdn.shopify.com/s/files/1/0253/4355/7737/files/karenkane_2024_winter_4L09500_COB_00_1.jpg,https://cdn.shopify.com/s/files/1/0253/4355/7737/files/karenkane_2024_winter_4L09500_COB_00_2.jpg,https://cdn.shopify.com/s/files/1/0253/4355/7737/files/karenkane_2024_winter_4L09500_COB_00_3.jpg,https://cdn.shopify.com/s/files/1/0253/4355/7737/files/karenkane_2024_winter_4L09500_COB_00_1.jpg,https://cdn.shopify.com/s/files/1/0253/4355/7737/files/karenkane_2024_winter_4L09500_COB_00_2.jpg,https://cdn.shopify.com/s/files/1/0253/4355/7737/files/karenkane_2024_winter_4L09500_COB_00_3.jpg,https://cdn.shopify.com/s/files/1/0253/4355/7737/files/karenkane_2024_winter_4L09500_COB_00_1.jpg,https://cdn.shopify.com/s/files/1/0253/4355/7737/files/karenkane_2024_winter_4L09500_COB_00_2.jpg,https://cdn.shopify.com/s/files/1/0253/4355/7737/files/karenkane_2024_winter_4L09500_COB_00_3.jpg,https://cdn.shopify.com/s/files/1/0253/4355/7737/files/karenkane_2024_winter_4L09500_COB_00_1.jpg,https://cdn.shopify.com/s/files/1/0253/4355/7737/files/karenkane_2024_winter_4L09500_COB_00_2.jpg,https://cdn.shopify.com/s/files/1/0253/4355/7737/files/karenkane_2024_winter_4L09500_COB_00_3.jpg",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{SERVER_URL}}/api/v1/utils/stitch-images",
+							"host": [
+								"{{SERVER_URL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"utils",
+								"stitch-images"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "api/v1/utils/make-image-imperfect",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "image_id",
+									"value": "image_ai.webp",
+									"type": "text"
+								},
+								{
+									"key": "enhance_color",
+									"value": "1",
+									"type": "text"
+								},
+								{
+									"key": "enhance_contrast",
+									"value": "1",
+									"type": "text"
+								},
+								{
+									"key": "noise_strength",
+									"value": "15",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{SERVER_URL}}/api/v1/utils/make-image-imperfect",
+							"host": [
+								"{{SERVER_URL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"utils",
+								"make-image-imperfect"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "api/v1/utils/youtube-transcript",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "en-US,en;q=0.9,hu;q=0.8,de;q=0.7,nl;q=0.6"
+							},
+							{
+								"key": "Cache-Control",
+								"value": "max-age=0"
+							},
+							{
+								"key": "Connection",
+								"value": "keep-alive"
+							},
+							{
+								"key": "Upgrade-Insecure-Requests",
+								"value": "1"
+							},
+							{
+								"key": "User-Agent",
+								"value": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36"
+							},
+							{
+								"key": "Authorization",
+								"value": "asfd"
+							},
+							{
+								"key": "Cookie",
+								"value": "SID=TLbMkMT2ADx0cVqOH2nNS1+p/pIbi/ne"
+							}
+						],
+						"url": {
+							"raw": "{{SERVER_URL}}/api/v1/utils/youtube-transcript?video_id=2dmjHP_bivg",
+							"host": [
+								"{{SERVER_URL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"utils",
+								"youtube-transcript"
+							],
+							"query": [
+								{
+									"key": "video_id",
+									"value": "2dmjHP_bivg"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Media",
+			"item": [
+				{
+					"name": "Audio",
+					"item": [
+						{
+							"name": "api/v1/media/audio-tools/tts/chatterbox",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "text",
+											"value": "Summer dresses are the ultimate symbol of comfort and style when the weather warms up. With their airy fabrics and vibrant colors, they effortlessly capture the carefree spirit of the season. Whether you're at a picnic, strolling along the beach, or heading to a casual brunch, there's a summer dress for every occasion. They're easy to wear, flattering for all shapes, and instantly make you feel fresh and confident. Celebrate summer with dresses that keep you cool and looking beautiful!",
+											"type": "text"
+										},
+										{
+											"key": "sample_audio_id",
+											"value": "audio_sample_keaton.mp3",
+											"type": "text",
+											"disabled": true
+										},
+										{
+											"key": "exaggeration",
+											"value": "0.9",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{SERVER_URL}}/api/v1/media/audio-tools/tts/chatterbox",
+									"host": [
+										"{{SERVER_URL}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"media",
+										"audio-tools",
+										"tts",
+										"chatterbox"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "api/v1/media/audio-tools/tts/kokoro",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "asfd",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "text",
+											"value": "Miri, esta cancion es para ti. Quiero hacerte en la playa.",
+											"type": "text"
+										},
+										{
+											"key": "voice",
+											"value": "ef_dora",
+											"type": "text"
+										},
+										{
+											"key": "speed",
+											"value": "1",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{SERVER_URL}}/api/v1/media/audio-tools/tts/kokoro",
+									"host": [
+										"{{SERVER_URL}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"media",
+										"audio-tools",
+										"tts",
+										"kokoro"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "api/v1/media/audio-tools/transcribe",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "audio_file",
+											"type": "file",
+											"src": [
+												"/Users/gyoridavid/Downloads/for_whisper.mp3",
+												"/Users/gyoridavid/Downloads/urdu.mp3"
+											]
+										},
+										{
+											"key": "language",
+											"value": "ur",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{SERVER_URL}}/api/v1/media/audio-tools/transcribe",
+									"host": [
+										"{{SERVER_URL}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"media",
+										"audio-tools",
+										"transcribe"
+									],
+									"query": [
+										{
+											"key": "audio_id",
+											"value": "for_whisper.mp3",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "/api/v1/media/audio-tools/tts/kokoro/voices",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{SERVER_URL}}/api/v1/media/audio-tools/tts/kokoro/voices",
+									"host": [
+										"{{SERVER_URL}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"media",
+										"audio-tools",
+										"tts",
+										"kokoro",
+										"voices"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "/api/v1/media/audio-tools/info/:file_id",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{SERVER_URL}}/api/v1/media/audio-tools/info/audio_0b6cdd0a-a06b-4c63-9dda-c377ae745c97.wav",
+									"host": [
+										"{{SERVER_URL}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"media",
+										"audio-tools",
+										"info",
+										"audio_0b6cdd0a-a06b-4c63-9dda-c377ae745c97.wav"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Video",
+					"item": [
+						{
+							"name": "api/v1/media/video-tools/merge",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "video_ids",
+											"value": "video_95e83674-a30f-4776-8ce5-393672529545.mp4,video_682304eb-84ab-4672-9705-0cdf7529e611.mp4",
+											"type": "text"
+										},
+										{
+											"key": "background_music_id",
+											"value": "audio_bg_music.mp3",
+											"type": "text"
+										},
+										{
+											"key": "background_music_volume",
+											"value": "0.8",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{SERVER_URL}}/api/v1/media/video-tools/merge",
+									"host": [
+										"{{SERVER_URL}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"media",
+										"video-tools",
+										"merge"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "api/v1/media/video-tools/extract-frame/:VIDEO_ID",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "video_id",
+											"value": "This changed everything for me. I realized it's not the situation or the person causing those feelings, but how I choose to react.",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{SERVER_URL}}/api/v1/media/video-tools/extract-frame/video_d00890df-1c1d-467e-b6dc-d29e829fc975.mp4?timestamp=9999",
+									"host": [
+										"{{SERVER_URL}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"media",
+										"video-tools",
+										"extract-frame",
+										"video_d00890df-1c1d-467e-b6dc-d29e829fc975.mp4"
+									],
+									"query": [
+										{
+											"key": "timestamp",
+											"value": "9999"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "api/v1/media/video-tools/add-colorkey-overlay",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "asfd",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "cfg_weight",
+											"value": "0.5",
+											"type": "text",
+											"disabled": true
+										},
+										{
+											"key": "text",
+											"value": "Earth, soft and yielding, holds the night, receiving the moon's silent kiss.",
+											"type": "text",
+											"disabled": true
+										},
+										{
+											"key": "exaggeration",
+											"value": "0.5",
+											"type": "text",
+											"disabled": true
+										},
+										{
+											"key": "temperature",
+											"value": "0.9",
+											"type": "text",
+											"disabled": true
+										},
+										{
+											"key": "sample_audio_id",
+											"value": "audio_alan_original.mp3",
+											"type": "text",
+											"disabled": true
+										},
+										{
+											"key": "video_id",
+											"value": "video_MainFootage.mp4",
+											"type": "text"
+										},
+										{
+											"key": "overlay_video_id",
+											"value": "video_OverlayLoop.mp4",
+											"type": "text"
+										},
+										{
+											"key": "color",
+											"value": "#000000",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{SERVER_URL}}/api/v1/media/video-tools/add-colorkey-overlay",
+									"host": [
+										"{{SERVER_URL}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"media",
+										"video-tools",
+										"add-colorkey-overlay"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "api/v1/media/fonts",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{SERVER_URL}}/api/v1/media/fonts",
+									"host": [
+										"{{SERVER_URL}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"media",
+										"fonts"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "api/v1/media/video-tools/generate/tts-captioned-video",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "background_id",
+											"value": "image_bad.png",
+											"type": "text"
+										},
+										{
+											"key": "audio_id",
+											"value": "audio_3b954024-155b-4beb-a210-d4873d94ac6e.wav",
+											"type": "text"
+										},
+										{
+											"key": "kokoro_voice",
+											"value": "ef_dora",
+											"type": "text",
+											"disabled": true
+										},
+										{
+											"key": "kokoro_speed",
+											"value": "1",
+											"type": "text",
+											"disabled": true
+										},
+										{
+											"key": "text",
+											"value": "Miri, esta cancion es para ti. Quiero hacerte en la playa.",
+											"type": "text",
+											"disabled": true
+										},
+										{
+											"key": "caption_config_line_count",
+											"value": "2",
+											"type": "text",
+											"disabled": true
+										},
+										{
+											"key": "caption_config_line_max_length",
+											"value": "40",
+											"type": "text",
+											"disabled": true
+										},
+										{
+											"key": "caption_config_font_name",
+											"value": "EB Garamond",
+											"type": "text",
+											"disabled": true
+										},
+										{
+											"key": "caption_config_font_bold",
+											"value": "true",
+											"type": "text",
+											"disabled": true
+										},
+										{
+											"key": "caption_config_font_italic",
+											"value": "true",
+											"type": "text",
+											"disabled": true
+										},
+										{
+											"key": "caption_config_font_color",
+											"value": "ffffff",
+											"type": "text",
+											"disabled": true
+										},
+										{
+											"key": "caption_config_subtitle_position",
+											"value": "center",
+											"type": "text",
+											"disabled": true
+										},
+										{
+											"key": "caption_config_shadow_color",
+											"value": "000000",
+											"type": "text",
+											"disabled": true
+										},
+										{
+											"key": "caption_config_shadow_transparency",
+											"value": "0.9",
+											"type": "text",
+											"disabled": true
+										},
+										{
+											"key": "caption_config_shadow_blur",
+											"value": "20",
+											"type": "text",
+											"disabled": true
+										},
+										{
+											"key": "caption_config_stroke_color",
+											"value": "ff0000",
+											"type": "text",
+											"disabled": true
+										},
+										{
+											"key": "caption_config_stroke_size",
+											"value": "0",
+											"type": "text",
+											"disabled": true
+										},
+										{
+											"key": "width",
+											"value": "1920",
+											"type": "text"
+										},
+										{
+											"key": "height",
+											"value": "1080",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{SERVER_URL}}/api/v1/media/video-tools/generate/tts-captioned-video",
+									"host": [
+										"{{SERVER_URL}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"media",
+										"video-tools",
+										"generate",
+										"tts-captioned-video"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "urdu_test",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "background_id",
+											"value": "image_3ed9bd9d-b40f-448d-89ec-f1a20708166e.jpg",
+											"type": "text"
+										},
+										{
+											"key": "audio_id",
+											"value": "audio_urdu.mp3",
+											"type": "text"
+										},
+										{
+											"key": "width",
+											"value": "1920",
+											"type": "text"
+										},
+										{
+											"key": "height",
+											"value": "1080",
+											"type": "text"
+										},
+										{
+											"key": "language",
+											"value": "ur",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{SERVER_URL}}/api/v1/media/video-tools/generate/tts-captioned-video",
+									"host": [
+										"{{SERVER_URL}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"media",
+										"video-tools",
+										"generate",
+										"tts-captioned-video"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "/api/v1/media/video-tools/info/:file_id",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{SERVER_URL}}/api/v1/media/video-tools/info/image_1a45b62f-9fef-4df7-a942-e67940bce639",
+									"host": [
+										"{{SERVER_URL}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"media",
+										"video-tools",
+										"info",
+										"image_1a45b62f-9fef-4df7-a942-e67940bce639"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Storage",
+					"item": [
+						{
+							"name": "api/v1/media/storage/:file_id/status",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{SERVER_URL}}/api/v1/media/storage/video_dab8352e-d29f-438c-a4aa-5c5f982e9647.mp4/status",
+									"host": [
+										"{{SERVER_URL}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"media",
+										"storage",
+										"video_dab8352e-d29f-438c-a4aa-5c5f982e9647.mp4",
+										"status"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "api/v1/media/storage/:file_id",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{SERVER_URL}}/api/v1/media/storage/video_fa103ef6-f7b1-4154-b1c7-5f50dd03f209.mp4",
+									"host": [
+										"{{SERVER_URL}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"media",
+										"storage",
+										"video_fa103ef6-f7b1-4154-b1c7-5f50dd03f209.mp4"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "api/v1/media/storage/:file_id",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{SERVER_URL}}/api/v1/media/storage/video_fa103ef6-f7b1-4154-b1c7-5f50dd03f209.mp4",
+									"host": [
+										"{{SERVER_URL}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"media",
+										"storage",
+										"video_fa103ef6-f7b1-4154-b1c7-5f50dd03f209.mp4"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "/api/v1/media/storage",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "file",
+											"type": "file",
+											"src": "/Users/gyoridavid/Downloads/workshop/8057b656452cc7a813a5de3b7b39f848009097b938232929db20b6ff97b08297.jpg"
+										},
+										{
+											"key": "url",
+											"value": "",
+											"type": "text"
+										},
+										{
+											"key": "media_type",
+											"value": "image",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{SERVER_URL}}/api/v1/media/storage",
+									"host": [
+										"{{SERVER_URL}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"media",
+										"storage"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "SERVER_URL",
+			"value": "http://192.168.68.60:8000",
+			"type": "string"
+		}
+	]
+}

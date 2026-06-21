@@ -14,6 +14,8 @@ WSL2 Ubuntu | Docker Compose | ngrok
 
 5. **Docker Compose**: All container management uses standard `docker compose` commands from `$N8N_DEPLOYMENT_PATH`.
 
+6. **Traefik/Coolify TLS**: For Coolify-managed deployments, Traefik ACME certificates are stored in `/data/coolify/proxy/acme.json`; Coolify CA/SSL assets also exist under `/data/coolify/ssl/`.
+
 ---
 
 *Documentation generated: 2026-01-27*

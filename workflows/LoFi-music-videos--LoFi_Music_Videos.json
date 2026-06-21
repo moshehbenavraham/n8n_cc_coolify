@@ -1,0 +1,2283 @@
+{
+  "name": "Lo-Fi music video creator",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Create a LoFi music video",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Tracks (mp3 or wav)",
+              "fieldType": "file",
+              "acceptFileTypes": "wav, mp3",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Background video",
+              "fieldType": "file",
+              "multipleFiles": false,
+              "acceptFileTypes": ".mp4",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Turn background video to a looping video",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "yes"
+                  },
+                  {
+                    "option": "no"
+                  }
+                ]
+              },
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Intro video",
+              "fieldType": "file",
+              "multipleFiles": false,
+              "acceptFileTypes": ".mov"
+            },
+            {
+              "fieldLabel": "Context for the title/description",
+              "fieldType": "textarea",
+              "placeholder": "describe what's on the video, vibe, etc.",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Music length (minutes, max 180)",
+              "fieldType": "number",
+              "placeholder": "default: 30",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Options",
+              "fieldType": "checkbox",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Video blur effect"
+                  },
+                  {
+                    "option": "Video zoom effect"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.3,
+      "position": [
+        -2592,
+        112
+      ],
+      "id": "334ae8ed-f2f9-406a-b715-2858ec454496",
+      "name": "On form submission",
+      "webhookId": "cb8884c9-2f3e-495a-ae35-d6d3cb146b53"
+    },
+    {
+      "parameters": {
+        "content": "# Upload tracks to the server",
+        "height": 560,
+        "width": 816
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1600,
+        -128
+      ],
+      "id": "d50149da-6da5-4e1e-b9b2-1690b7014d8f",
+      "name": "Sticky Note",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "file_id",
+              "renameField": true,
+              "outputFieldName": "tracks"
+            }
+          ]
+        },
+        "options": {
+          "mergeLists": true
+        }
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        -928,
+        256
+      ],
+      "id": "d522108e-e17d-4805-9859-43265de8dd69",
+      "name": "Tracks"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Setup defaults').first().json.AI_AGENTS_NO_CODE_TOOLS_URL }}/api/v1/media/storage",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "media_type",
+              "value": "audio"
+            },
+            {
+              "parameterType": "formBinaryData",
+              "name": "file",
+              "inputDataFieldName": "={{ Object.keys($binary)[0] }}"
+            }
+          ]
+        },
+        "options": {
+          "batching": {
+            "batch": {
+              "batchSize": 1
+            }
+          },
+          "redirect": {
+            "redirect": {}
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -1072,
+        128
+      ],
+      "id": "813cea1c-0451-4a3b-8a2c-05f04813f8a6",
+      "name": "Upload track"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "$binary",
+        "options": {
+          "includeBinary": false
+        }
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -1392,
+        128
+      ],
+      "id": "601a650a-18c6-444b-adad-54395863f39b",
+      "name": "For each track"
+    },
+    {
+      "parameters": {
+        "content": "# Create music mix",
+        "height": 560,
+        "width": 928
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -2080,
+        480
+      ],
+      "id": "fd329757-146a-4178-8ce9-fa4941edd3ce",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "# Create playlist",
+        "height": 560,
+        "width": 208
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -2336,
+        480
+      ],
+      "id": "cfce5753-a3c5-426a-a14f-843cba23f694",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Setup defaults').first().json.AI_AGENTS_NO_CODE_TOOLS_URL }}/api/v1/media/music-tools/create-mix",
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "audio_ids",
+              "value": "={{ $json.playlist.join(',') }}"
+            },
+            {
+              "name": "duration_minutes",
+              "value": "={{ $('On form submission').item.json['Music length (minutes, max 180)'] || 30 }}"
+            }
+          ]
+        },
+        "options": {
+          "redirect": {
+            "redirect": {}
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -2032,
+        736
+      ],
+      "id": "45382bb7-b360-4901-8904-e0fc98b7e838",
+      "name": "Create a mix"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Setup defaults').first().json.AI_AGENTS_NO_CODE_TOOLS_URL }}/api/v1/media/music-tools/create-playlist",
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "audio_ids",
+              "value": "={{ $('Tracks').item.json.tracks.join(',') }}"
+            },
+            {
+              "name": "analysis_data",
+              "value": "true"
+            }
+          ]
+        },
+        "options": {
+          "redirect": {
+            "redirect": {}
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -2288,
+        736
+      ],
+      "id": "a79879e0-2e63-491e-87f0-d8b2e6b0d1e5",
+      "name": "Create a playlist"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Setup defaults').first().json.AI_AGENTS_NO_CODE_TOOLS_URL }}/api/v1/media/music-tools/create-thumbnail",
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "video_id",
+              "value": "={{ $('Set looping video id').item.json.looping_video_id }}"
+            },
+            {
+              "name": "title",
+              "value": "={{ $json.output.thumbnail_title }}"
+            },
+            {
+              "name": "subtitle",
+              "value": "={{ $json.output.thumbnail_subtitle }}"
+            }
+          ]
+        },
+        "options": {
+          "redirect": {
+            "redirect": {}
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -1520,
+        2544
+      ],
+      "id": "2960cb89-1f5f-4a00-883b-13e1b22d6689",
+      "name": "Create a thumbnail"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Setup defaults').first().json.AI_AGENTS_NO_CODE_TOOLS_URL }}/api/v1/media/video-tools/create-looping-video",
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "video_id",
+              "value": "={{ $('Upload looping video').item.json.file_id }}"
+            }
+          ]
+        },
+        "options": {
+          "redirect": {
+            "redirect": {}
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -1728,
+        1152
+      ],
+      "id": "e5366033-1831-4578-bdb1-7ce55645c235",
+      "name": "Start creating looping video"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -1536,
+        1152
+      ],
+      "id": "72236c7c-9ec0-436c-99f9-45a9cda13a3a",
+      "name": "Wait for looping video",
+      "webhookId": "2514de72-3647-43da-b9b3-a42643e20fad"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Setup defaults').first().json.AI_AGENTS_NO_CODE_TOOLS_URL }}/api/v1/media/storage/{{ $('Start creating looping video').item.json.file_id }}/status",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1328,
+        1152
+      ],
+      "id": "c934f876-f3d3-4e79-931c-209c889c77ac",
+      "name": "Get status of the looping video",
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "ready",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "91402596-3978-4dfc-91b7-9ffe3521b862"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "ready"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "0c29765e-4213-434c-9bf3-c5e854dd6ee8",
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "processing",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "processing"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "4a6cfd86-e690-417e-aa6d-ae497e1177ae",
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "not_found",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "failed"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -1152,
+        1152
+      ],
+      "id": "c2d349f9-e8d1-4454-955a-a8ac380bd32a",
+      "name": "Looping video status"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "4a6cfd86-e690-417e-aa6d-ae497e1177ae",
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "not_found",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "failed"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "0c29765e-4213-434c-9bf3-c5e854dd6ee8",
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "processing",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "processing"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "ready",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "91402596-3978-4dfc-91b7-9ffe3521b862"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "ready"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -1472,
+        816
+      ],
+      "id": "5c293c10-faa8-434e-9966-1c806342b750",
+      "name": "Looping video status1"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Setup defaults').first().json.AI_AGENTS_NO_CODE_TOOLS_URL }}/api/v1/media/storage/{{ $('Create a mix').item.json.file_id }}/status",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1632,
+        608
+      ],
+      "id": "cf4ce9a1-4ce9-4107-9306-04a7c718ec31",
+      "name": "Get status of the mix",
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "errorMessage": "Failed to create music mix"
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        -1296,
+        624
+      ],
+      "id": "6f5dad33-5cc5-4577-b603-3e7a8c165874",
+      "name": "Music mix failed"
+    },
+    {
+      "parameters": {
+        "errorMessage": "Failed to create looping video"
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        -896,
+        1296
+      ],
+      "id": "027bf8dc-c898-400b-82e2-80368f014890",
+      "name": "Looping video failed"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Setup defaults').first().json.AI_AGENTS_NO_CODE_TOOLS_URL }}/api/v1/media/music-tools/create-music-video",
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "audio_id",
+              "value": "={{ $('Create a mix').item.json.file_id }}"
+            },
+            {
+              "name": "looping_video_id",
+              "value": "={{ $('Set looping video id').item.json.looping_video_id }}"
+            },
+            {
+              "name": "intro_id",
+              "value": "={{ $json.intro_video_id }}"
+            },
+            {
+              "name": "zoom_effect",
+              "value": "={{ $('On form submission').item.json.Options.find(item => item === 'Video zoom effect') ? 'true' : '' }}"
+            },
+            {
+              "name": "blur_effect",
+              "value": "={{ $('On form submission').item.json.Options.find(item => item === 'Video blur effect') ? 'true' : '' }}"
+            }
+          ]
+        },
+        "options": {
+          "redirect": {
+            "redirect": {}
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -1456,
+        1840
+      ],
+      "id": "d2f91bc8-38d2-477f-bac8-4835b768ea90",
+      "name": "Start creating the music video"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "0c29765e-4213-434c-9bf3-c5e854dd6ee8",
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "processing",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "processing"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "ready",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "91402596-3978-4dfc-91b7-9ffe3521b862"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "ready"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "4a6cfd86-e690-417e-aa6d-ae497e1177ae",
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "not_found",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "failed"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -816,
+        2080
+      ],
+      "id": "8e44a443-bfb3-4cec-b356-0d2c7c901472",
+      "name": "Music video status"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Setup defaults').first().json.AI_AGENTS_NO_CODE_TOOLS_URL }}/api/v1/media/storage",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "media_type",
+              "value": "video"
+            },
+            {
+              "parameterType": "formBinaryData",
+              "name": "file",
+              "inputDataFieldName": "=bg_video"
+            }
+          ]
+        },
+        "options": {
+          "redirect": {
+            "redirect": {}
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -2080,
+        1328
+      ],
+      "id": "57e696c5-991c-4c9a-bc12-bbea4d8f77b5",
+      "name": "Upload looping video"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "7c05ca52-d278-46b1-b506-2ce68d2f4908",
+              "leftValue": "={{ $('On form submission').item.json['Turn background video to a looping video'] }}",
+              "rightValue": "yes",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -1904,
+        1328
+      ],
+      "id": "bd6fed4c-ed05-43db-a301-a38103fd3543",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "eea2ae7d-f721-43d1-a3cd-2ec4a058583f",
+              "name": "looping_video_id",
+              "value": "={{ $('Upload looping video').item.json.file_id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -896,
+        1472
+      ],
+      "id": "9124f3e8-f807-4fc4-9804-59f9cbc84fd0",
+      "name": "Edit Fields2"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "899e89c9-ffeb-4b03-8890-899b282424a9",
+              "name": "looping_video_id",
+              "value": "={{ $('Start creating looping video').item.json.file_id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -896,
+        1136
+      ],
+      "id": "0f921b98-95c3-47a6-8ed3-a30518a3f933",
+      "name": "Edit Fields3"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6682aaa7-c965-42fd-a425-d96744bca51b",
+              "name": "looping_video_id",
+              "value": "={{ $json.looping_video_id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -672,
+        1472
+      ],
+      "id": "5758b78f-e86f-4b22-ab48-2f117fbad1fd",
+      "name": "Set looping video id"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "b2d65162-2593-423e-b43b-1323934e8bf6",
+              "leftValue": "={{ $('On form submission').item.json['Intro video'] }}",
+              "rightValue": "",
+              "operator": {
+                "type": "object",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -2288,
+        1984
+      ],
+      "id": "b0409d0e-9c77-48c8-bfc8-27875e6a4eda",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "4ea895ef-30f5-4544-a981-9fdab04a6efe",
+              "name": "intro_video",
+              "value": "={{ $('On form submission').item.binary.Intro_video }}",
+              "type": "binary"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2048,
+        1808
+      ],
+      "id": "3f55d05d-44bd-4569-9f96-b1b79dadc5ff",
+      "name": "Set intro video binary data"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Setup defaults').first().json.AI_AGENTS_NO_CODE_TOOLS_URL }}/api/v1/media/storage",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "media_type",
+              "value": "video"
+            },
+            {
+              "parameterType": "formBinaryData",
+              "name": "file",
+              "inputDataFieldName": "=intro_video"
+            }
+          ]
+        },
+        "options": {
+          "redirect": {
+            "redirect": {}
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -1872,
+        1808
+      ],
+      "id": "2010fdd7-d12f-4877-9498-e0418c57686d",
+      "name": "Upload intro video"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f7df87cc-2f21-427c-8981-3f7c4e8a6028",
+              "name": "intro_video_id",
+              "value": "={{ $json.file_id || undefined }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1664,
+        2000
+      ],
+      "id": "9ece4e9d-37db-4260-80fb-02e060bb7a45",
+      "name": "Set intro video id"
+    },
+    {
+      "parameters": {
+        "errorMessage": "Error while creating the music video"
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        -608,
+        1872
+      ],
+      "id": "b836c0e6-80e6-4875-9133-4a3022e051e4",
+      "name": "Stop and Error"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "19a860f4-82e8-48c9-abc9-b2ef0ad74dad",
+              "leftValue": "={{ Object.keys($binary)[0] }}",
+              "rightValue": "Tracks",
+              "operator": {
+                "type": "string",
+                "operation": "startsWith"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        -1232,
+        128
+      ],
+      "id": "4ade9c72-b650-4f9f-b6fc-4fed242f58b9",
+      "name": "Filter"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=<Instructions>\n\nCreate a title, description, tags, thumbnail title and thumbnail subtitle for my music video.\nUse the attached thumbnail background image and the context below to create relevant content.\n\nMy youtube channel is a lo-fi music channel with ambient videos.\nPerfect for studying, relaxing, or working.\n\nMake sure to add the tracklist in the description for me using the following data:\n```\n{{ JSON.stringify($('Get chapters data').item.json.chapters, null, 2) }}\n```\nCreate short, creative song titles to each songs that is relevant the the context below.\nThe last track should be just named loop or similar, signaling that it's a long loop of tracks that came before.\n\nThe description should look like this:\n```\n<<This is the description of the video.>>\n\nTracklist:\n00:00 Song title 1\n01:06 Song title 2\n02:10 Song title 3\n\n\nThe thumbnail title should be 2 words long.\n</Instructions>\n\n<Context>\n{{ $('On form submission').item.json['Context for the title/description'] }}\n</Context>",
+        "hasOutputParser": true,
+        "messages": {
+          "messageValues": [
+            {
+              "type": "HumanMessagePromptTemplate",
+              "messageType": "imageBinary"
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.7,
+      "position": [
+        -1840,
+        2544
+      ],
+      "id": "ff006d65-f8dd-48e1-af90-c7c564f5f52d",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Setup defaults').first().json.AI_AGENTS_NO_CODE_TOOLS_URL }}/api/v1/media/storage/{{ $('Create a mix').item.json.chapters_file_id }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -2288,
+        2544
+      ],
+      "id": "fb301315-62c2-4759-888b-ca469a60d254",
+      "name": "Get chapters data"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Setup defaults').first().json.AI_AGENTS_NO_CODE_TOOLS_URL }}/api/v1/media/video-tools/extract-frame/{{ $('Set looping video id').item.json.looping_video_id }}",
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "timestamp",
+              "value": "1"
+            }
+          ]
+        },
+        "options": {
+          "redirect": {
+            "redirect": {}
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -2048,
+        2544
+      ],
+      "id": "f3efa414-99e1-4014-957f-7b0f8bfa321a",
+      "name": "Extract a frame from the looping video"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -2544,
+        2320
+      ],
+      "id": "3966d3ac-de24-4644-817c-f251070fc089",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "tGvJRP2th9CbI2oq",
+          "name": "OpenAi account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n\t\"title\": \"\",\n    \"description\": \"\",\n    \"tags\": [\"\", \"\"],\n    \"thumbnail_title\": \"\",\n    \"thumbnail_subtitle\": \"\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        -1648,
+        2736
+      ],
+      "id": "5e37bb90-5f46-41e2-923f-2ed65abaaa51",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "amount": 1
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -1296,
+        2544
+      ],
+      "id": "a367b4e3-f033-4a18-aba9-c76fdba374dd",
+      "name": "Wait for thumbnail",
+      "webhookId": "2514de72-3647-43da-b9b3-a42643e20fad"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Setup defaults').first().json.AI_AGENTS_NO_CODE_TOOLS_URL }}/api/v1/media/storage/{{ $('Create a thumbnail').item.json.file_id }}/status",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1120,
+        2544
+      ],
+      "id": "1fc35e6a-9550-4d05-bbf9-183ecbf7dbab",
+      "name": "Get status of the thumbnail",
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "ready",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "91402596-3978-4dfc-91b7-9ffe3521b862"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "ready"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "0c29765e-4213-434c-9bf3-c5e854dd6ee8",
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "processing",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "processing"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "4a6cfd86-e690-417e-aa6d-ae497e1177ae",
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "not_found",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "failed"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -944,
+        2528
+      ],
+      "id": "21eddfb0-7de0-4bf1-9345-223db594267c",
+      "name": "Thumbnail status"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7d55d6da-a78c-4a28-9343-0ea9035a0aa3",
+              "name": "AI_AGENTS_NO_CODE_TOOLS_URL",
+              "value": "={{   ((u) => {   let s = u.trim();   if (!/^https?:\\/\\//i.test(s)) s = 'https://' + s;   const parts = s.split('/');   return parts[0] + '//' + parts[2]; })($json.AI_AGENTS_NO_CODE_TOOLS_URL)  }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2032,
+        112
+      ],
+      "id": "51ef27ea-19ee-4a26-9fd5-e85113ba1c00",
+      "name": "Setup defaults"
+    },
+    {
+      "parameters": {
+        "content": "# Test connection",
+        "height": 560,
+        "width": 420,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -2064,
+        -128
+      ],
+      "id": "4a59331f-d6c0-450e-9ee0-a90460729430",
+      "name": "Sticky Note15"
+    },
+    {
+      "parameters": {
+        "errorMessage": "The server is not running or isn't configured"
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        -1824,
+        256
+      ],
+      "id": "72ead1d3-d790-4b70-831d-fc6798f30a10",
+      "name": "Server isn't ready"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.AI_AGENTS_NO_CODE_TOOLS_URL }}/health",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1824,
+        32
+      ],
+      "id": "3c25b898-df72-43b2-ba9d-9568ed3d9237",
+      "name": "HTTP Request",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "content": "# Configure me ?\n",
+        "height": 560,
+        "width": 220,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -2336,
+        -128
+      ],
+      "id": "1066746f-1e51-4974-a5cc-2760fef8fb04",
+      "name": "Sticky Note12"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7bbb518a-c4f1-49a5-9e72-3e9d939b131b",
+              "name": "AI_AGENTS_NO_CODE_TOOLS_URL",
+              "value": "<<add your server url here>>",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2272,
+        112
+      ],
+      "id": "844ddc6b-35c7-441f-bb67-2b5b085803bf",
+      "name": "Configure me"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "return $('On form submission').first()"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1552,
+        128
+      ],
+      "id": "55bbc6b7-0297-4e9e-b9ac-fe39d9638d69",
+      "name": "Relay binary data"
+    },
+    {
+      "parameters": {
+        "content": "# Create looping video",
+        "height": 560,
+        "width": 1808
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -2336,
+        1088
+      ],
+      "id": "164c4526-5e00-48ea-beff-893d58ddbb3b",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "4ea895ef-30f5-4544-a981-9fdab04a6efe",
+              "name": "bg_video",
+              "value": "={{ $('On form submission').item.binary.Background_video }}",
+              "type": "binary"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2288,
+        1328
+      ],
+      "id": "827b8bc6-d1cd-4d87-8bbe-96c554ad1596",
+      "name": "Background video binary"
+    },
+    {
+      "parameters": {
+        "content": "# Create music video",
+        "height": 560,
+        "width": 1856
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -2336,
+        1712
+      ],
+      "id": "e99dc2de-b522-4d4d-bd12-3192f07ea4b5",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "# Create thumbnail, title etc.",
+        "height": 560,
+        "width": 1632
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -2336,
+        2336
+      ],
+      "id": "5b5efe4d-884d-4f02-b113-dcbdede5510a",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "content": "# Collect artifacts",
+        "height": 560,
+        "width": 304,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -656,
+        2336
+      ],
+      "id": "6b6f9169-c9f5-4f04-918a-37882b76eceb",
+      "name": "Sticky Note6"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "86ddf913-e734-4452-afc9-87cf8dfc9a5a",
+              "name": "title",
+              "value": "={{ $('Basic LLM Chain').item.json.output.title }}",
+              "type": "string"
+            },
+            {
+              "id": "fcda7120-3fef-448a-a3be-59ae66529290",
+              "name": "description",
+              "value": "={{ $('Basic LLM Chain').item.json.output.description }}",
+              "type": "string"
+            },
+            {
+              "id": "228bb769-ea2d-4197-92a4-514dd5678d2e",
+              "name": "tags",
+              "value": "={{ $('Basic LLM Chain').item.json.output.tags }}",
+              "type": "array"
+            },
+            {
+              "id": "8400d66d-77b7-4d93-8dd2-14842fffb5c0",
+              "name": "thumbnail_download_url",
+              "value": "={{ $('Setup defaults').first().json.AI_AGENTS_NO_CODE_TOOLS_URL }}/api/v1/media/storage/{{ $('Create a thumbnail').item.json.file_id }}",
+              "type": "string"
+            },
+            {
+              "id": "9830fe7f-641a-4a41-be3f-1bf5ca4d7dbd",
+              "name": "music_video_download_url",
+              "value": "={{ $('Setup defaults').first().json.AI_AGENTS_NO_CODE_TOOLS_URL }}/api/v1/media/storage/{{ $('Start creating the music video').item.json.file_id }}",
+              "type": "string"
+            },
+            {
+              "id": "c2fa7ef7-71f4-4551-8e2a-ec5affdb616e",
+              "name": "music_download_url",
+              "value": "={{ $('Setup defaults').first().json.AI_AGENTS_NO_CODE_TOOLS_URL }}/api/v1/media/storage/{{ $('Create a mix').item.json.file_id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -576,
+        2560
+      ],
+      "id": "6e8002ec-6e3a-4412-bd3c-148407932d9e",
+      "name": "Setup final artifacts"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Setup defaults').first().json.AI_AGENTS_NO_CODE_TOOLS_URL }}/api/v1/media/storage/{{ $('Start creating the music video').item.json.file_id }}/status",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1024,
+        1840
+      ],
+      "id": "eb6f4810-5b78-41a2-b267-7d277b91b815",
+      "name": "Get status of the music video",
+      "retryOnFail": true
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -1232,
+        1840
+      ],
+      "id": "226d9bb1-b116-4aee-bac3-91cd48014383",
+      "name": "Wait for music video",
+      "webhookId": "2514de72-3647-43da-b9b3-a42643e20fad"
+    },
+    {
+      "parameters": {
+        "amount": 15
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -1840,
+        608
+      ],
+      "id": "7053002b-f5f2-4782-b18e-40c6cb9e6a03",
+      "name": "Wait for music mix",
+      "webhookId": "2514de72-3647-43da-b9b3-a42643e20fad"
+    },
+    {
+      "parameters": {
+        "model": "qwen3:32b",
+        "options": {
+          "numCtx": 16048
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        -3008,
+        2320
+      ],
+      "id": "9713ffbb-2c18-45c2-ba09-d3f8bf4e5144",
+      "name": "Ollama Chat Model",
+      "credentials": {
+        "ollamaApi": {
+          "id": "cWXUsJ0LsqnzOEx0",
+          "name": "Ollama account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatDeepSeek",
+      "typeVersion": 1,
+      "position": [
+        -2672,
+        2320
+      ],
+      "id": "4725e790-60de-494a-8678-b22f25ea334d",
+      "name": "DeepSeek Chat Model",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "model": "tngtech/deepseek-r1t-chimera:free",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        -2544,
+        2672
+      ],
+      "id": "4c29c435-c646-4b31-8aea-feca519f33c0",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "pKxg2Rhtt3cG3h19",
+          "name": "OpenRouter account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -3008,
+        2672
+      ],
+      "id": "622c5234-4937-4fd3-ba50-36ff90a502a3",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "omtFgoCWQwibKrMM",
+          "name": "Google Gemini(PaLM) Api account 2"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatAzureOpenAi",
+      "typeVersion": 1,
+      "position": [
+        -3008,
+        2480
+      ],
+      "id": "f5b484c0-7d14-4053-b9d8-bf7f55b65bc7",
+      "name": "Azure OpenAI Chat Model",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatXAiGrok",
+      "typeVersion": 1,
+      "position": [
+        -2832,
+        2480
+      ],
+      "id": "9e9c798e-2b80-49da-a6c3-1c0635b32e31",
+      "name": "xAI Grok Chat Model",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "claude-sonnet-4-20250514",
+          "cachedResultName": "Claude 4 Sonnet"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "typeVersion": 1.3,
+      "position": [
+        -2672,
+        2480
+      ],
+      "id": "f74aa90e-dbb8-4413-a2dd-b6f9c620f04d",
+      "name": "Anthropic Chat Model",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatXAiGrok",
+      "typeVersion": 1,
+      "position": [
+        -2544,
+        2480
+      ],
+      "id": "5ae097d9-6cf8-4e4a-84a4-3f7d06b9e828",
+      "name": "xAI Grok Chat Model1",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        -2672,
+        2672
+      ],
+      "id": "f6bb1e62-2f90-47c0-8b1d-916ed510342b",
+      "name": "Groq Chat Model",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatAwsBedrock",
+      "typeVersion": 1,
+      "position": [
+        -2832,
+        2320
+      ],
+      "id": "4b2355e8-6fa5-4e4e-885e-65adf43dc674",
+      "name": "AWS Bedrock Chat Model",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatMistralCloud",
+      "typeVersion": 1,
+      "position": [
+        -2832,
+        2672
+      ],
+      "id": "61de3227-9b6a-45cd-b84e-8f7580d9f07f",
+      "name": "Mistral Cloud Chat Model",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "content": "# Pick your choice of LLM ?\n? Make sure to deactive/delete the rest of the LLMs after selecting one",
+        "height": 700,
+        "width": 700,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -3088,
+        2192
+      ],
+      "id": "183a24e2-9f93-456b-877f-01891fac4482",
+      "name": "Sticky Note7"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Configure me",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload track": {
+      "main": [
+        [
+          {
+            "node": "Tracks",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "For each track": {
+      "main": [
+        [
+          {
+            "node": "Filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tracks": {
+      "main": [
+        [
+          {
+            "node": "Create a playlist",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a mix": {
+      "main": [
+        [
+          {
+            "node": "Wait for music mix",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a playlist": {
+      "main": [
+        [
+          {
+            "node": "Create a mix",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a thumbnail": {
+      "main": [
+        [
+          {
+            "node": "Wait for thumbnail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start creating looping video": {
+      "main": [
+        [
+          {
+            "node": "Wait for looping video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait for looping video": {
+      "main": [
+        [
+          {
+            "node": "Get status of the looping video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get status of the looping video": {
+      "main": [
+        [
+          {
+            "node": "Looping video status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Looping video status": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait for looping video",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Looping video failed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Looping video status1": {
+      "main": [
+        [
+          {
+            "node": "Music mix failed",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait for music mix",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Background video binary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get status of the mix": {
+      "main": [
+        [
+          {
+            "node": "Looping video status1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start creating the music video": {
+      "main": [
+        [
+          {
+            "node": "Wait for music video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Music video status": {
+      "main": [
+        [
+          {
+            "node": "Wait for music video",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get chapters data",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Stop and Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload looping video": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Start creating looping video",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields3": {
+      "main": [
+        [
+          {
+            "node": "Set looping video id",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields2": {
+      "main": [
+        [
+          {
+            "node": "Set looping video id",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set looping video id": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Set intro video binary data",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Set intro video id",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set intro video binary data": {
+      "main": [
+        [
+          {
+            "node": "Upload intro video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload intro video": {
+      "main": [
+        [
+          {
+            "node": "Set intro video id",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set intro video id": {
+      "main": [
+        [
+          {
+            "node": "Start creating the music video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter": {
+      "main": [
+        [
+          {
+            "node": "Upload track",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get chapters data": {
+      "main": [
+        [
+          {
+            "node": "Extract a frame from the looping video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract a frame from the looping video": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Create a thumbnail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait for thumbnail": {
+      "main": [
+        [
+          {
+            "node": "Get status of the thumbnail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get status of the thumbnail": {
+      "main": [
+        [
+          {
+            "node": "Thumbnail status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Thumbnail status": {
+      "main": [
+        [
+          {
+            "node": "Setup final artifacts",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait for thumbnail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Setup defaults": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Relay binary data",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Server isn't ready",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Configure me": {
+      "main": [
+        [
+          {
+            "node": "Setup defaults",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Relay binary data": {
+      "main": [
+        [
+          {
+            "node": "For each track",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Background video binary": {
+      "main": [
+        [
+          {
+            "node": "Upload looping video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get status of the music video": {
+      "main": [
+        [
+          {
+            "node": "Music video status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait for music video": {
+      "main": [
+        [
+          {
+            "node": "Get status of the music video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait for music mix": {
+      "main": [
+        [
+          {
+            "node": "Get status of the mix",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        []
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "09853dec-bd70-455f-b62d-7dec17764a09",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "636db6b6ab21a21c6458e2137f340e33dc3e49f5a1c560c8d1e2372c227cf40e"
+  },
+  "id": "ChmEw4l2FkN4RRnH",
+  "tags": []
+}
